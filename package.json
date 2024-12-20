@@ -21,9 +21,8 @@
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@types/node": "^20.12.11",
-		"lerna": "^8.1.2",
+		"lerna": "^8.1.9",
 		"tsconfig-paths": "^4.2.0",
-		"tsx": "^4.19.2",
-		"typescript": "~5.4.5"
+		"tsx": "^4.19.2"
 	}
 }
