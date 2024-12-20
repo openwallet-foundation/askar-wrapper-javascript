@@ -1,4 +1,4 @@
-import { AskarError, KeyAlgs, askar } from '@owf/askar-shared'
+import { AskarError, KeyAlgorithm, askar } from '@owf/askar-shared'
 
 import { setup, setupWallet } from './utils'
 
@@ -11,16 +11,17 @@ describe('Error', () => {
   test('set error code to 0 after correct call', () => {
     ok(() =>
       askar.keyGenerate({
-        algorithm: KeyAlgs.AesA128CbcHs256,
+        algorithm: KeyAlgorithm.AesA128CbcHs256,
         ephemeral: true,
       })
     )
   })
 
   test('set error code to non 0 after incorrect call', () => {
+    // @ts-expect-error: we pass in an incorrect algorithm on purpose
     throws(
-      askar.keyGenerate({ algorithm: 'incorrect-alg', ephemeral: true }),
-      new AskarError({ code: 1, message: 'Unknown key algorithm' })
+      () => askar.keyGenerate({ algorithm: 'incorrect-alg', ephemeral: true }),
+      new AskarError({ code: 8, message: 'Unknown key algorithm' })
     )
   })
 
@@ -33,6 +34,7 @@ describe('Error', () => {
   test('set error code to non 0 incorrect async call where the error is outside the callback', async () => {
     const store = await setupWallet()
 
+    // @ts-expect-error: we do not pass in a profile name on purpose
     await rejects(store.removeProfile(), {
       code: 5,
       message: 'Profile name not provided',

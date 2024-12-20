@@ -15,13 +15,15 @@
 		"style:fix": "pnpm style:check --write --unsafe",
 		"types:check": "pnpm -r --parallel types:check",
 		"validate": "pnpm style:check && pnpm types:check",
-		"build": "pnpm -r build"
+		"build": "pnpm -r build",
+		"test": "pnpm -r test"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@types/node": "^20.12.11",
 		"lerna": "^8.1.2",
 		"tsconfig-paths": "^4.2.0",
+		"tsx": "^4.19.2",
 		"typescript": "~5.4.5"
 	}
 }

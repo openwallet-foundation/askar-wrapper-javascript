@@ -1,13 +1,13 @@
-import { strictEqual } from 'node:assert'
+import { deepStrictEqual } from 'node:assert'
 import { before, describe, test } from 'node:test'
-import { CryptoBox, Key, KeyAlgs } from '@owf/askar-shared'
+import { CryptoBox, Key, KeyAlgorithm } from '@owf/askar-shared'
 import { setup } from './utils/initialize'
 
 describe('CryptoBox', () => {
   before(setup)
 
   test('seal', () => {
-    const x25519Key = Key.generate(KeyAlgs.X25519)
+    const x25519Key = Key.generate(KeyAlgorithm.X25519)
 
     const message = Uint8Array.from(Buffer.from('foobar'))
     const sealed = CryptoBox.seal({ recipientKey: x25519Key, message })
@@ -17,7 +17,7 @@ describe('CryptoBox', () => {
       ciphertext: sealed,
     })
 
-    strictEqual(opened, message)
+    deepStrictEqual(opened, message)
 
     x25519Key.handle.free()
   })

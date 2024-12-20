@@ -1,5 +1,9 @@
 .DS_Store
 
+*.so
+*.dylib
+*.dll
+
 node_modules
 
 build

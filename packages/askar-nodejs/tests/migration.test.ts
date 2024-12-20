@@ -1,4 +1,4 @@
-import { ok, throws } from 'node:assert'
+import { doesNotReject, rejects } from 'node:assert'
 import fs from 'node:fs'
 import path from 'node:path'
 import test, { before, beforeEach, describe } from 'node:test'
@@ -29,8 +29,8 @@ describe('migration', () => {
   })
 
   test('migrate', async () => {
-    ok(
-      await Migration.migrate({
+    await doesNotReject(
+      Migration.migrate({
         specUri: DB_UPGRADE_PATH,
         kdfLevel: 'RAW',
         walletName: 'walletwallet.0',
@@ -39,8 +39,8 @@ describe('migration', () => {
     )
 
     // Double migrate should not work
-    throws(
-      await Migration.migrate({
+    await rejects(
+      Migration.migrate({
         specUri: DB_UPGRADE_PATH,
         kdfLevel: 'RAW',
         walletName: 'walletwallet.0',

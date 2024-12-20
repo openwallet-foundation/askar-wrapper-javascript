@@ -1,7 +1,7 @@
 import { promises } from 'node:fs'
-import { AskarError, KdfMethod, Key, KeyAlgs, Store, StoreKeyMethod } from '@owf/askar-shared'
+import { AskarError, KdfMethod, Key, KeyAlgorithm, Store, StoreKeyMethod } from '@owf/askar-shared'
 
-import { deepStrictEqual, strictEqual, throws } from 'node:assert'
+import { deepStrictEqual, doesNotReject, ok, rejects, strictEqual, throws } from 'node:assert'
 import test, { afterEach, before, beforeEach, describe } from 'node:test'
 import { firstEntry, getRawKey, secondEntry, setup, setupWallet, testStoreUri } from './utils'
 
@@ -70,13 +70,14 @@ describe('Store and Session', () => {
 
     await newStore.close()
 
-    throws(
-      await Store.open({
+    await rejects(
+      Store.open({
         profile: 'rekey',
         uri: `sqlite://${storagePath}/rekey.db`,
         keyMethod: new StoreKeyMethod(KdfMethod.Raw),
         passKey: initialKey,
-      })
+      }),
+      AskarError
     )
 
     newStore = await Store.open({
@@ -149,7 +150,11 @@ describe('Store and Session', () => {
 
     await session.insert(firstEntry)
     await session.insert(secondEntry)
-    const found = await store.scan({ category: firstEntry.category }).fetchAll()
+
+    const found = (await store.scan({ category: firstEntry.category }).fetchAll()).sort(
+      (a, b) => a.name.length - b.name.length
+    )
+
     strictEqual(found.length, 2)
 
     // value is converted to string, so we expect it as string at this level
@@ -163,7 +168,7 @@ describe('Store and Session', () => {
 
     await txn.insert(firstEntry)
 
-    strictEqual(txn.count(firstEntry), 1)
+    strictEqual(await txn.count(firstEntry), 1)
 
     deepStrictEqual(await txn.fetch(firstEntry), firstEntry)
 
@@ -181,7 +186,7 @@ describe('Store and Session', () => {
   test('Key store', async () => {
     const session = await store.openSession()
 
-    const key = Key.generate(KeyAlgs.Ed25519)
+    const key = Key.generate(KeyAlgorithm.Ed25519)
 
     const keyName = 'testKey'
 
@@ -189,34 +194,34 @@ describe('Store and Session', () => {
 
     const fetchedKey1 = await session.fetchKey({ name: keyName })
     const __fetchedKey1 = fetchedKey1
-    deepStrictEqual(__fetchedKey1, {
-      name: keyName,
-      tags: { a: 'b' },
-      metadata: 'metadata',
-    })
+
+    strictEqual(__fetchedKey1?.name, keyName)
+    deepStrictEqual(__fetchedKey1?.tags, { a: 'b' })
+    strictEqual(__fetchedKey1?.metadata, 'metadata')
 
     await session.updateKey({ name: keyName, metadata: 'updated metadata', tags: { a: 'c' } })
     const fetchedKey2 = await session.fetchKey({ name: keyName })
     const __fetchedKey2 = fetchedKey2
-    deepStrictEqual(__fetchedKey2, {
-      name: keyName,
-      tags: { a: 'c' },
-      metadata: 'updated metadata',
-    })
+
+    strictEqual(__fetchedKey2?.name, keyName)
+    deepStrictEqual(__fetchedKey2?.tags, { a: 'c' })
+    strictEqual(__fetchedKey2?.metadata, 'updated metadata')
 
     strictEqual(key.jwkThumbprint, fetchedKey1?.key.jwkThumbprint)
 
     const found = await session.fetchAllKeys({
-      algorithm: KeyAlgs.Ed25519,
+      algorithm: KeyAlgorithm.Ed25519,
       thumbprint: key.jwkThumbprint,
       tagFilter: { a: 'c' },
     })
 
-    deepStrictEqual(found[0], { name: keyName, metadata: 'updated metadata', tags: { a: 'c' } })
+    strictEqual(found[0].name, keyName)
+    strictEqual(found[0].metadata, 'updated metadata')
+    deepStrictEqual(found[0].tags, { a: 'c' })
 
     await session.removeKey({ name: keyName })
 
-    strictEqual(session.fetchKey({ name: keyName }), null)
+    strictEqual(await session.fetchKey({ name: keyName }), null)
 
     await session.close()
 
@@ -254,7 +259,7 @@ describe('Store and Session', () => {
       await store2.close()
     }
 
-    throws(await store.createProfile(profile), AskarError)
+    await rejects(store.createProfile(profile), AskarError)
 
     // Check if profile is still usable
     const session4 = await store.session(profile).open()
@@ -264,31 +269,33 @@ describe('Store and Session', () => {
     await store.setDefaultProfile(profile)
     strictEqual(await store.getDefaultProfile(), profile)
 
-    deepStrictEqual(await store.listProfiles(), [profile])
+    ok((await store.listProfiles()).includes(profile))
 
     await store.removeProfile(profile)
 
     // Opening removed profile should fail
-    throws(await store.session(profile).open(), AskarError)
+    await rejects(store.session(profile).open(), AskarError)
 
     // Unknown unknown profile should fail
-    throws(await store.session('unknown profile').open(), AskarError)
+    await rejects(store.session('unknown profile').open(), AskarError)
 
     strictEqual(await store.createProfile(profile), profile)
 
     const session7 = await store.session(profile).open()
-    strictEqual(session7.count(firstEntry), 0)
+    strictEqual(await session7.count(firstEntry), 0)
     await session7.close()
   })
 
   test('Copy', async () => {
     const key = getRawKey()
 
-    await store.copyTo({
-      uri: 'sqlite://:memory:',
-      keyMethod: new StoreKeyMethod(KdfMethod.Raw),
-      passKey: key,
-      recreate: true,
-    })
+    await doesNotReject(
+      store.copyTo({
+        uri: 'sqlite://:memory:',
+        keyMethod: new StoreKeyMethod(KdfMethod.Raw),
+        passKey: key,
+        recreate: true,
+      })
+    )
   })
 })

@@ -19,7 +19,8 @@
 	"scripts": {
 		"types:check": "pnpm build --noEmit",
 		"build": "tsc -p ./tsconfig.build.json",
-		"install": "node scripts/install.js"
+		"install": "node scripts/install.js",
+		"test": "node --import tsx --test tests/*.test.ts"
 	},
 	"dependencies": {
 		"@2060.io/ffi-napi": "^4.0.9",

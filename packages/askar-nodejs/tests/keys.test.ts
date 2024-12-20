@@ -1,8 +1,8 @@
-import { Key, KeyAlgs, KeyMethod } from '@owf/askar-shared'
+import { Jwk, Key, KeyAlgorithm, KeyMethod } from '@owf/askar-shared'
 
 import { askarNodeJS } from '../src'
 
-import { deepStrictEqual, ok, strictEqual } from 'node:assert'
+import { deepStrictEqual, ok, strict, strictEqual } from 'node:assert'
 import test, { before, describe } from 'node:test'
 import { setup } from './utils'
 
@@ -14,12 +14,12 @@ describe('keys', () => {
 
     strictEqual(backends.length, 1)
 
-    strictEqual(backends, ['software'])
+    deepStrictEqual(backends, ['software'])
   })
 
   test('aes cbc hmac', () => {
-    const key = Key.generate(KeyAlgs.AesA128CbcHs256)
-    strictEqual(key.algorithm, KeyAlgs.AesA128CbcHs256)
+    const key = Key.generate(KeyAlgorithm.AesA128CbcHs256)
+    strictEqual(key.algorithm, KeyAlgorithm.AesA128CbcHs256)
 
     const messageString = 'test message'
     const message = Uint8Array.from(Buffer.from(messageString))
@@ -32,49 +32,58 @@ describe('keys', () => {
     const enc = key.aeadEncrypt({ message, nonce: aeadNonce })
     const dec = key.aeadDecrypt(enc.parts)
 
-    strictEqual(dec, message)
+    deepStrictEqual(dec, message)
   })
 
   test('Bls G2 Keygen', () => {
     const seed = Uint8Array.from(Buffer.from('testseed000000000000000000000001'))
-    const key = Key.fromSeed({ algorithm: KeyAlgs.Bls12381G2, seed })
+    const key = Key.fromSeed({ algorithm: KeyAlgorithm.Bls12381G2, seed })
 
-    deepStrictEqual(key.jwkPublic, {
-      crv: 'BLS12381_G2',
-      kty: 'OKP',
-      x: 'lH6hIRPzjlKW6LvPm0sHqyEbGqf8ag7UWpA_GFfefwq_kzDXSHmls9Yoza_be23zEw-pSOmKI_MGR1DahBa7Jbho2BGwDNV_QmyhxMYBwTH12Ltk_GLyPD4AP6pQVgge',
-    })
+    deepStrictEqual(
+      key.jwkPublic,
+      new Jwk({
+        crv: 'BLS12381_G2',
+        kty: 'OKP',
+        x: 'lH6hIRPzjlKW6LvPm0sHqyEbGqf8ag7UWpA_GFfefwq_kzDXSHmls9Yoza_be23zEw-pSOmKI_MGR1DahBa7Jbho2BGwDNV_QmyhxMYBwTH12Ltk_GLyPD4AP6pQVgge',
+      })
+    )
   })
 
   test('Bls G1 Keygen', () => {
     const seed = Uint8Array.from(Buffer.from('testseed000000000000000000000001'))
-    const key = Key.fromSeed({ algorithm: KeyAlgs.Bls12381G1, seed })
+    const key = Key.fromSeed({ algorithm: KeyAlgorithm.Bls12381G1, seed })
 
-    deepStrictEqual(key.jwkPublic, {
-      crv: 'BLS12381_G1',
-      kty: 'OKP',
-      x: 'hsjb9FSBUJXuB1fCluEcUBLeAPgIbnZGfxPKyeN3LVjQaKFWzXfNtMFAY8VL-eu-',
-    })
+    deepStrictEqual(
+      key.jwkPublic,
+      new Jwk({
+        crv: 'BLS12381_G1',
+        kty: 'OKP',
+        x: 'hsjb9FSBUJXuB1fCluEcUBLeAPgIbnZGfxPKyeN3LVjQaKFWzXfNtMFAY8VL-eu-',
+      })
+    )
   })
 
   test('Bls G1G2 Keygen', () => {
     const seed = Uint8Array.from(Buffer.from('testseed000000000000000000000001'))
     const key = Key.fromSeed({
-      algorithm: KeyAlgs.Bls12381G1G2,
+      algorithm: KeyAlgorithm.Bls12381G1G2,
       seed,
       method: KeyMethod.BlsKeygen,
     })
 
-    deepStrictEqual(key.jwkPublic, {
-      crv: 'BLS12381_G1G2',
-      kty: 'OKP',
-      x: 'h56eYI8Qkq5hitICb-ik8wRTzcn6Fd4iY8aDNVc9q1xoPS3lh4DB_B4wNtar1HrViZIOsO6BgLV72zCrBE2ym3DEhDYcghnUMO4O8IVVD8yS-C_zu6OA3L-ny-AO4rbkAo-WuApZEjn83LY98UtoKpTufn4PCUFVQZzJNH_gXWHR3oDspJaCbOajBfm5qj6d',
-    })
+    deepStrictEqual(
+      key.jwkPublic,
+      new Jwk({
+        crv: 'BLS12381_G1G2',
+        kty: 'OKP',
+        x: 'h56eYI8Qkq5hitICb-ik8wRTzcn6Fd4iY8aDNVc9q1xoPS3lh4DB_B4wNtar1HrViZIOsO6BgLV72zCrBE2ym3DEhDYcghnUMO4O8IVVD8yS-C_zu6OA3L-ny-AO4rbkAo-WuApZEjn83LY98UtoKpTufn4PCUFVQZzJNH_gXWHR3oDspJaCbOajBfm5qj6d',
+      })
+    )
   })
 
   test('ed25519', () => {
-    const key = Key.generate(KeyAlgs.Ed25519)
-    strictEqual(key.algorithm, KeyAlgs.Ed25519)
+    const key = Key.generate(KeyAlgorithm.Ed25519)
+    strictEqual(key.algorithm, KeyAlgorithm.Ed25519)
 
     const message = Uint8Array.from(Buffer.from('test message'))
     const messageBuffer = Buffer.from('test message')
@@ -82,7 +91,9 @@ describe('keys', () => {
 
     strictEqual(key.verifySignature({ message, signature }), true)
     strictEqual(key.verifySignature({ message: messageBuffer, signature }), true)
-    strictEqual({ message: Buffer.from('other message'), signature }, false)
+    strictEqual(key.verifySignature({ message: Buffer.from('other message'), signature }), false)
+
+    // @ts-expect-error: testing to see what happens when we do not provide any agruments
     strictEqual(key.verifySignature(), false)
 
     strictEqual(
@@ -109,42 +120,36 @@ describe('keys', () => {
       false
     )
 
-    const x25519Key = key.convertkey({ algorithm: KeyAlgs.X25519 })
-    const x25519Key2 = Key.generate(KeyAlgs.X25519)
+    const x25519Key = key.convertkey({ algorithm: KeyAlgorithm.X25519 })
+    const x25519Key2 = Key.generate(KeyAlgorithm.X25519)
 
     const kex = x25519Key.keyFromKeyExchange({
-      algorithm: KeyAlgs.Chacha20XC20P,
+      algorithm: KeyAlgorithm.Chacha20XC20P,
       publicKey: x25519Key2,
     })
 
     ok(kex instanceof Key)
 
-    deepStrictEqual(key.jwkPublic, {
-      kty: 'OKP',
-      crv: 'Ed25519',
-    })
+    strictEqual(key.jwkPublic.kty, 'OKP')
+    strictEqual(key.jwkPublic.crv, 'Ed25519')
 
-    deepStrictEqual(key.jwkSecret, {
-      kty: 'OKP',
-      crv: 'Ed25519',
-    })
-  })
-})
-
-test('p384', () => {
-  const key = Key.generate(KeyAlgs.EcSecp384r1)
-  strictEqual(key.algorithm, KeyAlgs.EcSecp384r1)
-  const message = Uint8Array.from(Buffer.from('test message'))
-  const signature = key.signMessage({ message })
-  strictEqual(key.verifySignature({ message, signature }), true)
-
-  deepStrictEqual(key.jwkPublic, {
-    kty: 'EC',
-    crv: 'P-384',
+    strictEqual(key.jwkSecret.kty, 'OKP')
+    strictEqual(key.jwkSecret.crv, 'Ed25519')
   })
 
-  deepStrictEqual(key.jwkSecret, {
-    kty: 'EC',
-    crv: 'P-384',
+  test('p384', () => {
+    const key = Key.generate(KeyAlgorithm.EcSecp384r1)
+    strictEqual(key.algorithm, KeyAlgorithm.EcSecp384r1)
+
+    const message = Uint8Array.from(Buffer.from('test message'))
+    const signature = key.signMessage({ message })
+
+    strictEqual(key.verifySignature({ message, signature }), true)
+
+    strictEqual(key.jwkPublic.kty, 'EC')
+    strictEqual(key.jwkPublic.crv, 'P-384')
+
+    strictEqual(key.jwkSecret.kty, 'EC')
+    strictEqual(key.jwkSecret.crv, 'P-384')
   })
 })
