@@ -1,0 +1,30 @@
+{
+  "name": "@owf/askar-wrapper-javascript",
+  "private": true,
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openwallet-foundation/askar-wrapper-javascript",
+    "directory": "wrappers/javascript"
+  },
+  "engines": {
+    "node": ">= 18"
+  },
+  "scripts": {
+    "check-types": "pnpm -r check-types",
+    "build": "pnpm -r build",
+    "clean": "pnpm -r clean",
+    "validate": "pnpm lint && pnpm check-types && pnpm check-format",
+    "shared": "pnpm --cwd packages/askar-shared",
+    "nodejs": "pnpm --cwd packages/askar-nodejs",
+    "react-native": "pnpm --cwd packages/askar-react-native",
+    "set-version": "npx lerna version --exact --no-git-tag-version --no-push --yes"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.11",
+    "jest": "^29.7.0",
+    "lerna": "^8.1.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "~5.4.5"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "name": "@owf/askar-react-native",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "description": "React Native wrapper for Askar",
+  "main": "build/index",
+  "source": "src/index",
+  "homepage": "https://github.com/openwallet-foundation/askar-wrapper-javascript",
+  "author": "OpenWallet Foundation (https://github.com/openwallet-foundation)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openwallet-foundation/askar-wrapper-javascript",
+    "directory": "packages/askar-react-native"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "build",
+    "android/src",
+    "android/build.gradle",
+    "android/CMakeLists.txt",
+    "android/cpp-adapter.cpp",
+    "ios/**/*.h",
+    "ios/**/*.mm",
+    "ios/Askar.xcodeproj/project.pbxproj",
+    "cpp/**/*.cpp",
+    "cpp/**/*.h",
+    "askar.podspec"
+  ],
+  "scripts": {
+    "check-types": "pnpm compile --noEmit",
+    "build": "pnpm clean && pnpm compile",
+    "clean": "rimraf -rf ./build",
+    "compile": "tsc -p ./tsconfig.build.json",
+    "install": "node-pre-gyp install"
+  },
+  "dependencies": {
+    "@owf/askar-shared": "workspace:*",
+    "@mapbox/node-pre-gyp": "^1.0.11"
+  },
+  "devDependencies": {
+    "react": "catalog:",
+    "react-native": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react": ">= 16",
+    "react-native": ">= 0.66.0"
+  },
+  "binary": {
+    "module_name": "askar",
+    "module_path": "native",
+    "remote_path": "v0.3.2",
+    "host": "https://github.com/openwallet-foundation/askar/releases/download/",
+    "package_name": "library-ios-android.tar.gz"
+  }
+}

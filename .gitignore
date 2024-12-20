@@ -1,18 +1,9 @@
-.vscode
-target
-*.bak.db
-*.db-shm
-*.db-wal
 .DS_Store
-*.tgz
-*.so
-.npmrc
-out
 
-# react Native Libraries
-wrappers/javascript/packages/aries-askar-react-native/native/mobile/
+node_modules
 
-# Example app
-wrappers/javascript/packages/aries-askar-react-native-example/android
-wrappers/javascript/packages/aries-askar-react-native-example/ios
-wrappers/javascript/packages/aries-askar-react-native-example/.expo
+packages/askar-react-native/native/mobile
+
+examples/askar-react-native/android
+examples/askar-react-native/ios
+examples/askar-react-native/.expo

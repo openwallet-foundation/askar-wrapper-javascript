@@ -1,0 +1,10 @@
+packages:
+  - packages/*
+  - examples/*
+
+catalog:
+  '@types/node': ^22.10.2
+  buffer: ^6.0.3
+  typescript: ~5.7.2
+  react: 18.2.0
+  react-native: 0.74.1
