@@ -2,9 +2,9 @@ import { Key, KeyAlgs, KeyMethod } from '@owf/askar-shared'
 
 import { askarNodeJS } from '../src'
 
-import { setup } from './utils'
+import { deepStrictEqual, ok, strictEqual } from 'node:assert'
 import test, { before, describe } from 'node:test'
-import { deepStrictEqual, ok, strictEqual, } from 'node:assert'
+import { setup } from './utils'
 
 describe('keys', () => {
   before(setup)
@@ -80,7 +80,7 @@ describe('keys', () => {
     const messageBuffer = Buffer.from('test message')
     const signature = key.signMessage({ message })
 
-    strictEqual(key.verifySignature({ message, signature }),true)
+    strictEqual(key.verifySignature({ message, signature }), true)
     strictEqual(key.verifySignature({ message: messageBuffer, signature }), true)
     strictEqual({ message: Buffer.from('other message'), signature }, false)
     strictEqual(key.verifySignature(), false)
@@ -89,22 +89,25 @@ describe('keys', () => {
       key.verifySignature({
         message: Uint8Array.from(Buffer.from('other message')),
         signature,
-      }),false
+      }),
+      false
     )
-    
+
     strictEqual(
       key.verifySignature({
         message,
         signature: Uint8Array.from([8, 1, 1, 1]),
-      })
-    , false)
+      }),
+      false
+    )
 
     strictEqual(
       key.verifySignature({
         message,
         signature: Buffer.from('random signature'),
-      })
-    ,false)
+      }),
+      false
+    )
 
     const x25519Key = key.convertkey({ algorithm: KeyAlgs.X25519 })
     const x25519Key2 = Key.generate(KeyAlgs.X25519)

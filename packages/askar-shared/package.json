@@ -1,33 +1,29 @@
 {
-  "name": "@owf/askar-shared",
-  "version": "0.1.0",
-  "license": "Apache-2.0",
-  "description": "Shared library for using Askar with NodeJS and React Native",
-  "main": "build/index",
-  "source": "src/index",
-  "types": "build/index",
-  "homepage": "https://github.com/openwallet-foundation/askar-wrapper-javascript",
-  "repository": {
-    "url": "https://github.com/openwallet-foundation/askar-wrapper-javascript",
-    "type": "git",
-    "directory": "packages/askar-shared"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "files": [
-    "build"
-  ],
-  "scripts": {
-    "check-types": "pnpm compile --noEmit",
-    "build": "pnpm clean && pnpm compile",
-    "clean": "rimraf -rf ./build",
-    "compile": "tsc -p ./tsconfig.build.json"
-  },
-  "dependencies": {
-    "buffer": "catalog:"
-  },
-  "devDependencies": {
-    "typescript": "catalog:"
-  }
+	"name": "@owf/askar-shared",
+	"version": "0.1.0",
+	"license": "Apache-2.0",
+	"description": "Shared library for using Askar with NodeJS and React Native",
+	"main": "build/index",
+	"source": "src/index",
+	"types": "build/index",
+	"homepage": "https://github.com/openwallet-foundation/askar-wrapper-javascript",
+	"repository": {
+		"url": "https://github.com/openwallet-foundation/askar-wrapper-javascript",
+		"type": "git",
+		"directory": "packages/askar-shared"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"files": ["build"],
+	"scripts": {
+		"types:check": "pnpm build --noEmit",
+		"build": "tsc -p ./tsconfig.build.json"
+	},
+	"dependencies": {
+		"buffer": "catalog:"
+	},
+	"devDependencies": {
+		"typescript": "catalog:"
+	}
 }

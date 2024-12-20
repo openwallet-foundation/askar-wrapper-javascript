@@ -1,7 +1,7 @@
+import { strictEqual } from 'node:assert'
+import { before, describe, test } from 'node:test'
 import { CryptoBox, Key, KeyAlgs } from '@owf/askar-shared'
 import { setup } from './utils/initialize'
-import {describe,before,test } from 'node:test'
-import {strictEqual} from 'node:assert'
 
 describe('CryptoBox', () => {
   before(setup)

@@ -26,7 +26,7 @@ export class EntryList {
     return new Entry({ list: this.handle, position: index })
   }
 
-  private forEach(cb: (entry: Entry, index?: number) => unknown) {
+  private forEachEntry(cb: (entry: Entry, index?: number) => unknown) {
     for (let i = 0; i < this.length; i++) {
       cb(this.getEntryByIndex(i), i)
     }
@@ -41,7 +41,7 @@ export class EntryList {
 
   public toArray(valuesAreJson?: boolean): EntryObject[] {
     const list: EntryObject[] = []
-    this.forEach((entry) => list.push(entry.toJson(valuesAreJson)))
+    this.forEachEntry((entry) => list.push(entry.toJson(valuesAreJson)))
     return list
   }
 }

@@ -1,6 +1,6 @@
 import { alloc } from '@2060.io/ref-napi'
-import { FFI_POINTER, FFI_STRING, FFI_INT32, FFI_INT8 } from './primitives'
-import { SecretBufferStruct, EncryptedBufferStruct, AeadParamsStruct } from './structures'
+import { FFI_INT8, FFI_INT32, FFI_POINTER, FFI_STRING } from './primitives'
+import { AeadParamsStruct, EncryptedBufferStruct, SecretBufferStruct } from './structures'
 
 export const allocatePointer = (): Buffer => alloc(FFI_POINTER)
 

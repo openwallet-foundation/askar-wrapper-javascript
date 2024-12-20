@@ -1,9 +1,9 @@
 import type { NativeMethods } from './NativeBindingInterface'
 
+import fs from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
 import { Library } from '@2060.io/ffi-napi'
-import fs from 'fs'
-import os from 'os'
-import path from 'path'
 
 import { nativeBindings } from './bindings'
 
@@ -52,7 +52,7 @@ const getLibrary = () => {
 
   // Create the path + file
   const libaries = platformPaths.map((p) =>
-    path.join(p, `${extensions[platform].prefix ?? ''}${LIBNAME}${extensions[platform].extension}`),
+    path.join(p, `${extensions[platform].prefix ?? ''}${LIBNAME}${extensions[platform].extension}`)
   )
 
   // Gaurd so we quit if there is no valid path for the library

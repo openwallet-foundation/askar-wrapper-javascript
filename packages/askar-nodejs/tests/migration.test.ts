@@ -1,9 +1,9 @@
-import { Migration } from '@owf/askar-shared'
+import { ok, throws } from 'node:assert'
 import fs from 'node:fs'
 import path from 'node:path'
-import { setup } from './utils'
 import test, { before, beforeEach, describe } from 'node:test'
-import { ok, throws } from 'node:assert'
+import { Migration } from '@owf/askar-shared'
+import { setup } from './utils'
 
 const DB_TEMPLATE_PATH = path.join(__dirname, 'indy_wallet_sqlite.db')
 const DB_UPGRADE_PATH = path.join(__dirname, 'indy_wallet_sqlite_upgraded.db')
@@ -30,8 +30,7 @@ describe('migration', () => {
 
   test('migrate', async () => {
     ok(
-    await 
-      Migration.migrate({
+      await Migration.migrate({
         specUri: DB_UPGRADE_PATH,
         kdfLevel: 'RAW',
         walletName: 'walletwallet.0',
@@ -39,15 +38,14 @@ describe('migration', () => {
       })
     )
 
-
     // Double migrate should not work
-    throws(await 
-      Migration.migrate({
+    throws(
+      await Migration.migrate({
         specUri: DB_UPGRADE_PATH,
         kdfLevel: 'RAW',
         walletName: 'walletwallet.0',
         walletKey: 'GfwU1DC7gEZNs3w41tjBiZYj7BNToDoFEqKY6wZXqs1A',
-      }),
+      })
     )
   })
 })

@@ -1,5 +1,3 @@
-import type { NativeBindings } from './NativeBindings'
-import type { Callback, CallbackWithResponse, ReturnObject } from './serialize'
 import type {
   Askar,
   AskarErrorObject,
@@ -77,17 +75,19 @@ import type {
   StoreSetDefaultProfileOptions,
 } from '@owf/askar-shared'
 import {
-  AskarError,
-  handleInvalidNullResponse,
   AeadParams,
+  AskarError,
   EncryptedBuffer,
-  LocalKeyHandle,
   EntryListHandle,
-  StoreHandle,
-  SessionHandle,
-  ScanHandle,
   KeyEntryListHandle,
+  LocalKeyHandle,
+  ScanHandle,
+  SessionHandle,
+  StoreHandle,
+  handleInvalidNullResponse,
 } from '@owf/askar-shared'
+import type { NativeBindings } from './NativeBindings'
+import type { Callback, CallbackWithResponse, ReturnObject } from './serialize'
 import { serializeArguments } from './serialize'
 
 export class ReactNativeAskar implements Askar {
@@ -148,9 +148,7 @@ export class ReactNativeAskar implements Askar {
           reject(error)
         } else {
           if (value === undefined) {
-            reject(
-              AskarError.customError({ message: 'error code was 0 but no value found. This should not occur.' }),
-            )
+            reject(AskarError.customError({ message: 'error code was 0 but no value found. This should not occur.' }))
           } else {
             resolve(value)
           }
@@ -466,7 +464,7 @@ export class ReactNativeAskar implements Askar {
   public async scanNext(options: ScanNextOptions) {
     const serializedOptions = serializeArguments(options)
     const handle = await this.promisifyWithResponse<string>((cb) =>
-      this.handleError(this.askar.scanNext({ cb, ...serializedOptions })),
+      this.handleError(this.askar.scanNext({ cb, ...serializedOptions }))
     )
 
     return EntryListHandle.fromHandle(handle)
@@ -484,8 +482,8 @@ export class ReactNativeAskar implements Askar {
           limit: limit || -1,
           profile,
           tagFilter,
-        }),
-      ),
+        })
+      )
     )
 
     return ScanHandle.fromHandle(handle)
@@ -499,7 +497,7 @@ export class ReactNativeAskar implements Askar {
   public async sessionCount(options: SessionCountOptions): Promise<number> {
     const serializedOptions = serializeArguments(options)
     const response = await this.promisifyWithResponse<number>((cb) =>
-      this.handleError(this.askar.sessionCount({ cb, ...serializedOptions })),
+      this.handleError(this.askar.sessionCount({ cb, ...serializedOptions }))
     )
 
     return handleInvalidNullResponse(response)
@@ -508,7 +506,7 @@ export class ReactNativeAskar implements Askar {
   public async sessionFetch(options: SessionFetchOptions) {
     const serializedOptions = serializeArguments(options)
     const handle = await this.promisifyWithResponse<string>((cb) =>
-      this.handleError(this.askar.sessionFetch({ cb, ...serializedOptions })),
+      this.handleError(this.askar.sessionFetch({ cb, ...serializedOptions }))
     )
 
     return EntryListHandle.fromHandle(handle)
@@ -518,8 +516,8 @@ export class ReactNativeAskar implements Askar {
     const { category, sessionHandle, forUpdate, limit, tagFilter } = serializeArguments(options)
     const handle = await this.promisifyWithResponse<string>((cb) =>
       this.handleError(
-        this.askar.sessionFetchAll({ cb, category, sessionHandle, forUpdate, limit: limit || -1, tagFilter }),
-      ),
+        this.askar.sessionFetchAll({ cb, category, sessionHandle, forUpdate, limit: limit || -1, tagFilter })
+      )
     )
 
     return EntryListHandle.fromHandle(handle)
@@ -537,8 +535,8 @@ export class ReactNativeAskar implements Askar {
           limit: limit || -1,
           thumbprint,
           tagFilter,
-        }),
-      ),
+        })
+      )
     )
 
     return KeyEntryListHandle.fromHandle(handle)
@@ -546,7 +544,7 @@ export class ReactNativeAskar implements Askar {
   public async sessionFetchKey(options: SessionFetchKeyOptions) {
     const serializedOptions = serializeArguments(options)
     const handle = await this.promisifyWithResponse<string>((cb) =>
-      this.handleError(this.askar.sessionFetchKey({ cb, ...serializedOptions })),
+      this.handleError(this.askar.sessionFetchKey({ cb, ...serializedOptions }))
     )
 
     return KeyEntryListHandle.fromHandle(handle)
@@ -564,15 +562,15 @@ export class ReactNativeAskar implements Askar {
           expiryMs: expiryMs || -1,
           metadata,
           tags,
-        }),
-      ),
+        })
+      )
     )
   }
 
   public async sessionRemoveAll(options: SessionRemoveAllOptions): Promise<number> {
     const serializedOptions = serializeArguments(options)
     const response = await this.promisifyWithResponse<number>((cb) =>
-      this.handleError(this.askar.sessionRemoveAll({ cb, ...serializedOptions })),
+      this.handleError(this.askar.sessionRemoveAll({ cb, ...serializedOptions }))
     )
 
     return handleInvalidNullResponse(response)
@@ -586,7 +584,7 @@ export class ReactNativeAskar implements Askar {
   public async sessionStart(options: SessionStartOptions): Promise<SessionHandle> {
     const serializedOptions = serializeArguments(options)
     const handle = await this.promisifyWithResponse<number>((cb) =>
-      this.handleError(this.askar.sessionStart({ cb, ...serializedOptions })),
+      this.handleError(this.askar.sessionStart({ cb, ...serializedOptions }))
     )
 
     return SessionHandle.fromHandle(handle)
@@ -605,8 +603,8 @@ export class ReactNativeAskar implements Askar {
           expiryMs: expiryMs || -1,
           tags,
           value,
-        }),
-      ),
+        })
+      )
     )
   }
 
@@ -628,7 +626,7 @@ export class ReactNativeAskar implements Askar {
   public async storeCreateProfile(options: StoreCreateProfileOptions): Promise<string> {
     const serializedOptions = serializeArguments(options)
     const response = await this.promisifyWithResponse<string>((cb) =>
-      this.handleError(this.askar.storeCreateProfile({ cb, ...serializedOptions })),
+      this.handleError(this.askar.storeCreateProfile({ cb, ...serializedOptions }))
     )
 
     return handleInvalidNullResponse(response)
@@ -642,7 +640,7 @@ export class ReactNativeAskar implements Askar {
   public async storeGetProfileName(options: StoreGetProfileNameOptions): Promise<string> {
     const serializedOptions = serializeArguments(options)
     const response = await this.promisifyWithResponse<string>((cb) =>
-      this.handleError(this.askar.storeGetProfileName({ cb, ...serializedOptions })),
+      this.handleError(this.askar.storeGetProfileName({ cb, ...serializedOptions }))
     )
 
     return handleInvalidNullResponse(response)
@@ -651,7 +649,7 @@ export class ReactNativeAskar implements Askar {
   public async storeGetDefaultProfile(options: StoreGetDefaultProfileOptions): Promise<string> {
     const serializedOptions = serializeArguments(options)
     const response = await this.promisifyWithResponse<string>((cb) =>
-      this.handleError(this.askar.storeGetDefaultProfile({ cb, ...serializedOptions })),
+      this.handleError(this.askar.storeGetDefaultProfile({ cb, ...serializedOptions }))
     )
 
     return handleInvalidNullResponse(response)
@@ -661,8 +659,8 @@ export class ReactNativeAskar implements Askar {
     const serializedOptions = serializeArguments(options)
     const stringListHandle = handleInvalidNullResponse(
       await this.promisifyWithResponse<string>((cb) =>
-        this.handleError(this.askar.storeListProfiles({ cb, ...serializedOptions })),
-      ),
+        this.handleError(this.askar.storeListProfiles({ cb, ...serializedOptions }))
+      )
     )
     const ret = []
     const count = this.handleError(this.askar.stringListCount({ stringListHandle }))
@@ -676,7 +674,7 @@ export class ReactNativeAskar implements Askar {
   public async storeOpen(options: StoreOpenOptions): Promise<StoreHandle> {
     const serializedOptions = serializeArguments(options)
     const handle = await this.promisifyWithResponse<number>((cb) =>
-      this.handleError(this.askar.storeOpen({ cb, ...serializedOptions })),
+      this.handleError(this.askar.storeOpen({ cb, ...serializedOptions }))
     )
 
     return StoreHandle.fromHandle(handle)
@@ -685,7 +683,7 @@ export class ReactNativeAskar implements Askar {
   public async storeProvision(options: StoreProvisionOptions): Promise<StoreHandle> {
     const serializedOptions = serializeArguments(options)
     const handle = await this.promisifyWithResponse<number>((cb) =>
-      this.handleError(this.askar.storeProvision({ cb, ...serializedOptions })),
+      this.handleError(this.askar.storeProvision({ cb, ...serializedOptions }))
     )
 
     return StoreHandle.fromHandle(handle)
@@ -699,7 +697,7 @@ export class ReactNativeAskar implements Askar {
   public async storeRemove(options: StoreRemoveOptions): Promise<number> {
     const serializedOptions = serializeArguments(options)
     const response = await this.promisifyWithResponse<number>((cb) =>
-      this.handleError(this.askar.storeRemove({ cb, ...serializedOptions })),
+      this.handleError(this.askar.storeRemove({ cb, ...serializedOptions }))
     )
 
     return handleInvalidNullResponse(response)
@@ -708,7 +706,7 @@ export class ReactNativeAskar implements Askar {
   public async storeRemoveProfile(options: StoreRemoveProfileOptions): Promise<number> {
     const serializedOptions = serializeArguments(options)
     const response = await this.promisifyWithResponse<number>((cb) =>
-      this.handleError(this.askar.storeRemoveProfile({ cb, ...serializedOptions })),
+      this.handleError(this.askar.storeRemoveProfile({ cb, ...serializedOptions }))
     )
 
     return handleInvalidNullResponse(response)
@@ -717,7 +715,7 @@ export class ReactNativeAskar implements Askar {
   public async storeSetDefaultProfile(options: StoreSetDefaultProfileOptions): Promise<void> {
     const serializedOptions = serializeArguments(options)
     const response = await this.promisifyWithResponse((cb) =>
-      this.handleError(this.askar.storeSetDefaultProfile({ cb, ...serializedOptions })),
+      this.handleError(this.askar.storeSetDefaultProfile({ cb, ...serializedOptions }))
     )
 
     handleInvalidNullResponse(response)

@@ -1,4 +1,4 @@
-import { ArcHandle, Jwk, ScanHandle, SessionHandle, StoreHandle, Key } from '@owf/askar-shared'
+import { ArcHandle, Jwk, Key, ScanHandle, SessionHandle, StoreHandle } from '@owf/askar-shared'
 
 export type ReturnObject<T = unknown> = {
   errorCode: number
@@ -22,7 +22,7 @@ type Argument =
   | Key
   | Jwk
 
-type SerializedArgument = string | number | Callback | CallbackWithResponse | ArrayBuffer
+type SerializedArgument = string | number | Callback | CallbackWithResponse | ArrayBuffer | ArrayBufferLike
 
 type SerializedArguments = Record<string, SerializedArgument>
 
@@ -83,32 +83,39 @@ const serialize = (arg: Argument): SerializedArgument => {
     case 'object':
       if (arg instanceof Date) {
         return arg.valueOf()
-      } else if (arg instanceof Uint8Array) {
+      }
+      if (arg instanceof Uint8Array) {
         return arg.buffer
-      } else if (arg instanceof Jwk) {
+      }
+      if (arg instanceof Jwk) {
         return arg.toUint8Array().buffer
-      } else if (arg instanceof Key) {
-        return arg.handle.handle
-      } else if (
+      }
+      if (arg instanceof Key) {
+        return arg.handle.handle as string
+      }
+      if (
         arg instanceof StoreHandle ||
         arg instanceof SessionHandle ||
         arg instanceof ScanHandle ||
         arg instanceof ArcHandle
       ) {
-        return arg.handle
-      } else {
-        return JSON.stringify(arg)
+        return arg.handle as number
       }
+      return JSON.stringify(arg)
     default:
       throw new Error(`Could not serialize value ${arg}`)
   }
 }
 
 const serializeArguments = <T extends Record<string, Argument> = Record<string, Argument>>(
-  args: T,
+  args: T
 ): SerializedOptions<T> => {
   const retVal: SerializedArguments = {}
-  Object.entries(args).forEach(([key, val]) => (retVal[key] = serialize(val)))
+
+  for (const [key, value] of Object.entries(args)) {
+    retVal[key] = serialize(value)
+  }
+
   return retVal as SerializedOptions<T>
 }
 

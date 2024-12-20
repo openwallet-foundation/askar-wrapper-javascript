@@ -1,8 +1,8 @@
-import type { ByteBufferType, EncryptedBufferType } from './structures'
 import type { Pointer } from '@2060.io/ref-napi'
-import type { TypedArray } from 'ref-array-di'
 import { reinterpret } from '@2060.io/ref-napi'
 import { EncryptedBuffer } from '@owf/askar-shared'
+import type { TypedArray } from 'ref-array-di'
+import type { ByteBufferType, EncryptedBufferType } from './structures'
 import { ByteBufferStruct } from './structures'
 
 export const byteBufferClassToStruct = ({ len, data }: ByteBufferType) => {

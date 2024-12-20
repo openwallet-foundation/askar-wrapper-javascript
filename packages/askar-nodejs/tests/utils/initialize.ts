@@ -1,4 +1,4 @@
-import { Store, StoreKeyMethod, KdfMethod, registerAskar } from '@owf/askar-shared'
+import { KdfMethod, Store, StoreKeyMethod, registerAskar } from '@owf/askar-shared'
 
 import { NodeJSAskar } from '../../src/NodeJSAskar'
 

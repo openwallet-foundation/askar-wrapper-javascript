@@ -2,8 +2,8 @@ import { Ecdh1PU, EcdhEs, Jwk, Key, KeyAlgs } from '@owf/askar-shared'
 
 import { base64url, setup } from './utils'
 
-import {describe, test, before} from 'node:test'
-import { strictEqual} from 'node:assert'
+import { strictEqual } from 'node:assert'
+import { before, describe, test } from 'node:test'
 
 describe('jose ecdh', () => {
   before(setup)
@@ -241,8 +241,8 @@ describe('jose ecdh', () => {
       secretKey: Uint8Array.from(
         Buffer.from(
           'fffefdfcfbfaf9f8f7f6f5f4f3f2f1f0efeeedecebeae9e8e7e6e5e4e3e2e1e0dfdedddcdbdad9d8d7d6d5d4d3d2d1d0cfcecdcccbcac9c8c7c6c5c4c3c2c1c0',
-          'hex',
-        ),
+          'hex'
+        )
       ),
     })
 
@@ -253,8 +253,8 @@ describe('jose ecdh', () => {
 
     const { ciphertext, tag: ccTag } = enc.parts
 
-    strictEqual(Buffer.from(ciphertext).toString('base64url'),'Az2IWsISEMDJvyc5XRL-3-d-RgNBOGolCsxFFoUXFYw')
-    strictEqual(Buffer.from(ccTag).toString('base64url'),'HLb4fTlm8spGmij3RyOs2gJ4DpHM4hhVRwdF_hGb3WQ' )
+    strictEqual(Buffer.from(ciphertext).toString('base64url'), 'Az2IWsISEMDJvyc5XRL-3-d-RgNBOGolCsxFFoUXFYw')
+    strictEqual(Buffer.from(ccTag).toString('base64url'), 'HLb4fTlm8spGmij3RyOs2gJ4DpHM4hhVRwdF_hGb3WQ')
 
     const derived = new Ecdh1PU({
       apv: Uint8Array.from(Buffer.from(apv)),
@@ -269,17 +269,19 @@ describe('jose ecdh', () => {
       receive: false,
     })
 
-    strictEqual(derived.secretBytes,Uint8Array.from(Buffer.from('df4c37a0668306a11e3d6b0074b5d8df', 'hex')))
+    strictEqual(derived.secretBytes, Uint8Array.from(Buffer.from('df4c37a0668306a11e3d6b0074b5d8df', 'hex')))
 
     const encryptedKey = derived.wrapKey({ other: cek }).ciphertextWithTag
 
-    strictEqual(encryptedKey,
+    strictEqual(
+      encryptedKey,
       Uint8Array.from(
         Buffer.from(
           'pOMVA9_PtoRe7xXW1139NzzN1UhiFoio8lGto9cf0t8PyU-sjNXH8-LIRLycq8CHJQbDwvQeU1cSl55cQ0hGezJu2N9IY0QN',
-          'base64url',
+          'base64url'
         )
-      ))
+      )
+    )
 
     const encryptedKey2 = new Ecdh1PU({
       apv: Uint8Array.from(Buffer.from(apv)),

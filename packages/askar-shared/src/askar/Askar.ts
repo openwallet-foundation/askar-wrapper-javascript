@@ -1,4 +1,6 @@
 import type {
+  AeadParams,
+  EncryptedBuffer,
   EntryListHandle,
   Jwk,
   Key,
@@ -7,9 +9,8 @@ import type {
   ScanHandle,
   SessionHandle,
   StoreHandle,
- AeadParams, EncryptedBuffer 
 } from '../crypto'
-import type { KeyAlgorithm, LogLevel, SignatureAlgorithm, KeyBackend } from '../enums'
+import type { KeyAlgorithm, KeyBackend, LogLevel, SignatureAlgorithm } from '../enums'
 import type { AskarErrorObject } from '../error'
 
 export type ErrorCode = number
@@ -21,7 +22,7 @@ export type NativeLogCallback = (
   message: string,
   modulePath: string,
   file: string,
-  line: number,
+  line: number
 ) => void
 
 export type SetCustomLoggerOptions = {

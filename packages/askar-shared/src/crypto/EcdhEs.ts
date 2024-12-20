@@ -1,5 +1,5 @@
-import type { KeyAlgorithm } from '../enums'
 import { askar } from '../askar'
+import type { KeyAlgorithm } from '../enums'
 import { Jwk } from './Jwk'
 import { Key } from './Key'
 
@@ -34,7 +34,7 @@ export class EcdhEs {
         algorithm: encAlg,
         ephemeralKey,
         recipientKey,
-      }),
+      })
     )
   }
 

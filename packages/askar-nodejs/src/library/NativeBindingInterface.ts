@@ -20,8 +20,10 @@ type StringTypeArrayToTypes<List extends (keyof StringTypeMapping)[]> = {
   [Item in keyof List]: List[Item] extends keyof StringTypeMapping ? StringTypeMapping[List[Item]] : Buffer
 }
 
+// biome-ignore lint/suspicious/noExplicitAny:
 type TypedMethods<Base extends Record<string | number | symbol, [any, any[]]>> = {
   [Property in keyof Base]: (
+    // biome-ignore lint/suspicious/noExplicitAny:
     ...args: StringTypeArrayToTypes<Base[Property][1]> extends any[] ? StringTypeArrayToTypes<Base[Property][1]> : []
   ) => StringTypeMapping[Base[Property][0]]
 }

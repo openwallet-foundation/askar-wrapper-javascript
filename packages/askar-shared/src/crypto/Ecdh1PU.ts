@@ -1,5 +1,5 @@
-import type { KeyAlgorithm } from '../enums'
 import { askar } from '../askar'
+import type { KeyAlgorithm } from '../enums'
 import { Key } from './Key'
 
 export class Ecdh1PU {
@@ -39,7 +39,7 @@ export class Ecdh1PU {
         recipientKey: recipientKey,
         senderKey: senderKey,
         ccTag,
-      }),
+      })
     )
   }
 

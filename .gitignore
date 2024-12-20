@@ -2,6 +2,8 @@
 
 node_modules
 
+build
+
 packages/askar-react-native/native/mobile
 
 examples/askar-react-native/android

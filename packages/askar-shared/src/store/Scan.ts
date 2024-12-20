@@ -1,6 +1,6 @@
+import type { EntryListHandle, ScanHandle } from '../crypto'
 import type { Entry, EntryObject } from './Entry'
 import type { Store } from './Store'
-import type { EntryListHandle, ScanHandle } from '../crypto'
 
 import { askar } from '../askar'
 import { AskarError } from '../error'
@@ -44,7 +44,7 @@ export class Scan {
     return this._handle
   }
 
-  private async forEach(cb: (row: Entry, index?: number) => void) {
+  private async forEachRow(cb: (row: Entry, index?: number) => void) {
     if (!this.handle) {
       if (!this.store?.handle) throw AskarError.customError({ message: 'Cannot scan from closed store' })
       this._handle = await askar.scanStart({
@@ -56,13 +56,13 @@ export class Scan {
         category: this.category,
       })
     }
+    const scanHandle = this.handle as ScanHandle
 
     try {
       let recordCount = 0
       // Loop while limit not reached (or no limit specified)
       while (!this.limit || recordCount < this.limit) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const listHandle = await askar.scanNext({ scanHandle: this._handle! })
+        const listHandle = await askar.scanNext({ scanHandle })
         if (!listHandle) break
 
         this._listHandle = listHandle
@@ -75,14 +75,13 @@ export class Scan {
         }
       }
     } finally {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      askar.scanFree({ scanHandle: this._handle! })
+      askar.scanFree({ scanHandle })
     }
   }
 
   public async fetchAll() {
     const rows: EntryObject[] = []
-    await this.forEach((row) => rows.push(row.toJson()))
+    await this.forEachRow((row) => rows.push(row.toJson()))
     return rows
   }
 }

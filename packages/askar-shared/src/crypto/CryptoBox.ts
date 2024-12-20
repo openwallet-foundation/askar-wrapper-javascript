@@ -1,5 +1,5 @@
-import type { Key } from './Key'
 import { askar } from '../askar'
+import type { Key } from './Key'
 
 export class CryptoBox {
   public static randomNonce() {

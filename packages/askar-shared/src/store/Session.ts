@@ -1,12 +1,9 @@
+import { Buffer } from 'buffer'
+import { askar } from '../askar'
 import type { Key, SessionHandle } from '../crypto'
 import type { KeyAlgorithm } from '../enums'
-
-import { Buffer } from 'buffer'
-
-import { askar } from '../askar'
 import { EntryOperation } from '../enums/EntryOperation'
 import { AskarError } from '../error'
-
 import { Entry } from './Entry'
 import { EntryList } from './EntryList'
 import { KeyEntryList } from './KeyEntryList'

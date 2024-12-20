@@ -1,5 +1,5 @@
-import type { StoreKeyMethod } from './StoreKeyMethod'
 import type { StoreHandle } from '../crypto'
+import type { StoreKeyMethod } from './StoreKeyMethod'
 
 import { askar } from '../askar'
 

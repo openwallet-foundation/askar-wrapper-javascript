@@ -1,9 +1,9 @@
-import { Store, StoreKeyMethod, Key, KeyAlgs, AskarError, KdfMethod } from '@owf/askar-shared'
-import { promises } from 'fs'
+import { promises } from 'node:fs'
+import { AskarError, KdfMethod, Key, KeyAlgs, Store, StoreKeyMethod } from '@owf/askar-shared'
 
-import { firstEntry, getRawKey, secondEntry, setup, setupWallet, testStoreUri } from './utils'
-import test, { afterEach, before, beforeEach, describe } from 'node:test'
 import { deepStrictEqual, strictEqual, throws } from 'node:assert'
+import test, { afterEach, before, beforeEach, describe } from 'node:test'
+import { firstEntry, getRawKey, secondEntry, setup, setupWallet, testStoreUri } from './utils'
 
 describe('Store and Session', () => {
   let store: Store
@@ -70,13 +70,14 @@ describe('Store and Session', () => {
 
     await newStore.close()
 
-    throws(await 
-      Store.open({
+    throws(
+      await Store.open({
         profile: 'rekey',
         uri: `sqlite://${storagePath}/rekey.db`,
         keyMethod: new StoreKeyMethod(KdfMethod.Raw),
         passKey: initialKey,
-      }))
+      })
+    )
 
     newStore = await Store.open({
       profile: 'rekey',
@@ -223,7 +224,7 @@ describe('Store and Session', () => {
     fetchedKey1?.key.handle.free()
     fetchedKey2?.key.handle.free()
     key.handle.free()
-    for(const entry of found) {
+    for (const entry of found) {
       entry.key.handle.free()
     }
   })
