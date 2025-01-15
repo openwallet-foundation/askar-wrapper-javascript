@@ -1,0 +1,54 @@
+{
+  "name": "@openwallet-foundation/askar-nodejs",
+  "version": "0.2.3",
+  "license": "Apache-2.0",
+  "description": "Nodejs wrapper for Askar",
+  "main": "build/index",
+  "source": "src/index",
+  "homepage": "https://github.com/openwallet-foundation/askar-wrapper-javascript",
+  "author": "Openwallet Foundation (https://github.com/openwallet-foundation)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openwallet-foundation/askar-wrapper-javascript",
+    "directory": "packages/askar-nodejs"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "build",
+    "scripts",
+    "../../LICENSE"
+  ],
+  "scripts": {
+    "types:check": "pnpm compile --noEmit",
+    "build": "pnpm clean && pnpm compile",
+    "clean": "rimraf -rf ./build",
+    "compile": "tsc -p ./tsconfig.build.json",
+    "install": "node scripts/install.js"
+  },
+  "dependencies": {
+    "@2060.io/ffi-napi": "^4.0.9",
+    "@2060.io/ref-napi": "^3.0.6",
+    "@openwallet-foundation/askar-shared": "workspace:*",
+    "@mapbox/node-pre-gyp": "^1.0.11",
+    "ref-array-di": "^1.2.2",
+    "ref-struct-di": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.11",
+    "@types/ref-array-di": "^1.2.3",
+    "@types/ref-struct-di": "^1.1.6",
+    "typescript": "~5.4.5"
+  },
+  "binary": {
+    "module_name": "aries_askar",
+    "module_path": "native",
+    "remote_path": "v0.3.2",
+    "host": "https://github.com/openwallet-foundation/askar/releases/download/",
+    "package_name": "library-{platform}-{arch}.tar.gz"
+  },
+  "engines": {
+    "node": ">= 18"
+  }
+}
