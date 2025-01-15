@@ -1,14 +1,17 @@
 import { refType } from '@2060.io/ref-napi'
 import {
+  AeadParamsStructPtr,
+  ByteBufferStruct,
+  EncryptedBufferStructPtr,
   FFI_CALLBACK_ID,
   FFI_CALLBACK_PTR,
   FFI_ENTRY_LIST_HANDLE,
   FFI_ERROR_CODE,
+  FFI_INT8,
+  FFI_INT8_PTR,
   FFI_INT32,
   FFI_INT32_PTR,
   FFI_INT64,
-  FFI_INT8,
-  FFI_INT8_PTR,
   FFI_KEY_ENTRY_LIST_HANDLE,
   FFI_LOCAL_KEY_HANDLE,
   FFI_POINTER,
@@ -16,14 +19,11 @@ import {
   FFI_SESSION_HANDLE,
   FFI_STORE_HANDLE,
   FFI_STRING,
-  FFI_STRING_PTR,
   FFI_STRING_LIST_HANDLE,
+  FFI_STRING_PTR,
+  FFI_VOID,
   SecretBufferStruct,
   SecretBufferStructPtr,
-  ByteBufferStruct,
-  AeadParamsStructPtr,
-  EncryptedBufferStructPtr,
-  FFI_VOID,
 } from '../ffi'
 
 export const nativeBindings = {
@@ -135,7 +135,18 @@ export const nativeBindings = {
   askar_scan_next: [FFI_ERROR_CODE, [FFI_SCAN_HANDLE, FFI_CALLBACK_PTR, FFI_CALLBACK_ID]],
   askar_scan_start: [
     FFI_ERROR_CODE,
-    [FFI_STORE_HANDLE, FFI_STRING, FFI_STRING, FFI_STRING, FFI_INT64, FFI_INT64, FFI_STRING, FFI_INT8, FFI_CALLBACK_PTR, FFI_CALLBACK_ID],
+    [
+      FFI_STORE_HANDLE,
+      FFI_STRING,
+      FFI_STRING,
+      FFI_STRING,
+      FFI_INT64,
+      FFI_INT64,
+      FFI_STRING,
+      FFI_INT8,
+      FFI_CALLBACK_PTR,
+      FFI_CALLBACK_ID,
+    ],
   ],
 
   askar_session_close: [FFI_ERROR_CODE, [FFI_SESSION_HANDLE, FFI_INT8, FFI_CALLBACK_PTR, FFI_CALLBACK_ID]],
@@ -149,7 +160,17 @@ export const nativeBindings = {
   ],
   askar_session_fetch_all: [
     FFI_ERROR_CODE,
-    [FFI_SESSION_HANDLE, FFI_STRING, FFI_STRING, FFI_INT64, FFI_STRING, FFI_INT8, FFI_INT8, FFI_CALLBACK_PTR, FFI_CALLBACK_ID],
+    [
+      FFI_SESSION_HANDLE,
+      FFI_STRING,
+      FFI_STRING,
+      FFI_INT64,
+      FFI_STRING,
+      FFI_INT8,
+      FFI_INT8,
+      FFI_CALLBACK_PTR,
+      FFI_CALLBACK_ID,
+    ],
   ],
   askar_session_fetch_all_keys: [
     FFI_ERROR_CODE,

@@ -1,6 +1,6 @@
-import type { LocalKeyHandle } from './handles'
 import type { KeyAlgorithm, SignatureAlgorithm } from '../enums'
 import type { KeyBackend } from '../enums'
+import type { LocalKeyHandle } from './handles'
 
 import { Buffer } from 'buffer'
 
@@ -54,7 +54,7 @@ export class Key {
         skHandle: this.handle,
         pkHandle: publicKey.handle,
         algorithm,
-      }),
+      })
     )
   }
 
@@ -84,7 +84,7 @@ export class Key {
       askar.keyGetJwkPublic({
         localKeyHandle: this.handle,
         algorithm: this.algorithm,
-      }),
+      })
     )
   }
 

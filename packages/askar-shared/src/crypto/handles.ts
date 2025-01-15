@@ -16,7 +16,7 @@ export class ArcHandle {
   }
 
   public static fromHandle(handle: ArcHandleType) {
-    return fromPointerHandle(this, handle)
+    return fromPointerHandle(ArcHandle, handle)
   }
 }
 
@@ -32,7 +32,7 @@ export class StoreHandle {
   }
 
   public static fromHandle(handle: number | null) {
-    return fromSequenceHandle(this, handle)
+    return fromSequenceHandle(StoreHandle, handle)
   }
 }
 
@@ -48,7 +48,7 @@ export class ScanHandle {
   }
 
   public static fromHandle(handle: number | null) {
-    return fromSequenceHandle(this, handle)
+    return fromSequenceHandle(ScanHandle, handle)
   }
 }
 
@@ -64,7 +64,7 @@ export class SessionHandle {
   }
 
   public static fromHandle(handle: number | null) {
-    return fromSequenceHandle(this, handle)
+    return fromSequenceHandle(SessionHandle, handle)
   }
 }
 
@@ -90,7 +90,7 @@ export class EntryListHandle extends ArcHandle {
   }
 
   public static fromHandle(handle: ArcHandleType) {
-    return fromPointerHandle(this, handle)
+    return fromPointerHandle(EntryListHandle, handle)
   }
 }
 
@@ -120,7 +120,7 @@ export class KeyEntryListHandle extends ArcHandle {
   }
 
   public static fromHandle(handle: ArcHandleType) {
-    return fromPointerHandle(this, handle)
+    return fromPointerHandle(KeyEntryListHandle, handle)
   }
 }
 
@@ -130,7 +130,7 @@ export class LocalKeyHandle extends ArcHandle {
   }
 
   public static fromHandle(handle: ArcHandleType) {
-    return fromPointerHandle(this, handle)
+    return fromPointerHandle(LocalKeyHandle, handle)
   }
 }
 
@@ -140,7 +140,7 @@ export class LocalKeyHandle extends ArcHandle {
  */
 function fromPointerHandle<HC extends typeof ArcHandle, H extends ArcHandleType>(
   HandleClass: HC,
-  handle: H,
+  handle: H
 ): H extends null ? null : InstanceType<HC> {
   return (handle ? (new HandleClass(handle) as InstanceType<HC>) : null) as H extends null ? null : InstanceType<HC>
 }

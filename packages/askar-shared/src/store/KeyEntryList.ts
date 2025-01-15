@@ -26,7 +26,7 @@ export class KeyEntryList {
     return new KeyEntry({ list: this.handle, pos: index })
   }
 
-  public forEach(cb: (entry: KeyEntry, index?: number) => unknown) {
+  public forEachKeyEntry(cb: (entry: KeyEntry, index?: number) => unknown) {
     for (let i = 0; i < this.length; i++) {
       cb(this.getEntryByIndex(i), i)
     }
@@ -34,7 +34,7 @@ export class KeyEntryList {
 
   public toArray(): KeyEntryObject[] {
     const list: KeyEntryObject[] = []
-    this.forEach((key) => list.push(key.toJson()))
+    this.forEachKeyEntry((key) => list.push(key.toJson()))
     return list
   }
 }

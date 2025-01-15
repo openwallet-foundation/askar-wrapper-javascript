@@ -64,7 +64,7 @@ export class Session {
     tagFilter,
     isJson,
     orderBy,
-    descending
+    descending,
   }: {
     category: string
     tagFilter?: Record<string, unknown>
@@ -82,9 +82,9 @@ export class Session {
       sessionHandle: this.handle,
       category,
       orderBy,
-      descending
+      descending,
     })
-    
+
     if (!handle) return []
 
     const entryList = new EntryList({ handle })

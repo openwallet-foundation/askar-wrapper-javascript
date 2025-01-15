@@ -1,22 +1,22 @@
 import type { NativeBindings } from './NativeBindings'
 
-import { registerAriesAskar } from '@hyperledger/aries-askar-shared'
+import { registerAskar } from '@openwallet-foundation/askar-shared'
 import { NativeModules } from 'react-native'
 
 import { ReactNativeAriesAskar } from './ReactNativeAriesAskar'
 
 // Reexport everything from shared
-export * from '@hyperledger/aries-askar-shared'
+export * from '@openwallet-foundation/askar-shared'
 
-const module = NativeModules.AriesAskar as { install: () => boolean }
-if (!module.install()) throw Error('Unable to install the turboModule: ariesAskar')
+const module = NativeModules.Askar as { install: () => boolean }
+if (!module.install()) throw Error('Unable to install the turboModule: askar')
 
-// This can already check whether `_aries_askar` exists on global
-// eslint-disable-next-line @typescript-eslint/no-use-before-define
-if (!_aries_askar) {
-  throw Error('_aries_askar has not been exposed on global. Something went wrong while installing the turboModule')
+// This can already check whether `_askar` exists on global
+// biome-ignore lint/correctness/noInvalidUseBeforeDeclaration:
+if (!_askar) {
+  throw Error('_askar has not been exposed on global. Something went wrong while installing the turboModule')
 }
 
-declare let _aries_askar: NativeBindings
+declare let _askar: NativeBindings
 
-registerAriesAskar({ askar: new ReactNativeAriesAskar(_aries_askar) })
+registerAskar({ askar: new ReactNativeAriesAskar(_askar) })

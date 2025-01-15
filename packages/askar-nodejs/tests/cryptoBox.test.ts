@@ -1,6 +1,6 @@
-import { CryptoBox, Key, KeyAlgorithm } from '@openwallet-foundation/askar-shared'
-import {describe, test, before } from 'node:test'
 import { deepStrictEqual } from 'node:assert'
+import { before, describe, test } from 'node:test'
+import { CryptoBox, Key, KeyAlgorithm } from '@openwallet-foundation/askar-shared'
 import { setup } from './utils/initialize'
 
 describe('CryptoBox', () => {

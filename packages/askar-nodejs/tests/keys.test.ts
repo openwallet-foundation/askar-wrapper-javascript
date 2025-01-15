@@ -1,6 +1,6 @@
-import { Jwk, Key, KeyAlgorithm, KeyMethod } from '@openwallet-foundation/askar-shared'
-import {describe, test, before} from 'node:test'
 import { deepStrictEqual, ok, strictEqual } from 'node:assert'
+import { before, describe, test } from 'node:test'
+import { Jwk, Key, KeyAlgorithm, KeyMethod } from '@openwallet-foundation/askar-shared'
 import { askarNodeJS } from '../src'
 import { setup } from './utils'
 
@@ -37,22 +37,28 @@ describe('keys', () => {
     const seed = Uint8Array.from(Buffer.from('testseed000000000000000000000001'))
     const key = Key.fromSeed({ algorithm: KeyAlgorithm.Bls12381G2, seed })
 
-    deepStrictEqual(key.jwkPublic, new Jwk({
-      crv: 'BLS12381_G2',
-      kty: 'OKP',
-      x: 'lH6hIRPzjlKW6LvPm0sHqyEbGqf8ag7UWpA_GFfefwq_kzDXSHmls9Yoza_be23zEw-pSOmKI_MGR1DahBa7Jbho2BGwDNV_QmyhxMYBwTH12Ltk_GLyPD4AP6pQVgge',
-      }))
+    deepStrictEqual(
+      key.jwkPublic,
+      new Jwk({
+        crv: 'BLS12381_G2',
+        kty: 'OKP',
+        x: 'lH6hIRPzjlKW6LvPm0sHqyEbGqf8ag7UWpA_GFfefwq_kzDXSHmls9Yoza_be23zEw-pSOmKI_MGR1DahBa7Jbho2BGwDNV_QmyhxMYBwTH12Ltk_GLyPD4AP6pQVgge',
+      })
+    )
   })
 
   test('Bls G1 Keygen', () => {
     const seed = Uint8Array.from(Buffer.from('testseed000000000000000000000001'))
     const key = Key.fromSeed({ algorithm: KeyAlgorithm.Bls12381G1, seed })
 
-    deepStrictEqual(key.jwkPublic, new Jwk({
-      crv: 'BLS12381_G1',
-      kty: 'OKP',
-      x: 'hsjb9FSBUJXuB1fCluEcUBLeAPgIbnZGfxPKyeN3LVjQaKFWzXfNtMFAY8VL-eu-',
-    }))
+    deepStrictEqual(
+      key.jwkPublic,
+      new Jwk({
+        crv: 'BLS12381_G1',
+        kty: 'OKP',
+        x: 'hsjb9FSBUJXuB1fCluEcUBLeAPgIbnZGfxPKyeN3LVjQaKFWzXfNtMFAY8VL-eu-',
+      })
+    )
   })
 
   test('Bls G1G2 Keygen', () => {
@@ -63,11 +69,14 @@ describe('keys', () => {
       method: KeyMethod.BlsKeygen,
     })
 
-    deepStrictEqual(key.jwkPublic, new Jwk({
-      crv: 'BLS12381_G1G2',
-      kty: 'OKP',
-      x: 'h56eYI8Qkq5hitICb-ik8wRTzcn6Fd4iY8aDNVc9q1xoPS3lh4DB_B4wNtar1HrViZIOsO6BgLV72zCrBE2ym3DEhDYcghnUMO4O8IVVD8yS-C_zu6OA3L-ny-AO4rbkAo-WuApZEjn83LY98UtoKpTufn4PCUFVQZzJNH_gXWHR3oDspJaCbOajBfm5qj6d',
-    }))
+    deepStrictEqual(
+      key.jwkPublic,
+      new Jwk({
+        crv: 'BLS12381_G1G2',
+        kty: 'OKP',
+        x: 'h56eYI8Qkq5hitICb-ik8wRTzcn6Fd4iY8aDNVc9q1xoPS3lh4DB_B4wNtar1HrViZIOsO6BgLV72zCrBE2ym3DEhDYcghnUMO4O8IVVD8yS-C_zu6OA3L-ny-AO4rbkAo-WuApZEjn83LY98UtoKpTufn4PCUFVQZzJNH_gXWHR3oDspJaCbOajBfm5qj6d',
+      })
+    )
   })
 
   test('ed25519', () => {
@@ -79,7 +88,6 @@ describe('keys', () => {
     const messageBuffer = Buffer.from('test message')
     const signature = key.signMessage({ message })
 
-
     strictEqual(key.verifySignature({ message, signature }), true)
     strictEqual(key.verifySignature({ message: messageBuffer, signature }), true)
     strictEqual(key.verifySignature({ message: Buffer.from('other message'), signature }), false)
@@ -87,20 +95,23 @@ describe('keys', () => {
       key.verifySignature({
         message: Uint8Array.from(Buffer.from('other message')),
         signature,
-      })
-    ,false)
+      }),
+      false
+    )
     strictEqual(
       key.verifySignature({
         message,
         signature: Uint8Array.from([8, 1, 1, 1]),
-      })
-    ,false)
+      }),
+      false
+    )
     strictEqual(
       key.verifySignature({
         message,
         signature: Buffer.from('random signature'),
       }),
-    false)
+      false
+    )
 
     const x25519Key = key.convertkey({ algorithm: KeyAlgorithm.X25519 })
     const x25519Key2 = Key.generate(KeyAlgorithm.X25519)
@@ -117,7 +128,6 @@ describe('keys', () => {
 
     strictEqual(key.jwkSecret.kty, 'OKP')
     strictEqual(key.jwkSecret.crv, 'Ed25519')
-
   })
 
   test('p384', () => {
@@ -128,7 +138,7 @@ describe('keys', () => {
     const message = Uint8Array.from(Buffer.from('test message'))
     const signature = key.signMessage({ message })
 
-    strictEqual(key.verifySignature({ message, signature }),true)
+    strictEqual(key.verifySignature({ message, signature }), true)
 
     strictEqual(key.jwkPublic.kty, 'EC')
     strictEqual(key.jwkPublic.crv, 'P-384')
@@ -137,4 +147,3 @@ describe('keys', () => {
     strictEqual(key.jwkSecret.crv, 'P-384')
   })
 })
-

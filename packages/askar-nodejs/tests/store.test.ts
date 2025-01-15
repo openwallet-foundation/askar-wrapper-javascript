@@ -1,7 +1,7 @@
-import { Store, StoreKeyMethod, Key, KeyAlgorithm, AskarError, KdfMethod } from '@openwallet-foundation/askar-shared'
-import { promises } from 'node:fs'
-import {describe, test, before, beforeEach, afterEach } from 'node:test'
 import { deepStrictEqual, doesNotReject, ok, rejects, strictEqual } from 'node:assert'
+import { promises } from 'node:fs'
+import { afterEach, before, beforeEach, describe, test } from 'node:test'
+import { AskarError, KdfMethod, Key, KeyAlgorithm, Store, StoreKeyMethod } from '@openwallet-foundation/askar-shared'
 import { firstEntry, getRawKey, secondEntry, setup, setupWallet, testStoreUri } from './utils'
 
 describe('Store and Session', () => {
@@ -70,13 +70,16 @@ describe('Store and Session', () => {
 
     await newStore.close()
 
-    await rejects(() => 
-      Store.open({
-        profile: 'rekey',
-        uri: `sqlite://${storagePath}/rekey.db`,
-        keyMethod: new StoreKeyMethod(KdfMethod.Raw),
-        passKey: initialKey,
-      }), new AskarError({code: 4, message: 'Error decrypting profile key\nCaused by: AEAD decryption error'}))
+    await rejects(
+      () =>
+        Store.open({
+          profile: 'rekey',
+          uri: `sqlite://${storagePath}/rekey.db`,
+          keyMethod: new StoreKeyMethod(KdfMethod.Raw),
+          passKey: initialKey,
+        }),
+      new AskarError({ code: 4, message: 'Error decrypting profile key\nCaused by: AEAD decryption error' })
+    )
 
     newStore = await Store.open({
       profile: 'rekey',
@@ -85,7 +88,7 @@ describe('Store and Session', () => {
       passKey: newKey,
     })
 
-    await promises.rm(storagePath, {recursive: true,force: true}).catch()
+    await promises.rm(storagePath, { recursive: true, force: true }).catch()
 
     await newStore.close(true)
   })
@@ -151,11 +154,13 @@ describe('Store and Session', () => {
 
     await session.insert(firstEntry)
     await session.insert(secondEntry)
-    const found = (await scanStore.scan({ category: firstEntry.category }).fetchAll()).sort((a) => a.name === 'testEntry' ? -1 : 1)
+    const found = (await scanStore.scan({ category: firstEntry.category }).fetchAll()).sort((a) =>
+      a.name === 'testEntry' ? -1 : 1
+    )
 
     strictEqual(found.length, 2)
     deepStrictEqual(found[0], firstEntry)
-    deepStrictEqual(found[1], {...secondEntry, value: JSON.stringify(secondEntry.value)})
+    deepStrictEqual(found[1], { ...secondEntry, value: JSON.stringify(secondEntry.value) })
 
     await session.close()
     await scanStore.close()
@@ -166,7 +171,7 @@ describe('Store and Session', () => {
 
     await txn.insert(firstEntry)
 
-    strictEqual(await txn.count(firstEntry),1)
+    strictEqual(await txn.count(firstEntry), 1)
 
     deepStrictEqual(await txn.fetch(firstEntry), firstEntry)
 
@@ -195,15 +200,15 @@ describe('Store and Session', () => {
     const fetchedKey1 = await session.fetchKey({ name: keyName })
 
     strictEqual(fetchedKey1?.name, keyName)
-    deepStrictEqual(fetchedKey1?.tags, {a: 'b'})
-    deepStrictEqual(fetchedKey1?.metadata,'metadata')
+    deepStrictEqual(fetchedKey1?.tags, { a: 'b' })
+    deepStrictEqual(fetchedKey1?.metadata, 'metadata')
 
     await session.updateKey({ name: keyName, metadata: 'updated metadata', tags: { a: 'c' } })
     const fetchedKey2 = await session.fetchKey({ name: keyName })
 
     strictEqual(fetchedKey2?.name, keyName)
-    deepStrictEqual(fetchedKey2?.tags, {a: 'c'})
-    deepStrictEqual(fetchedKey2?.metadata,'updated metadata')
+    deepStrictEqual(fetchedKey2?.tags, { a: 'c' })
+    deepStrictEqual(fetchedKey2?.metadata, 'updated metadata')
 
     ok(key.jwkThumbprint === fetchedKey1?.key.jwkThumbprint)
 
@@ -214,8 +219,8 @@ describe('Store and Session', () => {
     })
 
     strictEqual(found[0].name, keyName)
-    deepStrictEqual(found[0].tags, {a: 'c'})
-    deepStrictEqual(found[0].metadata,'updated metadata')
+    deepStrictEqual(found[0].tags, { a: 'c' })
+    deepStrictEqual(found[0].metadata, 'updated metadata')
 
     await session.removeKey({ name: keyName })
 
@@ -227,7 +232,9 @@ describe('Store and Session', () => {
     fetchedKey2?.key.handle.free()
     key.handle.free()
 
-    found.forEach((entry) => entry.key.handle.free())
+    for (const entry of found) {
+      entry.key.handle.free()
+    }
   })
 
   test('Profile', async () => {
@@ -251,7 +258,7 @@ describe('Store and Session', () => {
       const key = getRawKey()
       const store2 = await Store.open({ uri: testStoreUri, keyMethod: new StoreKeyMethod(KdfMethod.Raw), passKey: key })
       const session3 = await store2.openSession()
-      
+
       strictEqual(await session3.count(firstEntry), 0)
 
       await session3.close()
@@ -290,11 +297,13 @@ describe('Store and Session', () => {
   test('Copy', async () => {
     const key = getRawKey()
 
-    await doesNotReject(() => store.copyTo({
-      uri: 'sqlite://:memory:',
-      keyMethod: new StoreKeyMethod(KdfMethod.Raw),
-      passKey: key,
-      recreate: true,
-    }))
+    await doesNotReject(() =>
+      store.copyTo({
+        uri: 'sqlite://:memory:',
+        keyMethod: new StoreKeyMethod(KdfMethod.Raw),
+        passKey: key,
+        recreate: true,
+      })
+    )
   })
 })

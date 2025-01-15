@@ -1,7 +1,7 @@
-import type { ByteBufferStruct, SecretBufferStruct } from './structures'
 import { NULL } from '@2060.io/ref-napi'
-import { Key, ArcHandle, StoreHandle, SessionHandle, ScanHandle, Jwk } from '@openwallet-foundation/askar-shared'
+import { ArcHandle, Jwk, Key, ScanHandle, SessionHandle, StoreHandle } from '@openwallet-foundation/askar-shared'
 import { uint8arrayToByteBufferStruct } from './conversion'
+import type { ByteBufferStruct, SecretBufferStruct } from './structures'
 
 export type Callback = (err: number) => void
 export type CallbackWithResponse = (err: number, response: string) => void
@@ -77,34 +77,40 @@ const serialize = (arg: Argument): SerializedArgument => {
     case 'object':
       if (arg instanceof Date) {
         return arg.valueOf()
-      } else if (
+      }
+      if (
         arg instanceof ArcHandle ||
         arg instanceof StoreHandle ||
         arg instanceof SessionHandle ||
         arg instanceof ScanHandle
       ) {
         return arg.handle
-      } else if (arg instanceof Key) {
-        return arg.handle.handle
-      } else if (arg instanceof Buffer) {
-        return uint8arrayToByteBufferStruct(arg) as unknown as Buffer
-      } else if (arg instanceof Uint8Array) {
-        return uint8arrayToByteBufferStruct(Buffer.from(arg)) as unknown as Buffer
-      } else if (arg instanceof Jwk) {
-        return uint8arrayToByteBufferStruct(Buffer.from(arg.toUint8Array())) as unknown as Buffer
-      } else {
-        return JSON.stringify(arg)
       }
+      if (arg instanceof Key) {
+        return arg.handle.handle
+      }
+      if (arg instanceof Buffer) {
+        return uint8arrayToByteBufferStruct(arg) as unknown as Buffer
+      }
+      if (arg instanceof Uint8Array) {
+        return uint8arrayToByteBufferStruct(Buffer.from(arg)) as unknown as Buffer
+      }
+      if (arg instanceof Jwk) {
+        return uint8arrayToByteBufferStruct(Buffer.from(arg.toUint8Array())) as unknown as Buffer
+      }
+      return JSON.stringify(arg)
     default:
       throw new Error('could not serialize value')
   }
 }
 
 const serializeArguments = <T extends Record<string, Argument> = Record<string, Argument>>(
-  args: T,
+  args: T
 ): SerializedOptions<T> => {
   const retVal: SerializedArguments = {}
-  Object.entries(args).forEach(([key, val]) => (retVal[key] = serialize(val)))
+  for (const [key, value] of Object.entries(args)) {
+    retVal[key] = serialize(value)
+  }
   return retVal as SerializedOptions<T>
 }
 

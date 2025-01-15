@@ -1,5 +1,5 @@
-import type { KeyAlgorithm } from '../enums'
 import { askar } from '../askar'
+import type { KeyAlgorithm } from '../enums'
 import { Key } from './Key'
 
 export class Ecdh1PU {
@@ -39,7 +39,7 @@ export class Ecdh1PU {
         recipientKey: recipientKey,
         senderKey: senderKey,
         ccTag,
-      }),
+      })
     )
   }
 
@@ -60,7 +60,13 @@ export class Ecdh1PU {
     aad?: Uint8Array
     nonce?: Uint8Array
   }) {
-    const derived = this.deriveKey({ encryptionAlgorithm: encryptionAlgorithm, ephemeralKey, recipientKey, senderKey, receive: false })
+    const derived = this.deriveKey({
+      encryptionAlgorithm: encryptionAlgorithm,
+      ephemeralKey,
+      recipientKey,
+      senderKey,
+      receive: false,
+    })
     const encryptedBuffer = derived.aeadEncrypt({ message, aad, nonce })
     derived.handle.free()
     return encryptedBuffer
@@ -85,7 +91,13 @@ export class Ecdh1PU {
     tag: Uint8Array
     aad?: Uint8Array
   }) {
-    const derived = this.deriveKey({ encryptionAlgorithm: encryptionAlgorithm, ephemeralKey, recipientKey, senderKey, receive: true })
+    const derived = this.deriveKey({
+      encryptionAlgorithm: encryptionAlgorithm,
+      ephemeralKey,
+      recipientKey,
+      senderKey,
+      receive: true,
+    })
     const encryptedBuffer = derived.aeadDecrypt({ tag, nonce, ciphertext, aad })
     derived.handle.free()
     return encryptedBuffer
@@ -148,7 +160,7 @@ export class Ecdh1PU {
       senderKey,
       ccTag,
     })
-    const encryptedBuffer = derived.unwrapKey({ tag, nonce, ciphertext, algorithm: encryptionAlgorithm})
+    const encryptedBuffer = derived.unwrapKey({ tag, nonce, ciphertext, algorithm: encryptionAlgorithm })
     derived.handle.free()
     return encryptedBuffer
   }

@@ -36,7 +36,7 @@ export class EcdhEs {
         algorithm: encryptionAlgorithm,
         ephemeralKey,
         recipientKey,
-      }),
+      })
     )
   }
 
@@ -99,7 +99,12 @@ export class EcdhEs {
     recipientKey: Key
     cek: Key
   }) {
-    const derived = this.deriveKey({ encryptionAlgorithm: keyWrappingAlgorithm, ephemeralKey, recipientKey, receive: false })
+    const derived = this.deriveKey({
+      encryptionAlgorithm: keyWrappingAlgorithm,
+      ephemeralKey,
+      recipientKey,
+      receive: false,
+    })
     const encryptedBuffer = derived.wrapKey({ other: cek })
     derived.handle.free()
     return encryptedBuffer
@@ -122,7 +127,12 @@ export class EcdhEs {
     nonce?: Uint8Array
     tag?: Uint8Array
   }) {
-    const derived = this.deriveKey({ encryptionAlgorithm: keyWrappingAlgorithm, ephemeralKey, recipientKey, receive: true })
+    const derived = this.deriveKey({
+      encryptionAlgorithm: keyWrappingAlgorithm,
+      ephemeralKey,
+      recipientKey,
+      receive: true,
+    })
     const encryptedBuffer = derived.unwrapKey({ tag, nonce, ciphertext, algorithm: encryptionAlgorithm })
     derived.handle.free()
     return encryptedBuffer

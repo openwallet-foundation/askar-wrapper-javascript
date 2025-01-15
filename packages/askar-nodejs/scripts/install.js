@@ -8,7 +8,7 @@ const archTable = {
 
 const platform = osPlatform()
 const targetPlatform = platform === 'win32' ? 'windows' : platform
-const targetArchitecture = platform == 'darwin' ? 'universal' : archTable[arch]
+const targetArchitecture = platform === 'darwin' ? 'universal' : archTable[arch]
 
 const command = `node-pre-gyp install --target_arch=${targetArchitecture} --target_platform=${targetPlatform}`
 

@@ -1,7 +1,7 @@
 import { Callback } from '@2060.io/ffi-napi'
 import { refType } from '@2060.io/ref-napi'
 import { allocateCallbackBuffer } from './alloc'
-import { FFI_VOID, FFI_CALLBACK_ID, FFI_ERROR_CODE, FFI_STRING, FFI_INT32 } from './primitives'
+import { FFI_CALLBACK_ID, FFI_ERROR_CODE, FFI_INT32, FFI_STRING, FFI_VOID } from './primitives'
 
 export type NativeCallback = (id: number, errorCode: number) => void
 export const toNativeCallback = (cb: NativeCallback) => {
@@ -24,13 +24,13 @@ export type NativeLogCallback = (
   message: string,
   modulePath: string,
   file: string,
-  line: number,
+  line: number
 ) => void
 export const toNativeLogCallback = (cb: NativeLogCallback) => {
   const nativeCallback = Callback(
     FFI_VOID,
     [refType(FFI_VOID), FFI_INT32, FFI_STRING, FFI_STRING, FFI_STRING, FFI_STRING, FFI_INT32],
-    cb,
+    cb
   )
   const id = allocateCallbackBuffer(nativeCallback)
   return { nativeCallback, id }

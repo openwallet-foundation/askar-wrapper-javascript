@@ -1,4 +1,4 @@
-import { Store, StoreKeyMethod, KdfMethod, registerAskar, askar, LogLevel } from '@openwallet-foundation/askar-shared'
+import { KdfMethod, LogLevel, Store, StoreKeyMethod, askar, registerAskar } from '@openwallet-foundation/askar-shared'
 import { NodeJSAskar } from '../../src/NodeJSAskar'
 
 export const getRawKey = () => Store.generateRawKey(Buffer.from('00000000000000000000000000000My1'))
