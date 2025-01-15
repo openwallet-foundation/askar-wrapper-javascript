@@ -51,7 +51,7 @@
   "binary": {
     "module_name": "askar",
     "module_path": "native",
-    "remote_path": "v0.3.2",
+    "remote_path": "v0.4.1",
     "host": "https://github.com/openwallet-foundation/askar/releases/download/",
     "package_name": "library-ios-android.tar.gz"
   }
