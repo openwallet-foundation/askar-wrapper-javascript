@@ -2,12 +2,14 @@
 
 #include <jsi/jsi.h>
 
-#include "include/libaries_askar.h"
 #include "turboModuleUtility.h"
+
+// TODO(rename): rename to askar when lib name is changed
+#include "include/libaries_askar.h"
 
 using namespace facebook;
 
-namespace ariesAskar {
+namespace askar {
 
 jsi::Value version(jsi::Runtime &rt, jsi::Object options);
 jsi::Value getCurrentError(jsi::Runtime &rt, jsi::Object options);
@@ -106,4 +108,4 @@ jsi::Value stringListCount(jsi::Runtime &rt, jsi::Object options);
 jsi::Value stringListFree(jsi::Runtime &rt, jsi::Object options);
 jsi::Value stringListGetItem(jsi::Runtime &rt, jsi::Object options);
 
-} // namespace ariesAskar
+} // namespace askar

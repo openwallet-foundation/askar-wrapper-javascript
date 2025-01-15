@@ -3,17 +3,17 @@
 #include <jsi/jsi.h>
 #include <map>
 
-#include "ariesAskar.h"
 #include "turboModuleUtility.h"
+#include "askar.h"
 
 using namespace facebook;
 
 typedef jsi::Value (*Cb)(jsi::Runtime &rt, jsi::Object options);
 typedef std::map<const char *, Cb> FunctionMap;
 
-class JSI_EXPORT AriesAskarTurboModuleHostObject : public jsi::HostObject {
+class JSI_EXPORT AskarTurboModuleHostObject : public jsi::HostObject {
 public:
-  AriesAskarTurboModuleHostObject(jsi::Runtime &rt);
+  AskarTurboModuleHostObject(jsi::Runtime &rt);
   jsi::Function call(jsi::Runtime &rt, const char *name, Cb cb);
   FunctionMap functionMapping(jsi::Runtime &rt);
 

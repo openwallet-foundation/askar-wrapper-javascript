@@ -3,7 +3,7 @@ require "json"
 package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 
 Pod::Spec.new do |s|
-  s.name         = "aries-askar"
+  s.name         = "askar"
   s.version      = package["version"]
   s.summary      = package["description"]
   s.homepage     = package["homepage"]
@@ -11,14 +11,16 @@ Pod::Spec.new do |s|
   s.authors      = package["author"]
 
   s.platforms    = { :ios => "12.0" }
-  s.source       = { :git => "https://github.com/hyperledger/aries-askar", :tag => "#{s.version}" }
+  s.source       = { :git => "https://github.com/openwallet-foundation/askar-wrapper-javascript", :tag => "#{s.version}" }
 
   s.header_mappings_dir = "cpp"
 
   s.pod_target_xcconfig = {
-    :USE_HEADERMAP => "No"
+    :USE_HEADERMAP => "No",
+    'CLANG_CXX_LANGUAGE_STANDARD' => "c++20",
   }
 
+  # TODO(rename): rename to askar when lib name is changed
   s.ios.vendored_frameworks = "native/mobile/ios/aries_askar.xcframework"
 
   s.source_files = "ios/**/*.{h,m,mm}", "cpp/**/*.{h,cpp}"

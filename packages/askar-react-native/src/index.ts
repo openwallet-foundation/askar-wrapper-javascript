@@ -3,7 +3,7 @@ import type { NativeBindings } from './NativeBindings'
 import { registerAskar } from '@openwallet-foundation/askar-shared'
 import { NativeModules } from 'react-native'
 
-import { ReactNativeAriesAskar } from './ReactNativeAriesAskar'
+import { ReactNativeAskar } from './ReactNativeAskar'
 
 // Reexport everything from shared
 export * from '@openwallet-foundation/askar-shared'
@@ -19,4 +19,4 @@ if (!_askar) {
 
 declare let _askar: NativeBindings
 
-registerAskar({ askar: new ReactNativeAriesAskar(_askar) })
+registerAskar({ askar: new ReactNativeAskar(_askar) })

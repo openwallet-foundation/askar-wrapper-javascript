@@ -4,11 +4,12 @@
 #include <jsi/jsi.h>
 
 #include "HostObject.h"
+// TODO(rename): when lib has changed
 #include "include/libaries_askar.h"
 
 using namespace facebook;
 
-namespace ariesAskarTurboModuleUtility {
+namespace askarTurboModuleUtility {
 
 static const std::string errorPrefix = "Value `";
 static const std::string errorInfix = "` is not of type ";
@@ -58,4 +59,4 @@ jsi::Value createReturnValue(jsi::Runtime &rt, ErrorCode code, T out);
 jsi::ArrayBuffer byteBufferToArrayBuffer(jsi::Runtime &rt, ByteBuffer bb);
 jsi::ArrayBuffer secretBufferToArrayBuffer(jsi::Runtime &rt, SecretBuffer sb);
 
-} // namespace ariesAskarTurboModuleUtility
+} // namespace askarTurboModuleUtility

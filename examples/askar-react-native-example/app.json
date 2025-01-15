@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "aries-askar-react-native-example",
-    "slug": "aries-askar-react-native-example",
+    "name": "askar-react-native-example",
+    "slug": "askar-react-native-example",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,14 +14,14 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "org.hyperledger.ariesaskar.example"
+      "bundleIdentifier": "foundation.openwallet.askar.example"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "org.hyperledger.ariesaskar.example"
+      "package": "foundation.openwallet.askar.example"
     }
   }
 }

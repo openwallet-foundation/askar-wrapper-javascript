@@ -7,14 +7,14 @@
 
 using namespace facebook;
 
-struct AriesAskarModule : jni::JavaClass<AriesAskarModule> {
+struct AskarModule : jni::JavaClass<AskarModule> {
 public:
-  __unused static constexpr auto kJavaDescriptor = "Lorg/hyperledger/ariesaskar/AriesAskarModule;";
+  __unused static constexpr auto kJavaDescriptor = "Lfoundation/openwallet/askar/AskarModule;";
 
-  static constexpr auto TAG = "AriesAskar";
+  static constexpr auto TAG = "Askar";
 
   static void registerNatives() {
-    javaClassStatic()->registerNatives({ makeNativeMethod("installNative", AriesAskarModule::installNative) });
+    javaClassStatic()->registerNatives({ makeNativeMethod("installNative", AskarModule::installNative) });
   }
 
 private:
@@ -25,12 +25,12 @@ private:
     auto runtime = reinterpret_cast<jsi::Runtime*>(jsiRuntimePointer);
     auto jsCallInvoker = jsCallInvokerHolder->cthis()->getCallInvoker();
 
-    ariesAskarTurboModuleUtility::registerTurboModule(*runtime, jsCallInvoker);
+    askarTurboModuleUtility::registerTurboModule(*runtime, jsCallInvoker);
   }
 };
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *) {
   return facebook::jni::initialize(vm, [] {
-    AriesAskarModule::registerNatives();
+    AskarModule::registerNatives();
   });
 }

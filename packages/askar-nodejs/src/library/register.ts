@@ -5,6 +5,7 @@ import { Library } from '@2060.io/ffi-napi'
 import type { NativeMethods } from './NativeBindingInterface'
 import { nativeBindings } from './bindings'
 
+// TODO(rename): when lib is changed
 const LIBNAME = 'aries_askar'
 const ENV_VAR = 'LIB_ASKAR_PATH'
 

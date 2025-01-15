@@ -1,31 +1,28 @@
-package org.hyperledger.ariesaskar;
+package foundation.openwallet.askar;
 
 import android.util.Log;
-
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
-
 import com.facebook.proguard.annotations.DoNotStrip;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.turbomodule.core.CallInvokerHolderImpl;
-
 import id.animo.SecureEnvironment;
 
 @Keep
 @DoNotStrip
-public class AriesAskarModule extends ReactContextBaseJavaModule {
+public class AskarModule extends ReactContextBaseJavaModule {
     static {
-        System.loadLibrary("ariesaskarreactnative");
+        System.loadLibrary("askarreactnative");
     }
 
-    public static final String NAME = "AriesAskar";
+    public static final String NAME = "Askar";
 
-    static String TAG = "AriesAskar";
+    static String TAG = "Askar";
 
-    public AriesAskarModule(ReactApplicationContext reactContext) {
+    public AskarModule(ReactApplicationContext reactContext) {
         super(reactContext);
     }
 

@@ -29,7 +29,7 @@
     "askar.podspec"
   ],
   "scripts": {
-    "check-types": "pnpm compile --noEmit",
+    "types:check": "pnpm compile --noEmit",
     "build": "pnpm clean && pnpm compile",
     "clean": "rimraf -rf ./build",
     "compile": "tsc -p ./tsconfig.build.json",

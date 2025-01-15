@@ -1,12 +1,12 @@
-project(ariesaskarreactnative)
+project(askarreactnative)
 cmake_minimum_required(VERSION 3.4.1)
 
-set (PACKAGE_NAME "ariesaskarreactnative")
-set (LIB_NAME "ariesaskar")
+set (PACKAGE_NAME "askarreactnative")
+set (LIB_NAME "askar")
 file (GLOB LIBASKAR_DIR "${CMAKE_SOURCE_DIR}/../native/mobile/android/${ANDROID_ABI}")
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 20)
 
 set (BUILD_DIR ${CMAKE_SOURCE_DIR}/build)
 if(${REACT_NATIVE_VERSION} GREATER_EQUAL 71)
@@ -33,7 +33,7 @@ add_library(
   cpp-adapter.cpp
   ../cpp/HostObject.cpp
   ../cpp/turboModuleUtility.cpp
-  ../cpp/ariesAskar.cpp
+  ../cpp/askar.cpp
 )
 
 if(${REACT_NATIVE_VERSION} GREATER_EQUAL 71)
@@ -122,6 +122,7 @@ find_library(
 
 find_library(
   ASKAR_LIB 
+  # TODO(rename): when lib has changed
   aries_askar 
   paths ${LIBASKAR_DIR}
   NO_CMAKE_FIND_ROOT_PATH

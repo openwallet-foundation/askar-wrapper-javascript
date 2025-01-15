@@ -24,7 +24,7 @@ static def findNodeModules(baseDir) {
     }
     basePath = basePath.getParent()
   }
-  throw new GradleException("aries-askar: Failed to find node_modules/ path!")
+  throw new GradleException("askar: Failed to find node_modules/ path!")
 }
 
 static def findNodeModulePath(baseDir, packageName) {

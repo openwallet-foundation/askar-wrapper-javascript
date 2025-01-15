@@ -42,7 +42,7 @@ importers:
         specifier: ~5.4.5
         version: 5.4.5
 
-  examples/aries-askar-react-native-example:
+  examples/askar-react-native-example:
     dependencies:
       '@openwallet-foundation/askar-react-native':
         specifier: workspace:*

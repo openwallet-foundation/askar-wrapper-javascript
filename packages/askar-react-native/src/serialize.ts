@@ -1,4 +1,4 @@
-import { ArcHandle, Jwk, Key, ScanHandle, SessionHandle, StoreHandle } from '@hyperledger/aries-askar-shared'
+import { ArcHandle, Jwk, Key, ScanHandle, SessionHandle, StoreHandle } from '@openwallet-foundation/askar-shared'
 
 export type ReturnObject<T = unknown> = {
   errorCode: number

@@ -1,6 +1,6 @@
 import type {
-  AriesAskar,
-  AriesAskarErrorObject,
+  Askar,
+  AskarErrorObject,
   EntryListCountOptions,
   EntryListFreeOptions,
   EntryListGetCategoryOptions,
@@ -73,13 +73,13 @@ import type {
   StoreRemoveOptions,
   StoreRemoveProfileOptions,
   StoreSetDefaultProfileOptions,
-} from '@hyperledger/aries-askar-shared'
+} from '@openwallet-foundation/askar-shared'
 import type { NativeBindings } from './NativeBindings'
 import type { Callback, CallbackWithResponse, ReturnObject } from './serialize'
 
 import {
   AeadParams,
-  AriesAskarError,
+  AskarError,
   EncryptedBuffer,
   EntryListHandle,
   KeyEntryListHandle,
@@ -88,15 +88,15 @@ import {
   SessionHandle,
   StoreHandle,
   handleInvalidNullResponse,
-} from '@hyperledger/aries-askar-shared'
+} from '@openwallet-foundation/askar-shared'
 
 import { serializeArguments } from './serialize'
 
-export class ReactNativeAriesAskar implements AriesAskar {
-  private ariesAskar: NativeBindings
+export class ReactNativeAskar implements Askar {
+  private askar: NativeBindings
 
   public constructor(bindings: NativeBindings) {
-    this.ariesAskar = bindings
+    this.askar = bindings
   }
 
   /**
@@ -109,22 +109,22 @@ export class ReactNativeAriesAskar implements AriesAskar {
    * error codes are used rather than error messages for error handling.
    *
    */
-  private getAriesAskarError(errorCode: number): AriesAskarError {
+  private getAskarError(errorCode: number): AskarError {
     const error = this.getCurrentError()
     if (error.code !== errorCode) {
-      return new AriesAskarError({
+      return new AskarError({
         code: errorCode,
         message:
           'Error details have already been overwritten on the native side, unable to retrieve error message for the error',
       })
     }
 
-    return new AriesAskarError(error)
+    return new AskarError(error)
   }
 
   private handleError<T>({ errorCode, value }: ReturnObject<T>): T {
     if (errorCode === 0) return value as T
-    throw this.getAriesAskarError(errorCode)
+    throw this.getAskarError(errorCode)
   }
 
   private promisify(method: (cb: Callback) => void): Promise<void> {
@@ -146,13 +146,11 @@ export class ReactNativeAriesAskar implements AriesAskar {
     return new Promise((resolve, reject) => {
       const _cb: CallbackWithResponse<Return> = ({ errorCode, value }) => {
         if (errorCode !== 0) {
-          const error = this.getAriesAskarError(errorCode)
+          const error = this.getAskarError(errorCode)
           reject(error)
         } else {
           if (value === undefined) {
-            reject(
-              AriesAskarError.customError({ message: 'error code was 0 but no value found. This should not occur.' })
-            )
+            reject(AskarError.customError({ message: 'error code was 0 but no value found. This should not occur.' }))
           } else {
             resolve(value)
           }
@@ -163,12 +161,12 @@ export class ReactNativeAriesAskar implements AriesAskar {
   }
 
   public version(): string {
-    return handleInvalidNullResponse(this.ariesAskar.version({}))
+    return handleInvalidNullResponse(this.askar.version({}))
   }
 
-  public getCurrentError(): AriesAskarErrorObject {
-    const serializedError = handleInvalidNullResponse(this.ariesAskar.getCurrentError({}))
-    return JSON.parse(serializedError) as AriesAskarErrorObject
+  public getCurrentError(): AskarErrorObject {
+    const serializedError = handleInvalidNullResponse(this.askar.getCurrentError({}))
+    return JSON.parse(serializedError) as AskarErrorObject
   }
 
   public clearCustomLogger(): void {
@@ -180,7 +178,7 @@ export class ReactNativeAriesAskar implements AriesAskar {
   }
 
   public setDefaultLogger(): void {
-    this.ariesAskar.setDefaultLogger({})
+    this.askar.setDefaultLogger({})
   }
 
   public setMaxLogLevel(): void {
@@ -189,46 +187,46 @@ export class ReactNativeAriesAskar implements AriesAskar {
 
   public entryListCount(options: EntryListCountOptions): number {
     const serializedOptions = serializeArguments(options)
-    return handleInvalidNullResponse(this.handleError(this.ariesAskar.entryListCount(serializedOptions)))
+    return handleInvalidNullResponse(this.handleError(this.askar.entryListCount(serializedOptions)))
   }
 
   public entryListFree(options: EntryListFreeOptions): void {
     const serializedOptions = serializeArguments(options)
 
     // null response is expected as we're freeing the object
-    this.handleError(this.ariesAskar.entryListFree(serializedOptions))
+    this.handleError(this.askar.entryListFree(serializedOptions))
   }
 
   public entryListGetCategory(options: EntryListGetCategoryOptions): string {
     const serializedOptions = serializeArguments(options)
-    return handleInvalidNullResponse(this.handleError(this.ariesAskar.entryListGetCategory(serializedOptions)))
+    return handleInvalidNullResponse(this.handleError(this.askar.entryListGetCategory(serializedOptions)))
   }
 
   public entryListGetName(options: EntryListGetNameOptions): string {
     const serializedOptions = serializeArguments(options)
-    return handleInvalidNullResponse(this.handleError(this.ariesAskar.entryListGetName(serializedOptions)))
+    return handleInvalidNullResponse(this.handleError(this.askar.entryListGetName(serializedOptions)))
   }
 
   public entryListGetTags(options: EntryListGetTagsOptions): string | null {
     const serializedOptions = serializeArguments(options)
-    return this.handleError(this.ariesAskar.entryListGetTags(serializedOptions))
+    return this.handleError(this.askar.entryListGetTags(serializedOptions))
   }
 
   public entryListGetValue(options: EntryListGetValueOptions): Uint8Array {
     const serializedOptions = serializeArguments(options)
-    const buf = handleInvalidNullResponse(this.handleError(this.ariesAskar.entryListGetValue(serializedOptions)))
+    const buf = handleInvalidNullResponse(this.handleError(this.askar.entryListGetValue(serializedOptions)))
     return new Uint8Array(buf)
   }
 
   public keyAeadDecrypt(options: KeyAeadDecryptOptions): Uint8Array {
     const serializedOptions = serializeArguments(options)
-    const buf = handleInvalidNullResponse(this.handleError(this.ariesAskar.keyAeadDecrypt(serializedOptions)))
+    const buf = handleInvalidNullResponse(this.handleError(this.askar.keyAeadDecrypt(serializedOptions)))
     return new Uint8Array(buf)
   }
 
   public keyAeadEncrypt(options: KeyAeadEncryptOptions): EncryptedBuffer {
     const serializedOptions = serializeArguments(options)
-    const ret = this.handleError(this.ariesAskar.keyAeadEncrypt(serializedOptions))
+    const ret = this.handleError(this.askar.keyAeadEncrypt(serializedOptions))
 
     const { buffer, noncePos, tagPos } = handleInvalidNullResponse(ret)
 
@@ -237,12 +235,12 @@ export class ReactNativeAriesAskar implements AriesAskar {
 
   public keyAeadGetPadding(options: KeyAeadGetPaddingOptions): number {
     const serializedOptions = serializeArguments(options)
-    return handleInvalidNullResponse(this.handleError(this.ariesAskar.keyAeadGetPadding(serializedOptions)))
+    return handleInvalidNullResponse(this.handleError(this.askar.keyAeadGetPadding(serializedOptions)))
   }
 
   public keyAeadGetParams(options: KeyAeadGetParamsOptions): AeadParams {
     const serializedOptions = serializeArguments(options)
-    const ret = this.handleError(this.ariesAskar.keyAeadGetParams(serializedOptions))
+    const ret = this.handleError(this.askar.keyAeadGetParams(serializedOptions))
 
     const { tagLength, nonceLength } = handleInvalidNullResponse(ret)
 
@@ -251,93 +249,93 @@ export class ReactNativeAriesAskar implements AriesAskar {
 
   public keyAeadRandomNonce(options: KeyAeadRandomNonceOptions): Uint8Array {
     const serializedOptions = serializeArguments(options)
-    const buf = handleInvalidNullResponse(this.handleError(this.ariesAskar.keyAeadRandomNonce(serializedOptions)))
+    const buf = handleInvalidNullResponse(this.handleError(this.askar.keyAeadRandomNonce(serializedOptions)))
     return new Uint8Array(buf)
   }
 
   public keyConvert(options: KeyConvertOptions): LocalKeyHandle {
     const serializedOptions = serializeArguments(options)
-    const handle = handleInvalidNullResponse(this.handleError(this.ariesAskar.keyConvert(serializedOptions)))
+    const handle = handleInvalidNullResponse(this.handleError(this.askar.keyConvert(serializedOptions)))
 
     return new LocalKeyHandle(handle)
   }
 
   public keyCryptoBox(options: KeyCryptoBoxOptions): Uint8Array {
     const serializedOptions = serializeArguments(options)
-    const buf = handleInvalidNullResponse(this.handleError(this.ariesAskar.keyCryptoBox(serializedOptions)))
+    const buf = handleInvalidNullResponse(this.handleError(this.askar.keyCryptoBox(serializedOptions)))
     return new Uint8Array(buf)
   }
 
   public keyCryptoBoxOpen(options: KeyCryptoBoxOpenOptions): Uint8Array {
     const serializedOptions = serializeArguments(options)
-    const buf = handleInvalidNullResponse(this.handleError(this.ariesAskar.keyCryptoBoxOpen(serializedOptions)))
+    const buf = handleInvalidNullResponse(this.handleError(this.askar.keyCryptoBoxOpen(serializedOptions)))
     return new Uint8Array(buf)
   }
 
   public keyCryptoBoxRandomNonce(): Uint8Array {
-    const buf = handleInvalidNullResponse(this.handleError(this.ariesAskar.keyCryptoBoxRandomNonce({})))
+    const buf = handleInvalidNullResponse(this.handleError(this.askar.keyCryptoBoxRandomNonce({})))
     return new Uint8Array(buf)
   }
 
   public keyCryptoBoxSeal(options: KeyCryptoBoxSealOptions): Uint8Array {
     const serializedOptions = serializeArguments(options)
-    const buf = handleInvalidNullResponse(this.handleError(this.ariesAskar.keyCryptoBoxSeal(serializedOptions)))
+    const buf = handleInvalidNullResponse(this.handleError(this.askar.keyCryptoBoxSeal(serializedOptions)))
     return new Uint8Array(buf)
   }
 
   public keyCryptoBoxSealOpen(options: KeyCryptoBoxSealOpenOptions): Uint8Array {
     const serializedOptions = serializeArguments(options)
-    const buf = handleInvalidNullResponse(this.handleError(this.ariesAskar.keyCryptoBoxSealOpen(serializedOptions)))
+    const buf = handleInvalidNullResponse(this.handleError(this.askar.keyCryptoBoxSealOpen(serializedOptions)))
     return new Uint8Array(buf)
   }
 
   public keyDeriveEcdh1pu(options: KeyDeriveEcdh1puOptions): LocalKeyHandle {
     const serializedOptions = serializeArguments(options)
-    const handle = handleInvalidNullResponse(this.handleError(this.ariesAskar.keyDeriveEcdh1pu(serializedOptions)))
+    const handle = handleInvalidNullResponse(this.handleError(this.askar.keyDeriveEcdh1pu(serializedOptions)))
     return new LocalKeyHandle(handle)
   }
 
   public keyDeriveEcdhEs(options: KeyDeriveEcdhEsOptions): LocalKeyHandle {
     const serializedOptions = serializeArguments(options)
-    const handle = handleInvalidNullResponse(this.handleError(this.ariesAskar.keyDeriveEcdhEs(serializedOptions)))
+    const handle = handleInvalidNullResponse(this.handleError(this.askar.keyDeriveEcdhEs(serializedOptions)))
     return new LocalKeyHandle(handle)
   }
 
   public keyEntryListCount(options: KeyEntryListCountOptions): number {
     const serializedOptions = serializeArguments(options)
-    return handleInvalidNullResponse(this.handleError(this.ariesAskar.keyEntryListCount(serializedOptions)))
+    return handleInvalidNullResponse(this.handleError(this.askar.keyEntryListCount(serializedOptions)))
   }
 
   public keyEntryListFree(options: KeyEntryListFreeOptions): void {
     const serializedOptions = serializeArguments(options)
 
     // null resopnse is expected as we're freeing the object
-    this.handleError(this.ariesAskar.keyEntryListFree(serializedOptions))
+    this.handleError(this.askar.keyEntryListFree(serializedOptions))
   }
 
   public keyEntryListGetAlgorithm(options: KeyEntryListGetAlgorithmOptions): string {
     const serializedOptions = serializeArguments(options)
-    return handleInvalidNullResponse(this.handleError(this.ariesAskar.keyEntryListGetAlgorithm(serializedOptions)))
+    return handleInvalidNullResponse(this.handleError(this.askar.keyEntryListGetAlgorithm(serializedOptions)))
   }
 
   public keyEntryListGetMetadata(options: KeyEntryListGetMetadataOptions): string | null {
     const serializedOptions = serializeArguments(options)
-    return this.handleError(this.ariesAskar.keyEntryListGetMetadata(serializedOptions))
+    return this.handleError(this.askar.keyEntryListGetMetadata(serializedOptions))
   }
 
   public keyEntryListGetName(options: KeyEntryListGetNameOptions): string {
     const serializedOptions = serializeArguments(options)
-    return handleInvalidNullResponse(this.handleError(this.ariesAskar.keyEntryListGetName(serializedOptions)))
+    return handleInvalidNullResponse(this.handleError(this.askar.keyEntryListGetName(serializedOptions)))
   }
 
   public keyEntryListGetTags(options: KeyEntryListGetTagsOptions): string | null {
     const serializedOptions = serializeArguments(options)
-    return this.handleError(this.ariesAskar.keyEntryListGetTags(serializedOptions))
+    return this.handleError(this.askar.keyEntryListGetTags(serializedOptions))
   }
 
   public keyEntryListLoadLocal(options: KeyEntryListLoadLocalOptions): LocalKeyHandle {
     const serializedOptions = serializeArguments(options)
-    const handle = handleInvalidNullResponse(this.handleError(this.ariesAskar.keyEntryListLoadLocal(serializedOptions)))
+    const handle = handleInvalidNullResponse(this.handleError(this.askar.keyEntryListLoadLocal(serializedOptions)))
 
     return new LocalKeyHandle(handle)
   }
@@ -346,112 +344,112 @@ export class ReactNativeAriesAskar implements AriesAskar {
     const serializedOptions = serializeArguments(options)
 
     // null resopnse is expected as we're freeing the object
-    this.handleError(this.ariesAskar.keyFree(serializedOptions))
+    this.handleError(this.askar.keyFree(serializedOptions))
   }
 
   public keyFromJwk(options: KeyFromJwkOptions): LocalKeyHandle {
     const serializedOptions = serializeArguments(options)
-    const handle = handleInvalidNullResponse(this.handleError(this.ariesAskar.keyFromJwk(serializedOptions)))
+    const handle = handleInvalidNullResponse(this.handleError(this.askar.keyFromJwk(serializedOptions)))
 
     return new LocalKeyHandle(handle)
   }
 
   public keyFromKeyExchange(options: KeyFromKeyExchangeOptions): LocalKeyHandle {
     const serializedOptions = serializeArguments(options)
-    const handle = handleInvalidNullResponse(this.handleError(this.ariesAskar.keyFromKeyExchange(serializedOptions)))
+    const handle = handleInvalidNullResponse(this.handleError(this.askar.keyFromKeyExchange(serializedOptions)))
 
     return new LocalKeyHandle(handle)
   }
 
   public keyFromPublicBytes(options: KeyFromPublicBytesOptions): LocalKeyHandle {
     const serializedOptions = serializeArguments(options)
-    const handle = handleInvalidNullResponse(this.handleError(this.ariesAskar.keyFromPublicBytes(serializedOptions)))
+    const handle = handleInvalidNullResponse(this.handleError(this.askar.keyFromPublicBytes(serializedOptions)))
 
     return new LocalKeyHandle(handle)
   }
 
   public keyFromSecretBytes(options: KeyFromSecretBytesOptions): LocalKeyHandle {
     const serializedOptions = serializeArguments(options)
-    const handle = handleInvalidNullResponse(this.handleError(this.ariesAskar.keyFromSecretBytes(serializedOptions)))
+    const handle = handleInvalidNullResponse(this.handleError(this.askar.keyFromSecretBytes(serializedOptions)))
 
     return new LocalKeyHandle(handle)
   }
 
   public keyFromSeed(options: KeyFromSeedOptions): LocalKeyHandle {
     const serializedOptions = serializeArguments(options)
-    const handle = handleInvalidNullResponse(this.handleError(this.ariesAskar.keyFromSeed(serializedOptions)))
+    const handle = handleInvalidNullResponse(this.handleError(this.askar.keyFromSeed(serializedOptions)))
 
     return new LocalKeyHandle(handle)
   }
 
   public keyGenerate(options: KeyGenerateOptions): LocalKeyHandle {
     const serializedOptions = serializeArguments(options)
-    const handle = handleInvalidNullResponse(this.handleError(this.ariesAskar.keyGenerate(serializedOptions)))
+    const handle = handleInvalidNullResponse(this.handleError(this.askar.keyGenerate(serializedOptions)))
 
     return new LocalKeyHandle(handleInvalidNullResponse(handle))
   }
 
   public keyGetAlgorithm(options: KeyGetAlgorithmOptions): string {
     const serializedOptions = serializeArguments(options)
-    return handleInvalidNullResponse(this.handleError(this.ariesAskar.keyGetAlgorithm(serializedOptions)))
+    return handleInvalidNullResponse(this.handleError(this.askar.keyGetAlgorithm(serializedOptions)))
   }
 
   public keyGetEphemeral(options: KeyGetEphemeralOptions): number {
     const serializedOptions = serializeArguments(options)
-    return handleInvalidNullResponse(this.handleError(this.ariesAskar.keyGetEphemeral(serializedOptions)))
+    return handleInvalidNullResponse(this.handleError(this.askar.keyGetEphemeral(serializedOptions)))
   }
 
   public keyGetJwkPublic(options: KeyGetJwkPublicOptions): string {
     const serializedOptions = serializeArguments(options)
-    return handleInvalidNullResponse(this.handleError(this.ariesAskar.keyGetJwkPublic(serializedOptions)))
+    return handleInvalidNullResponse(this.handleError(this.askar.keyGetJwkPublic(serializedOptions)))
   }
 
   public keyGetJwkSecret(options: KeyGetJwkSecretOptions): Uint8Array {
     const serializedOptions = serializeArguments(options)
-    const buf = handleInvalidNullResponse(this.handleError(this.ariesAskar.keyGetJwkSecret(serializedOptions)))
+    const buf = handleInvalidNullResponse(this.handleError(this.askar.keyGetJwkSecret(serializedOptions)))
     return new Uint8Array(buf)
   }
 
   public keyGetJwkThumbprint(options: KeyGetJwkThumbprintOptions): string {
     const serializedOptions = serializeArguments(options)
-    return handleInvalidNullResponse(this.handleError(this.ariesAskar.keyGetJwkThumbprint(serializedOptions)))
+    return handleInvalidNullResponse(this.handleError(this.askar.keyGetJwkThumbprint(serializedOptions)))
   }
 
   public keyGetPublicBytes(options: KeyGetPublicBytesOptions): Uint8Array {
     const serializedOptions = serializeArguments(options)
-    const buf = handleInvalidNullResponse(this.handleError(this.ariesAskar.keyGetPublicBytes(serializedOptions)))
+    const buf = handleInvalidNullResponse(this.handleError(this.askar.keyGetPublicBytes(serializedOptions)))
     return new Uint8Array(buf)
   }
 
   public keyGetSecretBytes(options: KeyGetSecretBytesOptions): Uint8Array {
     const serializedOptions = serializeArguments(options)
-    const buf = handleInvalidNullResponse(this.handleError(this.ariesAskar.keyGetSecretBytes(serializedOptions)))
+    const buf = handleInvalidNullResponse(this.handleError(this.askar.keyGetSecretBytes(serializedOptions)))
     return new Uint8Array(buf)
   }
 
   public keySignMessage(options: KeySignMessageOptions): Uint8Array {
     const serializedOptions = serializeArguments(options)
-    const buf = handleInvalidNullResponse(this.handleError(this.ariesAskar.keySignMessage(serializedOptions)))
+    const buf = handleInvalidNullResponse(this.handleError(this.askar.keySignMessage(serializedOptions)))
     return new Uint8Array(buf)
   }
 
   public keyUnwrapKey(options: KeyUnwrapKeyOptions): LocalKeyHandle {
     const serializedOptions = serializeArguments(options)
-    const handle = handleInvalidNullResponse(this.handleError(this.ariesAskar.keyUnwrapKey(serializedOptions)))
+    const handle = handleInvalidNullResponse(this.handleError(this.askar.keyUnwrapKey(serializedOptions)))
 
     return new LocalKeyHandle(handle)
   }
 
   public keyVerifySignature(options: KeyVerifySignatureOptions): boolean {
     const serializedOptions = serializeArguments(options)
-    const result = this.handleError(this.ariesAskar.keyVerifySignature(serializedOptions))
+    const result = this.handleError(this.askar.keyVerifySignature(serializedOptions))
 
     return !!result
   }
 
   public keyWrapKey(options: KeyWrapKeyOptions): EncryptedBuffer {
     const serializedOptions = serializeArguments(options)
-    const ret = this.handleError(this.ariesAskar.keyWrapKey(serializedOptions))
+    const ret = this.handleError(this.askar.keyWrapKey(serializedOptions))
 
     const { buffer, noncePos, tagPos } = handleInvalidNullResponse(ret)
 
@@ -462,28 +460,31 @@ export class ReactNativeAriesAskar implements AriesAskar {
     const serializedOptions = serializeArguments(options)
 
     // null resopnse is expected as we're freeing the object
-    this.handleError(this.ariesAskar.scanFree(serializedOptions))
+    this.handleError(this.askar.scanFree(serializedOptions))
   }
 
   public async scanNext(options: ScanNextOptions) {
     const serializedOptions = serializeArguments(options)
     const handle = await this.promisifyWithResponse<string>((cb) =>
-      this.handleError(this.ariesAskar.scanNext({ cb, ...serializedOptions }))
+      this.handleError(this.askar.scanNext({ cb, ...serializedOptions }))
     )
 
     return EntryListHandle.fromHandle(handle)
   }
 
   public async scanStart(options: ScanStartOptions): Promise<ScanHandle> {
-    const { category, storeHandle, limit, offset, profile, tagFilter } = serializeArguments(options)
+    const { category, storeHandle, limit, offset, profile, tagFilter, orderBy, descending } =
+      serializeArguments(options)
     const handle = await this.promisifyWithResponse<number>((cb) =>
       this.handleError(
-        this.ariesAskar.scanStart({
+        this.askar.scanStart({
           cb,
           category,
           storeHandle,
           offset: offset || 0,
           limit: limit || -1,
+          orderBy,
+          descending,
           profile,
           tagFilter,
         })
@@ -495,13 +496,13 @@ export class ReactNativeAriesAskar implements AriesAskar {
 
   public sessionClose(options: SessionCloseOptions): Promise<void> {
     const serializedOptions = serializeArguments(options)
-    return this.promisify((cb) => this.handleError(this.ariesAskar.sessionClose({ cb, ...serializedOptions })))
+    return this.promisify((cb) => this.handleError(this.askar.sessionClose({ cb, ...serializedOptions })))
   }
 
   public async sessionCount(options: SessionCountOptions): Promise<number> {
     const serializedOptions = serializeArguments(options)
     const response = await this.promisifyWithResponse<number>((cb) =>
-      this.handleError(this.ariesAskar.sessionCount({ cb, ...serializedOptions }))
+      this.handleError(this.askar.sessionCount({ cb, ...serializedOptions }))
     )
 
     return handleInvalidNullResponse(response)
@@ -510,17 +511,26 @@ export class ReactNativeAriesAskar implements AriesAskar {
   public async sessionFetch(options: SessionFetchOptions) {
     const serializedOptions = serializeArguments(options)
     const handle = await this.promisifyWithResponse<string>((cb) =>
-      this.handleError(this.ariesAskar.sessionFetch({ cb, ...serializedOptions }))
+      this.handleError(this.askar.sessionFetch({ cb, ...serializedOptions }))
     )
 
     return EntryListHandle.fromHandle(handle)
   }
 
   public async sessionFetchAll(options: SessionFetchAllOptions) {
-    const { category, sessionHandle, forUpdate, limit, tagFilter } = serializeArguments(options)
+    const { category, sessionHandle, forUpdate, limit, tagFilter, descending, orderBy } = serializeArguments(options)
     const handle = await this.promisifyWithResponse<string>((cb) =>
       this.handleError(
-        this.ariesAskar.sessionFetchAll({ cb, category, sessionHandle, forUpdate, limit: limit || -1, tagFilter })
+        this.askar.sessionFetchAll({
+          cb,
+          category,
+          sessionHandle,
+          forUpdate,
+          limit: limit || -1,
+          tagFilter,
+          orderBy,
+          descending,
+        })
       )
     )
 
@@ -531,7 +541,7 @@ export class ReactNativeAriesAskar implements AriesAskar {
     const { sessionHandle, algorithm, forUpdate, limit, thumbprint, tagFilter } = serializeArguments(options)
     const handle = await this.promisifyWithResponse<string>((cb) =>
       this.handleError(
-        this.ariesAskar.sessionFetchAllKeys({
+        this.askar.sessionFetchAllKeys({
           cb,
           sessionHandle,
           algorithm,
@@ -548,7 +558,7 @@ export class ReactNativeAriesAskar implements AriesAskar {
   public async sessionFetchKey(options: SessionFetchKeyOptions) {
     const serializedOptions = serializeArguments(options)
     const handle = await this.promisifyWithResponse<string>((cb) =>
-      this.handleError(this.ariesAskar.sessionFetchKey({ cb, ...serializedOptions }))
+      this.handleError(this.askar.sessionFetchKey({ cb, ...serializedOptions }))
     )
 
     return KeyEntryListHandle.fromHandle(handle)
@@ -558,7 +568,7 @@ export class ReactNativeAriesAskar implements AriesAskar {
     const { sessionHandle, name, localKeyHandle, expiryMs, metadata, tags } = serializeArguments(options)
     return this.promisify((cb) =>
       this.handleError(
-        this.ariesAskar.sessionInsertKey({
+        this.askar.sessionInsertKey({
           cb,
           sessionHandle,
           name,
@@ -574,7 +584,7 @@ export class ReactNativeAriesAskar implements AriesAskar {
   public async sessionRemoveAll(options: SessionRemoveAllOptions): Promise<number> {
     const serializedOptions = serializeArguments(options)
     const response = await this.promisifyWithResponse<number>((cb) =>
-      this.handleError(this.ariesAskar.sessionRemoveAll({ cb, ...serializedOptions }))
+      this.handleError(this.askar.sessionRemoveAll({ cb, ...serializedOptions }))
     )
 
     return handleInvalidNullResponse(response)
@@ -582,13 +592,13 @@ export class ReactNativeAriesAskar implements AriesAskar {
 
   public sessionRemoveKey(options: SessionRemoveKeyOptions): Promise<void> {
     const serializedOptions = serializeArguments(options)
-    return this.promisify((cb) => this.handleError(this.ariesAskar.sessionRemoveKey({ cb, ...serializedOptions })))
+    return this.promisify((cb) => this.handleError(this.askar.sessionRemoveKey({ cb, ...serializedOptions })))
   }
 
   public async sessionStart(options: SessionStartOptions): Promise<SessionHandle> {
     const serializedOptions = serializeArguments(options)
     const handle = await this.promisifyWithResponse<number>((cb) =>
-      this.handleError(this.ariesAskar.sessionStart({ cb, ...serializedOptions }))
+      this.handleError(this.askar.sessionStart({ cb, ...serializedOptions }))
     )
 
     return SessionHandle.fromHandle(handle)
@@ -598,7 +608,7 @@ export class ReactNativeAriesAskar implements AriesAskar {
     const { category, name, operation, sessionHandle, expiryMs, tags, value } = serializeArguments(options)
     return this.promisify((cb) =>
       this.handleError(
-        this.ariesAskar.sessionUpdate({
+        this.askar.sessionUpdate({
           cb,
           category,
           name,
@@ -614,23 +624,23 @@ export class ReactNativeAriesAskar implements AriesAskar {
 
   public sessionUpdateKey(options: SessionUpdateKeyOptions): Promise<void> {
     const serializedOptions = serializeArguments(options)
-    return this.promisify((cb) => this.handleError(this.ariesAskar.sessionUpdateKey({ cb, ...serializedOptions })))
+    return this.promisify((cb) => this.handleError(this.askar.sessionUpdateKey({ cb, ...serializedOptions })))
   }
 
   public storeClose(options: StoreCloseOptions): Promise<void> {
     const serializedOptions = serializeArguments(options)
-    return this.promisify((cb) => this.handleError(this.ariesAskar.storeClose({ cb, ...serializedOptions })))
+    return this.promisify((cb) => this.handleError(this.askar.storeClose({ cb, ...serializedOptions })))
   }
 
   public storeCopyTo(options: StoreCopyToOptions): Promise<void> {
     const serializedOptions = serializeArguments(options)
-    return this.promisify((cb) => this.handleError(this.ariesAskar.storeCopyTo({ cb, ...serializedOptions })))
+    return this.promisify((cb) => this.handleError(this.askar.storeCopyTo({ cb, ...serializedOptions })))
   }
 
   public async storeCreateProfile(options: StoreCreateProfileOptions): Promise<string> {
     const serializedOptions = serializeArguments(options)
     const response = await this.promisifyWithResponse<string>((cb) =>
-      this.handleError(this.ariesAskar.storeCreateProfile({ cb, ...serializedOptions }))
+      this.handleError(this.askar.storeCreateProfile({ cb, ...serializedOptions }))
     )
 
     return handleInvalidNullResponse(response)
@@ -638,13 +648,13 @@ export class ReactNativeAriesAskar implements AriesAskar {
 
   public storeGenerateRawKey(options: StoreGenerateRawKeyOptions): string {
     const serializedOptions = serializeArguments(options)
-    return handleInvalidNullResponse(this.handleError(this.ariesAskar.storeGenerateRawKey(serializedOptions)))
+    return handleInvalidNullResponse(this.handleError(this.askar.storeGenerateRawKey(serializedOptions)))
   }
 
   public async storeGetProfileName(options: StoreGetProfileNameOptions): Promise<string> {
     const serializedOptions = serializeArguments(options)
     const response = await this.promisifyWithResponse<string>((cb) =>
-      this.handleError(this.ariesAskar.storeGetProfileName({ cb, ...serializedOptions }))
+      this.handleError(this.askar.storeGetProfileName({ cb, ...serializedOptions }))
     )
 
     return handleInvalidNullResponse(response)
@@ -653,7 +663,7 @@ export class ReactNativeAriesAskar implements AriesAskar {
   public async storeGetDefaultProfile(options: StoreGetDefaultProfileOptions): Promise<string> {
     const serializedOptions = serializeArguments(options)
     const response = await this.promisifyWithResponse<string>((cb) =>
-      this.handleError(this.ariesAskar.storeGetDefaultProfile({ cb, ...serializedOptions }))
+      this.handleError(this.askar.storeGetDefaultProfile({ cb, ...serializedOptions }))
     )
 
     return handleInvalidNullResponse(response)
@@ -663,22 +673,22 @@ export class ReactNativeAriesAskar implements AriesAskar {
     const serializedOptions = serializeArguments(options)
     const stringListHandle = handleInvalidNullResponse(
       await this.promisifyWithResponse<string>((cb) =>
-        this.handleError(this.ariesAskar.storeListProfiles({ cb, ...serializedOptions }))
+        this.handleError(this.askar.storeListProfiles({ cb, ...serializedOptions }))
       )
     )
     const ret = []
-    const count = this.handleError(this.ariesAskar.stringListCount({ stringListHandle }))
+    const count = this.handleError(this.askar.stringListCount({ stringListHandle }))
     for (let index = 0; index < count; index++) {
-      ret.push(this.handleError(this.ariesAskar.stringListGetItem({ stringListHandle, index })))
+      ret.push(this.handleError(this.askar.stringListGetItem({ stringListHandle, index })))
     }
-    this.handleError(this.ariesAskar.stringListFree({ stringListHandle }))
+    this.handleError(this.askar.stringListFree({ stringListHandle }))
     return ret
   }
 
   public async storeOpen(options: StoreOpenOptions): Promise<StoreHandle> {
     const serializedOptions = serializeArguments(options)
     const handle = await this.promisifyWithResponse<number>((cb) =>
-      this.handleError(this.ariesAskar.storeOpen({ cb, ...serializedOptions }))
+      this.handleError(this.askar.storeOpen({ cb, ...serializedOptions }))
     )
 
     return StoreHandle.fromHandle(handle)
@@ -687,7 +697,7 @@ export class ReactNativeAriesAskar implements AriesAskar {
   public async storeProvision(options: StoreProvisionOptions): Promise<StoreHandle> {
     const serializedOptions = serializeArguments(options)
     const handle = await this.promisifyWithResponse<number>((cb) =>
-      this.handleError(this.ariesAskar.storeProvision({ cb, ...serializedOptions }))
+      this.handleError(this.askar.storeProvision({ cb, ...serializedOptions }))
     )
 
     return StoreHandle.fromHandle(handle)
@@ -695,13 +705,13 @@ export class ReactNativeAriesAskar implements AriesAskar {
 
   public storeRekey(options: StoreRekeyOptions): Promise<void> {
     const serializedOptions = serializeArguments(options)
-    return this.promisify((cb) => this.handleError(this.ariesAskar.storeRekey({ cb, ...serializedOptions })))
+    return this.promisify((cb) => this.handleError(this.askar.storeRekey({ cb, ...serializedOptions })))
   }
 
   public async storeRemove(options: StoreRemoveOptions): Promise<number> {
     const serializedOptions = serializeArguments(options)
     const response = await this.promisifyWithResponse<number>((cb) =>
-      this.handleError(this.ariesAskar.storeRemove({ cb, ...serializedOptions }))
+      this.handleError(this.askar.storeRemove({ cb, ...serializedOptions }))
     )
 
     return handleInvalidNullResponse(response)
@@ -710,7 +720,7 @@ export class ReactNativeAriesAskar implements AriesAskar {
   public async storeRemoveProfile(options: StoreRemoveProfileOptions): Promise<number> {
     const serializedOptions = serializeArguments(options)
     const response = await this.promisifyWithResponse<number>((cb) =>
-      this.handleError(this.ariesAskar.storeRemoveProfile({ cb, ...serializedOptions }))
+      this.handleError(this.askar.storeRemoveProfile({ cb, ...serializedOptions }))
     )
 
     return handleInvalidNullResponse(response)
@@ -719,7 +729,7 @@ export class ReactNativeAriesAskar implements AriesAskar {
   public async storeSetDefaultProfile(options: StoreSetDefaultProfileOptions): Promise<void> {
     const serializedOptions = serializeArguments(options)
     const response = await this.promisifyWithResponse((cb) =>
-      this.handleError(this.ariesAskar.storeSetDefaultProfile({ cb, ...serializedOptions }))
+      this.handleError(this.askar.storeSetDefaultProfile({ cb, ...serializedOptions }))
     )
 
     handleInvalidNullResponse(response)
@@ -727,6 +737,6 @@ export class ReactNativeAriesAskar implements AriesAskar {
 
   public async migrateIndySdk(options: MigrateIndySdkOptions): Promise<void> {
     const serializedOptions = serializeArguments(options)
-    return this.promisify((cb) => this.handleError(this.ariesAskar.migrateIndySdk({ cb, ...serializedOptions })))
+    return this.promisify((cb) => this.handleError(this.askar.migrateIndySdk({ cb, ...serializedOptions })))
   }
 }

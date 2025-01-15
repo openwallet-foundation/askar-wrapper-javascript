@@ -2,13 +2,13 @@
 #import <jsi/jsi.h>
 #import <React/RCTUtils.h>
 #import <ReactCommon/RCTTurboModule.h>
+#import <askar/turboModuleUtility.h>
 
-#import "turboModuleUtility.h"
-#import "AriesAskar.h"
+#import "Askar.h"
 
 using namespace facebook;
 
-@implementation AriesAskar 
+@implementation Askar 
 
 RCT_EXPORT_MODULE()
 
@@ -26,7 +26,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
     }
     
     auto callInvoker = bridge.jsCallInvoker;
-    ariesAskarTurboModuleUtility::registerTurboModule(*jsiRuntime, callInvoker);
+    askarTurboModuleUtility::registerTurboModule(*jsiRuntime, callInvoker);
     return @true;
 }
 
