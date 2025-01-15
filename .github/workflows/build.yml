@@ -15,10 +15,6 @@ jobs:
     name: Continous Integration
     
     runs-on: ubuntu-latest
-    
-    defaults:
-      run:
-        working-directory: wrappers/javascript
 
     steps:
       - name: Checkout
