@@ -20,6 +20,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - uses: robinraju/release-downloader@v1
+        with:
+          repository: openwallet-foundation/askar
+          fileName: library-linux-x86_64.tar.gz
+          tag: 'v0.3.2'
+          out-file-path: packages/askar-nodejs/native
+
+      - run: ls -R packages/askar-nodejs/native
+
       - name: Set up Node.JS 18.x
         uses: actions/setup-node@v4
         with:
