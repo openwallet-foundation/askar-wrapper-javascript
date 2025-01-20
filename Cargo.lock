@@ -154,7 +154,7 @@ dependencies = [
 
 [[package]]
 name = "aries-askar"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "askar-crypto",
  "askar-storage",
@@ -174,7 +174,7 @@ dependencies = [
 
 [[package]]
 name = "askar-crypto"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "aead",
  "aes",
@@ -1142,9 +1142,9 @@ checksum = "8bf34a163b5c4c52d0478a4d757da8fb65cabef42ba90515efee0f6f9fa45aaa"
 
 [[package]]
 name = "futures-lite"
-version = "2.1.0"
+version = "2.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aeee267a1883f7ebef3700f262d2d54de95dfaf38189015a74fdc4e0c7ad8143"
+checksum = "f5edaec856126859abb19ed65f39e90fea3a9574b9707f13539acf4abf7eb532"
 dependencies = [
  "fastrand",
  "futures-core",
