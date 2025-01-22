@@ -33,5 +33,6 @@ The JavaScript wrapper is versioned independently from the native bindings. The 
 
 | Askar       | JavaScript Wrapper |
 | ----------- | ------------------ |
-| v0.2.9      | v0.1.0, v0.1.1     |
-| v0.3.1      | v0.2.0             |
+| v0.2.9      | v0.1.x             |
+| v0.3.x      | v0.2.x             |
+| v0.4.1      | v0.3.x             |
