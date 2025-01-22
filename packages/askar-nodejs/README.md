@@ -1,14 +1,20 @@
-# Askar Wrapper JavaScript
+# Askar NodeJS
 
-Wrapper for Node.js and React Native around [https://github.com/openwallet-foundation/askar](askar)
+Wrapper for Nodejs around Askar
 
 ## Requirements
 
-This library requires (and has been tested extensively with) Node.js version `18.x` and React Native version `0.75.x`. Newer versions might also work, but they have not been tested.
+This library requires (and has been tested extensively with) Node.js version `18.x`. Newer versions might also work, but they have not been tested.
+
+## Installation
+
+```sh
+yarn add @openwallet-foundation/askar-nodejs
+```
 
 ## Setup
 
-You can import all types and classes from the `@openwallet-foundation/askar-nodejs` or `@openwalletfoundation/askar-react-native` library:
+You can import all types and classes from the `@openwallet-foundation/askar-nodejs` library:
 
 ```typescript
 import { Key, KeyAlgs } from '@openwallet-foundation/askar-nodejs'
