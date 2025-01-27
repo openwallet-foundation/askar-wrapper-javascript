@@ -9,6 +9,18 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+      inputs:
+          release-type:
+              description: 'Type of release (major, minor, patch, alpha)'
+              required: true
+              default: patch
+              type: choice
+              options:
+                  - major
+                  - minor
+                  - patch
+                  - alpha
 
 jobs:
   continous-integration:
@@ -64,22 +76,34 @@ jobs:
       - name: Build library
         run: pnpm build
 
-      - name: Set NPM config
-        if: |
-          github.event_name == 'release' ||
-          (github.event_name == 'workflow_dispatch' && github.event.inputs.publish-javascript-wrapper == 'true')
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
-          echo "registry=https://registry.npmjs.org/" >> .npmrc
-          echo "always-auth=true" >> .npmrc
+      - name: Set the NPM config
+        env:
+            NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
 
-      - name: Publish JavaScript Wrapper
-        if: |
-          github.event_name == 'release' ||
-          (github.event_name == 'workflow_dispatch' && github.event.inputs.publish-javascript-wrapper == 'true')
+      - name: Publish
+        id: publish
+        env:
+            GH_TOKEN: ${{ secrets.GH_TOKEN }}
+            NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          if [[ $(cat lerna.json | grep version | head -1 | grep dev) ]]; then
-            npx lerna publish from-package --no-push --no-private --yes --no-git-tag-version --dist-tag=alpha
-          else
-            npx lerna publish from-package --no-push --no-private --yes --no-git-tag-version
-          fi
+            echo ${{ inputs.release-type }}
+            git config --global user.name "Openwallet Foundation"
+
+            if [ ${{ inputs.release-type }} == 'alpha' ]; then
+              pnpm release --pre-dist-tag alpha prerelease --yes
+            else
+              pnpm release ${{ inputs.release-type }} --force-publish --no-private --yes
+            fi
+
+            version=$(node -p "require('./lerna.json').version")
+            echo "LERNA_VERSION=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Create Github Release
+        uses: softprops/action-gh-release@v1
+        with:
+            generate_release_notes: true
+            prerelease: ${{ inputs.release-type == 'alpha' }}
+            token: ${{ secrets.GH_TOKEN }}
+            tag_name: v${{ steps.publish.outputs.LERNA_VERSION }}
+            name: Release v${{ steps.publish.outputs.LERNA_VERSION }}
