@@ -16,7 +16,7 @@
     "build": "pnpm -r build",
     "clean": "pnpm -r clean",
     "test": "node --import tsx --test packages/**/tests/*.test.ts",
-    "publish": "lerna publish"
+    "release": "lerna publish"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
