@@ -36,8 +36,8 @@
     "install": "node-pre-gyp install"
   },
   "dependencies": {
-    "@openwallet-foundation/askar-shared": "workspace:*",
-    "@mapbox/node-pre-gyp": "^1.0.11"
+    "@mapbox/node-pre-gyp": "^1.0.11",
+    "@openwallet-foundation/askar-shared": "workspace:*"
   },
   "devDependencies": {
     "react": "18.2.0",
