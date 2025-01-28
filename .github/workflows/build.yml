@@ -79,7 +79,7 @@ jobs:
             echo ${{ inputs.release-type }}
             git config --global user.name "Openwallet Foundation"
 
-            if [[ $(cat lerna.json | grep version | head -1 | grep dev) ]]; then
+            if [[ $(cat lerna.json | grep version | head -1 | grep alpha) ]]; then
               pnpm release from-package --no-push --no-private --yes --no-git-tag-version --dist-tag=alpha
             else
               pnpm release from-package --no-push --no-private --yes --no-git-tag-version
