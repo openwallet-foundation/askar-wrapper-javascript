@@ -80,7 +80,7 @@ jobs:
             git config --global user.name "Openwallet Foundation"
 
             if [[ $(cat lerna.json | grep version | head -1 | grep dev) ]]; then
-              pnpm publish from-package --no-push --no-private --yes --no-git-tag-version --dist-tag=alpha
+              pnpm release from-package --no-push --no-private --yes --no-git-tag-version --dist-tag=alpha
             else
-              pnpm publish from-package --no-push --no-private --yes --no-git-tag-version
+              pnpm release from-package --no-push --no-private --yes --no-git-tag-version
             fi
