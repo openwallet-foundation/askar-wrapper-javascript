@@ -4,6 +4,8 @@
 askar_tmp_db
 node_modules
 
+build
+
 packages/askar-nodejs/native
 packages/askar-react-native/native
 packages/askar-react-native/android/build
