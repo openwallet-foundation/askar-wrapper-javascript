@@ -238,10 +238,10 @@ jsi::Value storeRekey(jsi::Runtime &rt, jsi::Object options) {
   State *state = new State(&cb);
   state->rt = &rt;
 
-  ErrorCode code = askar_store_rekey(storeHandle, 
-      keyMethod.length() ? keyMethod.c_str() : nullptr, 
+  ErrorCode code = askar_store_rekey(storeHandle,
+      keyMethod.length() ? keyMethod.c_str() : nullptr,
       passKey.c_str(), callback, CallbackId(state));
-                            
+
   return createReturnValue(rt, code, nullptr);
 }
 
@@ -350,7 +350,7 @@ jsi::Value sessionFetchAll(jsi::Runtime &rt, jsi::Object options) {
   state->rt = &rt;
 
   ErrorCode code = askar_session_fetch_all(
-      sessionHandle, 
+      sessionHandle,
       category.c_str(),
       tagFilter.length() ? tagFilter.c_str() : nullptr,
       limit,
@@ -518,7 +518,7 @@ jsi::Value sessionUpdateKey(jsi::Runtime &rt, jsi::Object options) {
 
 jsi::Value scanStart(jsi::Runtime &rt, jsi::Object options) {
   auto storeHandle = jsiToValue<int64_t>(rt, options, "storeHandle");
-  auto category = jsiToValue<std::string>(rt, options, "category");
+  auto category = jsiToValue<std::string>(rt, options, "category", true);
 
   auto tagFilter = jsiToValue<std::string>(rt, options, "tagFilter", true);
   auto profile = jsiToValue<std::string>(rt, options, "profile", true);
@@ -532,12 +532,12 @@ jsi::Value scanStart(jsi::Runtime &rt, jsi::Object options) {
   state->rt = &rt;
 
   ErrorCode code = askar_scan_start(
-      storeHandle, 
+      storeHandle,
       profile.length() ? profile.c_str() : nullptr,
-      category.c_str(), 
+      category.length() ? category.c_str() : nullptr,
       tagFilter.length() ? tagFilter.c_str() : nullptr,
-      offset, 
-      limit, 
+      offset,
+      limit,
       orderBy.length() ? orderBy.c_str() : nullptr,
       descending,
       callbackWithResponse,
@@ -636,9 +636,9 @@ jsi::Value keyGenerate(jsi::Runtime &rt, jsi::Object options) {
   LocalKeyHandle out;
 
   ErrorCode code = askar_key_generate(
-      algorithm.c_str(), 
-      keyBackend.length() ? keyBackend.c_str() : nullptr, 
-      ephemeral, 
+      algorithm.c_str(),
+      keyBackend.length() ? keyBackend.c_str() : nullptr,
+      ephemeral,
       &out
   );
 
