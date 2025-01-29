@@ -207,7 +207,7 @@ export type ScanFreeOptions = { scanHandle: ScanHandle }
 export type ScanNextOptions = { scanHandle: ScanHandle }
 export type ScanStartOptions = {
   storeHandle: StoreHandle
-  category: string
+  category?: string
   profile?: string
   tagFilter?: Record<string, unknown>
   offset?: number
