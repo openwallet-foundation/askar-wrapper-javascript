@@ -20,6 +20,6 @@
     "@babel/core": "^7.20.0",
     "@babel/runtime": "^7.22.15",
     "@types/react": "~18.3.18",
-    "typescript": "~5.3.3"
+    "typescript": "catalog:"
   }
 }
