@@ -42,7 +42,7 @@
   "devDependencies": {
     "react": "18.2.0",
     "react-native": ">= 0.71",
-    "typescript": "~5.4.5"
+    "typescript": "catalog:"
   },
   "peerDependencies": {
     "react": ">= 16",

@@ -1,6 +1,8 @@
 # Askar Shared
 
-This package does not contain any functionality, just the classes and types that wrap around the native NodeJS / React Native functionality
+This package does not contain any functionality, just the classes and types that wrap around the native NodeJS / React Native functionality.
+
+See the [project README](https://github.com/openwallet-foundation/askar-wrapper-javascript) for version compatability between Askar and this JavaScript Wrapper.
 
 ## Platform independent setup
 
@@ -10,35 +12,26 @@ Before calling any methods you then need to make sure you register the platform 
 
 ```typescript
 // register.ts
-import '@openwallet-foundation/askar-nodejs'
+import "@openwallet-foundation/askar-nodejs";
 ```
 
 ```typescript
 // register.native.ts
-import '@openwallet-foundation/askar-react-native'
+import "@openwallet-foundation/askar-react-native";
 ```
 
 An alterative approach is to first try to require the Node.JS package, and otherwise require the React Native package:
 
 ```typescript
 try {
-  require('@openwallet-foundation/askar-nodejs')
+  require("@openwallet-foundation/askar-nodejs");
 } catch (error) {
   try {
-    require('@openwallet-foundation/askar-react-native')
+    require("@openwallet-foundation/askar-react-native");
   } catch (error) {
-    throw new Error('Could not load Askar bindings')
+    throw new Error("Could not load Askar bindings");
   }
 }
 ```
 
 How you approach it is up to you, as long as the native binding are called before any actions are performed on the Askar library.
-
-## Version Compatibility
-
-The JavaScript wrapper is versioned independently from the native bindings. The following table shows the compatibility between the different versions:
-
-| Askar       | JavaScript Wrapper |
-| ----------- | ------------------ |
-| v0.2.9      | v0.1.0, v0.1.1     |
-| v0.3.1      | v0.2.0             |
