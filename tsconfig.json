@@ -4,9 +4,5 @@
     "paths": {
       "@openwallet-foundation/*": ["packages/*/src"]
     }
-  },
-  "ts-node": {
-    "require": ["tsconfig-paths/register"],
-    "files": true
   }
 }

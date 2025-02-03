@@ -10,6 +10,7 @@ packages/askar-nodejs/native
 packages/askar-react-native/native
 packages/askar-react-native/android/build
 packages/askar-react-native/android/.cxx
+.gradle
 
 examples/askar-react-native-example/android
 examples/askar-react-native-example/ios
