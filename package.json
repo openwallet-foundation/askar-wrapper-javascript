@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",
+    "@changesets/cli": "catalog:",
     "@types/node": "catalog:",
     "rimraf": "catalog:",
     "tsx": "catalog:",
