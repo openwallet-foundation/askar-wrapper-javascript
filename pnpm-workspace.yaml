@@ -8,3 +8,4 @@ catalog:
   rimraf: ^5.0.5
   "@biomejs/biome": 1.9.4
   "@types/node": ^20.12.11
+  "@changesets/cli": ^2.27.12
