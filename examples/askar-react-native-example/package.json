@@ -1,6 +1,6 @@
 {
-  "name": "@openwallet-foundation/askar-react-native-example",
-  "version": "1.0.0",
+  "name": "askar-react-native-example",
+  "version": "0.0.0",
   "private": true,
   "main": "./src/index.js",
   "scripts": {
