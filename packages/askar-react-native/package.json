@@ -26,18 +26,18 @@
     "ios/Askar.xcodeproj/project.pbxproj",
     "cpp/**/*.cpp",
     "cpp/**/*.h",
-    "askar.podspec"
+    "askar.podspec",
+    "scripts"
   ],
   "scripts": {
     "types:check": "pnpm compile --noEmit",
     "build": "pnpm clean && pnpm compile",
     "clean": "rimraf -rf ./build",
     "compile": "tsc -p ./tsconfig.build.json",
-    "install": "node-pre-gyp install"
+    "install": "node scripts/install.js"
   },
   "dependencies": {
-    "@openwallet-foundation/askar-shared": "workspace:*",
-    "@mapbox/node-pre-gyp": "^1.0.11"
+    "@openwallet-foundation/askar-shared": "workspace:*"
   },
   "devDependencies": {
     "react": "18.2.0",
@@ -49,10 +49,8 @@
     "react-native": ">= 0.71"
   },
   "binary": {
-    "module_name": "askar",
-    "module_path": "native",
-    "remote_path": "v0.4.1",
-    "host": "https://github.com/openwallet-foundation/askar/releases/download/",
-    "package_name": "library-ios-android.tar.gz"
+    "version": "v0.4.1",
+    "host": "https://github.com/openwallet-foundation/askar/releases/download",
+    "packageName": "library-ios-android.tar.gz"
   }
 }

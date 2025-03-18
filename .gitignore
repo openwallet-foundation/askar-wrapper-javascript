@@ -7,7 +7,9 @@ node_modules
 build
 
 packages/askar-nodejs/native
+packages/askar-nodejs/native/version.json
 packages/askar-react-native/native
+packages/askar-react-native/native/version.json
 packages/askar-react-native/android/build
 packages/askar-react-native/android/.cxx
 .gradle

@@ -16,7 +16,10 @@
   "publishConfig": {
     "access": "public"
   },
-  "files": ["build"],
+  "files": [
+    "build",
+    "installBinary.js"
+  ],
   "scripts": {
     "types:check": "pnpm compile --noEmit",
     "build": "pnpm clean && pnpm compile",
@@ -24,7 +27,8 @@
     "compile": "tsc -p ./tsconfig.build.json"
   },
   "dependencies": {
-    "buffer": "^6.0.3"
+    "buffer": "^6.0.3",
+    "tar": "^7.4.3"
   },
   "devDependencies": {
     "typescript": "catalog:"

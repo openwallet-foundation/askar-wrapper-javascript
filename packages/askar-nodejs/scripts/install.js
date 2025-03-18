@@ -1,5 +1,8 @@
-const { execSync } = require('node:child_process')
+const { downloadBinaryIfNeeded } = require('@openwallet-foundation/askar-shared/installBinary')
 const { arch, platform: osPlatform } = require('os')
+const path = require('path')
+
+const { binary } = require('../package.json')
 
 const archTable = {
   x64: 'x86_64',
@@ -8,8 +11,12 @@ const archTable = {
 
 const platform = osPlatform()
 const targetPlatform = platform === 'win32' ? 'windows' : platform
-const targetArchitecture = platform === 'darwin' ? 'universal' : archTable[arch]
+const targetArchitecture = platform === 'darwin' ? 'universal' : archTable[arch()]
+const packageName = binary.packageName.replace('{platform}', targetPlatform).replace('{arch}', targetArchitecture)
 
-const command = `node-pre-gyp install --target_arch=${targetArchitecture} --target_platform=${targetPlatform}`
-
-execSync(command)
+downloadBinaryIfNeeded({
+  packageName,
+  host: binary.host,
+  version: binary.version,
+  targetDirectory: path.join(__dirname, '../native'),
+})
