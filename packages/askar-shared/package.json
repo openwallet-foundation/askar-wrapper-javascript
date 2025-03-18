@@ -16,10 +16,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "files": [
-    "build",
-    "installBinary.js"
-  ],
+  "files": ["build", "installBinary.js"],
   "scripts": {
     "types:check": "pnpm compile --noEmit",
     "build": "pnpm clean && pnpm compile",
