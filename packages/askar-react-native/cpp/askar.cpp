@@ -427,7 +427,7 @@ jsi::Value sessionInsertKey(jsi::Runtime &rt, jsi::Object options) {
 
 jsi::Value sessionRemoveAll(jsi::Runtime &rt, jsi::Object options) {
   auto sessionHandle = jsiToValue<int64_t>(rt, options, "sessionHandle");
-  auto category = jsiToValue<std::string>(rt, options, "category");
+  auto category = jsiToValue<std::string>(rt, options, "category", true);
 
   auto tagFilter = jsiToValue<std::string>(rt, options, "tagFilter", true);
 
@@ -436,7 +436,8 @@ jsi::Value sessionRemoveAll(jsi::Runtime &rt, jsi::Object options) {
   state->rt = &rt;
 
   ErrorCode code =
-      askar_session_remove_all(sessionHandle, category.c_str(),
+      askar_session_remove_all(sessionHandle,
+                               category.length() ? category.c_str() : nullptr,
                                tagFilter.length() ? tagFilter.c_str() : nullptr,
                                callbackWithResponse, CallbackId(state));
 
