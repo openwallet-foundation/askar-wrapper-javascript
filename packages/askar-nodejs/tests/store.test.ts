@@ -148,6 +148,23 @@ describe('Store and Session', () => {
     await session.close()
   })
 
+  test('Fetch all without category', async () => {
+    const session = await store.openSession()
+
+    await session.insert(firstEntry)
+    await session.insert(secondEntry)
+
+    strictEqual(await session.count(firstEntry), 2)
+    strictEqual(await session.count({}), 2)
+
+    strictEqual((await session.fetchAll({})).length, 2)
+    await session.removeAll({ category: firstEntry.category })
+
+    strictEqual(await session.count(firstEntry), 0)
+
+    await session.close()
+  })
+
   test('Scan', async () => {
     const scanStore = await setupWallet()
     const session = await scanStore.openSession()

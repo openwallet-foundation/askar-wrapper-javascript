@@ -28,7 +28,7 @@ export class Session {
     return this._handle
   }
 
-  public async count({ category, tagFilter }: { category: string; tagFilter?: Record<string, unknown> }) {
+  public async count({ category, tagFilter }: { category?: string; tagFilter?: Record<string, unknown> }) {
     if (!this.handle) throw AskarError.customError({ message: 'Cannot count from closed session' })
     return await askar.sessionCount({ tagFilter, category, sessionHandle: this.handle })
   }
@@ -66,7 +66,7 @@ export class Session {
     orderBy,
     descending,
   }: {
-    category: string
+    category?: string
     tagFilter?: Record<string, unknown>
     limit?: number
     forUpdate?: boolean
@@ -160,7 +160,7 @@ export class Session {
     })
   }
 
-  public async removeAll({ category, tagFilter }: { category: string; tagFilter?: Record<string, unknown> }) {
+  public async removeAll({ category, tagFilter }: { category?: string; tagFilter?: Record<string, unknown> }) {
     if (!this.handle) throw AskarError.customError({ message: 'Cannot remove all with a closed session' })
 
     await askar.sessionRemoveAll({

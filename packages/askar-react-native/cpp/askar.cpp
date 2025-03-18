@@ -302,7 +302,7 @@ jsi::Value sessionClose(jsi::Runtime &rt, jsi::Object options) {
 
 jsi::Value sessionCount(jsi::Runtime &rt, jsi::Object options) {
   auto sessionHandle = jsiToValue<int64_t>(rt, options, "sessionHandle");
-  auto category = jsiToValue<std::string>(rt, options, "category");
+  auto category = jsiToValue<std::string>(rt, options, "category", true);
   auto tagFilter = jsiToValue<std::string>(rt, options, "tagFilter", true);
 
   jsi::Function cb = options.getPropertyAsFunction(rt, "cb");
@@ -310,7 +310,8 @@ jsi::Value sessionCount(jsi::Runtime &rt, jsi::Object options) {
   state->rt = &rt;
 
   ErrorCode code =
-      askar_session_count(sessionHandle, category.c_str(),
+      askar_session_count(sessionHandle, 
+                          category.length() ? category.c_str() : nullptr,
                           tagFilter.length() ? tagFilter.c_str() : nullptr,
                           callbackWithResponse, CallbackId(state));
 
@@ -336,7 +337,7 @@ jsi::Value sessionFetch(jsi::Runtime &rt, jsi::Object options) {
 
 jsi::Value sessionFetchAll(jsi::Runtime &rt, jsi::Object options) {
   auto sessionHandle = jsiToValue<int64_t>(rt, options, "sessionHandle");
-  auto category = jsiToValue<std::string>(rt, options, "category");
+  auto category = jsiToValue<std::string>(rt, options, "category", true);
   auto forUpdate = jsiToValue<int8_t>(rt, options, "forUpdate");
 
   auto tagFilter = jsiToValue<std::string>(rt, options, "tagFilter", true);
@@ -351,7 +352,7 @@ jsi::Value sessionFetchAll(jsi::Runtime &rt, jsi::Object options) {
 
   ErrorCode code = askar_session_fetch_all(
       sessionHandle,
-      category.c_str(),
+      category.length() ? category.c_str() : nullptr,
       tagFilter.length() ? tagFilter.c_str() : nullptr,
       limit,
       orderBy.length() ? orderBy.c_str() : nullptr,
@@ -426,7 +427,7 @@ jsi::Value sessionInsertKey(jsi::Runtime &rt, jsi::Object options) {
 
 jsi::Value sessionRemoveAll(jsi::Runtime &rt, jsi::Object options) {
   auto sessionHandle = jsiToValue<int64_t>(rt, options, "sessionHandle");
-  auto category = jsiToValue<std::string>(rt, options, "category");
+  auto category = jsiToValue<std::string>(rt, options, "category", true);
 
   auto tagFilter = jsiToValue<std::string>(rt, options, "tagFilter", true);
 
@@ -435,7 +436,8 @@ jsi::Value sessionRemoveAll(jsi::Runtime &rt, jsi::Object options) {
   state->rt = &rt;
 
   ErrorCode code =
-      askar_session_remove_all(sessionHandle, category.c_str(),
+      askar_session_remove_all(sessionHandle,
+                               category.length() ? category.c_str() : nullptr,
                                tagFilter.length() ? tagFilter.c_str() : nullptr,
                                callbackWithResponse, CallbackId(state));
 
