@@ -222,7 +222,7 @@ export type SessionCloseOptions = {
 }
 export type SessionCountOptions = {
   sessionHandle: SessionHandle
-  category: string
+  category?: string
   tagFilter?: Record<string, unknown>
 }
 export type SessionFetchOptions = {
@@ -233,7 +233,7 @@ export type SessionFetchOptions = {
 }
 export type SessionFetchAllOptions = {
   sessionHandle: SessionHandle
-  category: string
+  category?: string
   tagFilter?: Record<string, unknown>
   limit?: number
   orderBy?: string
@@ -263,7 +263,7 @@ export type SessionInsertKeyOptions = {
 }
 export type SessionRemoveAllOptions = {
   sessionHandle: SessionHandle
-  category: string
+  category?: string
   tagFilter?: Record<string, unknown>
 }
 export type SessionRemoveKeyOptions = {
