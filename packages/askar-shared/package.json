@@ -1,6 +1,6 @@
 {
   "name": "@openwallet-foundation/askar-shared",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "license": "Apache-2.0",
   "description": "Shared library for using Askar with NodeJS and React Native",
   "main": "build/index",
@@ -16,7 +16,10 @@
   "publishConfig": {
     "access": "public"
   },
-  "files": ["build", "../../LICENSE"],
+  "files": [
+    "build",
+    "../../LICENSE"
+  ],
   "scripts": {
     "types:check": "pnpm compile --noEmit",
     "build": "pnpm clean && pnpm compile",

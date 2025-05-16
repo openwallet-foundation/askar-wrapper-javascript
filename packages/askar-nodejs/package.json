@@ -1,6 +1,6 @@
 {
   "name": "@openwallet-foundation/askar-nodejs",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "license": "Apache-2.0",
   "description": "Nodejs wrapper for Askar",
   "main": "build/index",
@@ -15,7 +15,11 @@
   "publishConfig": {
     "access": "public"
   },
-  "files": ["build", "scripts", "../../LICENSE"],
+  "files": [
+    "build",
+    "scripts",
+    "../../LICENSE"
+  ],
   "scripts": {
     "types:check": "pnpm compile --noEmit",
     "build": "pnpm clean && pnpm compile",
