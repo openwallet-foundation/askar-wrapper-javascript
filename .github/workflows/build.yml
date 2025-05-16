@@ -6,7 +6,7 @@ permissions:
 
 on:
   push:
-    branches: [main]
+    branches: [v0.2.4]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -55,9 +55,7 @@ jobs:
         run: pnpm test
 
   continous-deployment:
-    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    needs: ['continous-integration']
       
     steps:
       - name: Checkout
@@ -93,7 +91,7 @@ jobs:
             if [ ${{ inputs.release-type }} == 'alpha' ]; then
               pnpm release --pre-dist-tag alpha prerelease --yes
             else
-              pnpm release ${{ inputs.release-type }} --force-publish --no-private --yes
+              pnpm release patch --force-publish --no-private --yes
             fi
 
             version=$(node -p "require('./lerna.json').version")
