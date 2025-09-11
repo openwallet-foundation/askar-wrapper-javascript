@@ -1,110 +1,110 @@
 import {
   AeadParams,
-  AeadParamsOptions,
-  Askar,
+  type AeadParamsOptions,
+  type Askar,
   AskarError,
-  AskarErrorObject,
-  EncryptedBuffer,
-  EntryListCountOptions,
-  EntryListFreeOptions,
-  EntryListGetCategoryOptions,
-  EntryListGetNameOptions,
-  EntryListGetTagsOptions,
-  EntryListGetValueOptions,
+  type AskarErrorObject,
+  type EncryptedBuffer,
+  type EntryListCountOptions,
+  type EntryListFreeOptions,
+  type EntryListGetCategoryOptions,
+  type EntryListGetNameOptions,
+  type EntryListGetTagsOptions,
+  type EntryListGetValueOptions,
   EntryListHandle,
-  KeyAeadDecryptOptions,
-  KeyAeadEncryptOptions,
-  KeyAeadGetPaddingOptions,
-  KeyAeadGetParamsOptions,
-  KeyAeadRandomNonceOptions,
-  KeyConvertOptions,
-  KeyCryptoBoxOpenOptions,
-  KeyCryptoBoxOptions,
-  KeyCryptoBoxSealOpenOptions,
-  KeyCryptoBoxSealOptions,
-  KeyDeriveEcdh1puOptions,
-  KeyDeriveEcdhEsOptions,
-  KeyEntryListCountOptions,
-  KeyEntryListFreeOptions,
-  KeyEntryListGetAlgorithmOptions,
-  KeyEntryListGetMetadataOptions,
-  KeyEntryListGetNameOptions,
-  KeyEntryListGetTagsOptions,
+  type KeyAeadDecryptOptions,
+  type KeyAeadEncryptOptions,
+  type KeyAeadGetPaddingOptions,
+  type KeyAeadGetParamsOptions,
+  type KeyAeadRandomNonceOptions,
+  type KeyConvertOptions,
+  type KeyCryptoBoxOpenOptions,
+  type KeyCryptoBoxOptions,
+  type KeyCryptoBoxSealOpenOptions,
+  type KeyCryptoBoxSealOptions,
+  type KeyDeriveEcdh1puOptions,
+  type KeyDeriveEcdhEsOptions,
+  type KeyEntryListCountOptions,
+  type KeyEntryListFreeOptions,
+  type KeyEntryListGetAlgorithmOptions,
+  type KeyEntryListGetMetadataOptions,
+  type KeyEntryListGetNameOptions,
+  type KeyEntryListGetTagsOptions,
   KeyEntryListHandle,
-  KeyEntryListLoadLocalOptions,
-  KeyFreeOptions,
-  KeyFromJwkOptions,
-  KeyFromKeyExchangeOptions,
-  KeyFromPublicBytesOptions,
-  KeyFromSecretBytesOptions,
-  KeyFromSeedOptions,
-  KeyGenerateOptions,
-  KeyGetAlgorithmOptions,
-  KeyGetEphemeralOptions,
-  KeyGetJwkPublicOptions,
-  KeyGetJwkSecretOptions,
-  KeyGetJwkThumbprintOptions,
-  KeyGetPublicBytesOptions,
-  KeyGetSecretBytesOptions,
-  KeySignMessageOptions,
-  KeyUnwrapKeyOptions,
-  KeyVerifySignatureOptions,
-  KeyWrapKeyOptions,
+  type KeyEntryListLoadLocalOptions,
+  type KeyFreeOptions,
+  type KeyFromJwkOptions,
+  type KeyFromKeyExchangeOptions,
+  type KeyFromPublicBytesOptions,
+  type KeyFromSecretBytesOptions,
+  type KeyFromSeedOptions,
+  type KeyGenerateOptions,
+  type KeyGetAlgorithmOptions,
+  type KeyGetEphemeralOptions,
+  type KeyGetJwkPublicOptions,
+  type KeyGetJwkSecretOptions,
+  type KeyGetJwkThumbprintOptions,
+  type KeyGetPublicBytesOptions,
+  type KeyGetSecretBytesOptions,
+  type KeySignMessageOptions,
+  type KeyUnwrapKeyOptions,
+  type KeyVerifySignatureOptions,
+  type KeyWrapKeyOptions,
   LocalKeyHandle,
-  MigrateIndySdkOptions,
-  ScanFreeOptions,
+  type MigrateIndySdkOptions,
+  type ScanFreeOptions,
   ScanHandle,
-  ScanNextOptions,
-  ScanStartOptions,
-  SessionCloseOptions,
-  SessionCountOptions,
-  SessionFetchAllKeysOptions,
-  SessionFetchAllOptions,
-  SessionFetchKeyOptions,
-  SessionFetchOptions,
+  type ScanNextOptions,
+  type ScanStartOptions,
+  type SessionCloseOptions,
+  type SessionCountOptions,
+  type SessionFetchAllKeysOptions,
+  type SessionFetchAllOptions,
+  type SessionFetchKeyOptions,
+  type SessionFetchOptions,
   SessionHandle,
-  SessionInsertKeyOptions,
-  SessionRemoveAllOptions,
-  SessionRemoveKeyOptions,
-  SessionStartOptions,
-  SessionUpdateKeyOptions,
-  SessionUpdateOptions,
-  SetCustomLoggerOptions,
-  SetMaxLogLevelOptions,
-  StoreCloseOptions,
-  StoreCopyToOptions,
-  StoreCreateProfileOptions,
-  StoreGenerateRawKeyOptions,
-  StoreGetDefaultProfileOptions,
-  StoreGetProfileNameOptions,
+  type SessionInsertKeyOptions,
+  type SessionRemoveAllOptions,
+  type SessionRemoveKeyOptions,
+  type SessionStartOptions,
+  type SessionUpdateKeyOptions,
+  type SessionUpdateOptions,
+  type SetCustomLoggerOptions,
+  type SetMaxLogLevelOptions,
+  type StoreCloseOptions,
+  type StoreCopyToOptions,
+  type StoreCreateProfileOptions,
+  type StoreGenerateRawKeyOptions,
+  type StoreGetDefaultProfileOptions,
+  type StoreGetProfileNameOptions,
   StoreHandle,
-  StoreListProfilesOptions,
-  StoreOpenOptions,
-  StoreProvisionOptions,
-  StoreRekeyOptions,
-  StoreRemoveOptions,
-  StoreRemoveProfileOptions,
-  StoreSetDefaultProfileOptions,
+  type StoreListProfilesOptions,
+  type StoreOpenOptions,
+  type StoreProvisionOptions,
+  type StoreRekeyOptions,
+  type StoreRemoveOptions,
+  type StoreRemoveProfileOptions,
+  type StoreSetDefaultProfileOptions,
   handleInvalidNullResponse,
 } from '@openwallet-foundation/askar-shared'
 import {
-  ByteBufferType,
-  EncryptedBufferType,
+  type ByteBufferType,
+  type EncryptedBufferType,
   FFI_ENTRY_LIST_HANDLE,
-  FFI_INT64,
   FFI_INT8,
+  FFI_INT64,
   FFI_KEY_ENTRY_LIST_HANDLE,
   FFI_SCAN_HANDLE,
   FFI_SESSION_HANDLE,
   FFI_STORE_HANDLE,
   FFI_STRING,
   FFI_STRING_LIST_HANDLE,
-  NativeCallback,
-  NativeCallbackWithResponse,
+  type NativeCallback,
+  type NativeCallbackWithResponse,
   allocateAeadParams,
   allocateEncryptedBuffer,
-  allocateInt32Buffer,
   allocateInt8Buffer,
+  allocateInt32Buffer,
   allocatePointer,
   allocateSecretBuffer,
   allocateStringBuffer,
@@ -115,7 +115,7 @@ import {
   serializeArguments,
   toNativeCallback,
   toNativeCallbackWithResponse,
-  toNativeLogCallback
+  toNativeLogCallback,
 } from './ffi'
 import { getNativeAskar } from './library'
 
@@ -313,7 +313,7 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_entry_list_get_value(entryListHandle, index, ret)
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray= new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
     this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
 
     return bufferArray
@@ -326,7 +326,7 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_aead_decrypt(localKeyHandle, ciphertext, nonce, tag, aad, ret)
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray= new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
     this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
 
     return bufferArray
@@ -372,7 +372,7 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_aead_random_nonce(localKeyHandle, ret)
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray= new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
     this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
 
     return bufferArray
@@ -396,7 +396,7 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_crypto_box(recipientKey, senderKey, message, nonce, ret)
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray= new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
     this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
 
     return bufferArray
@@ -409,7 +409,7 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_crypto_box_open(recipientKey, senderKey, message, nonce, ret)
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray= new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
     this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
 
     return bufferArray
@@ -421,7 +421,7 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_crypto_box_random_nonce(ret)
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray= new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
     this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
 
     return bufferArray
@@ -434,7 +434,7 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_crypto_box_seal(localKeyHandle, message, ret)
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray= new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
     this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
 
     return bufferArray
@@ -447,7 +447,7 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_crypto_box_seal_open(localKeyHandle, ciphertext, ret)
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray= new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
     this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
 
     return bufferArray
@@ -673,7 +673,7 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_get_jwk_secret(localKeyHandle, ret)
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray= new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
     this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
 
     return bufferArray
@@ -696,7 +696,7 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_get_public_bytes(localKeyHandle, ret)
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray= new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
     this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
 
     return bufferArray
@@ -709,7 +709,7 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_get_secret_bytes(localKeyHandle, ret)
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray= new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
     this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
 
     return bufferArray
@@ -722,7 +722,7 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_sign_message(localKeyHandle, message, sigType, ret)
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray= new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
     this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
 
     return bufferArray
