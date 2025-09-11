@@ -12,7 +12,7 @@
   "scripts": {
     "style:check": "biome check --unsafe .",
     "style:fix": "pnpm style:check --write",
-    "types:check": "pnpm -r types:check",
+    "types:check": "pnpm -r check-types",
     "build": "pnpm -r build",
     "clean": "pnpm -r clean",
     "test": "node --import tsx --test packages/**/tests/*.test.ts",
