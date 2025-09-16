@@ -40,9 +40,10 @@ describe('keys', () => {
     deepStrictEqual(
       key.jwkPublic,
       new Jwk({
-        crv: 'BLS12381_G2',
-        kty: 'OKP',
-        x: 'lH6hIRPzjlKW6LvPm0sHqyEbGqf8ag7UWpA_GFfefwq_kzDXSHmls9Yoza_be23zEw-pSOmKI_MGR1DahBa7Jbho2BGwDNV_QmyhxMYBwTH12Ltk_GLyPD4AP6pQVgge',
+        crv: 'BLS12381G2',
+        kty: 'EC',
+        x: 'FH6hIRPzjlKW6LvPm0sHqyEbGqf8ag7UWpA_GFfefwq_kzDXSHmls9Yoza_be23zEw-pSOmKI_MGR1DahBa7Jbho2BGwDNV_QmyhxMYBwTH12Ltk_GLyPD4AP6pQVgge',
+        y: 'CA1TwLRnETa8qPKPktW4XHSkD_9Qmuxb7syIiOMAjWKsIaptbF2USMVp40NqyV7XD8qQ_kM4QNme49eGyn_aQSsVdQKy7zSeBlRubTIc4Gl3vL-SHk8NlQJ41-NlTpBU'
       })
     )
   })
@@ -54,27 +55,10 @@ describe('keys', () => {
     deepStrictEqual(
       key.jwkPublic,
       new Jwk({
-        crv: 'BLS12381_G1',
-        kty: 'OKP',
-        x: 'hsjb9FSBUJXuB1fCluEcUBLeAPgIbnZGfxPKyeN3LVjQaKFWzXfNtMFAY8VL-eu-',
-      })
-    )
-  })
-
-  test('Bls G1G2 Keygen', () => {
-    const seed = Uint8Array.from(Buffer.from('testseed000000000000000000000001'))
-    const key = Key.fromSeed({
-      algorithm: KeyAlgorithm.Bls12381G1G2,
-      seed,
-      method: KeyMethod.BlsKeygen,
-    })
-
-    deepStrictEqual(
-      key.jwkPublic,
-      new Jwk({
-        crv: 'BLS12381_G1G2',
-        kty: 'OKP',
-        x: 'h56eYI8Qkq5hitICb-ik8wRTzcn6Fd4iY8aDNVc9q1xoPS3lh4DB_B4wNtar1HrViZIOsO6BgLV72zCrBE2ym3DEhDYcghnUMO4O8IVVD8yS-C_zu6OA3L-ny-AO4rbkAo-WuApZEjn83LY98UtoKpTufn4PCUFVQZzJNH_gXWHR3oDspJaCbOajBfm5qj6d',
+        crv: 'BLS12381G1',
+        kty: 'EC',
+        x: 'Bsjb9FSBUJXuB1fCluEcUBLeAPgIbnZGfxPKyeN3LVjQaKFWzXfNtMFAY8VL-eu-',
+        y: 'BmNdJxcuusPBTqggIS-D-ItsxILnKz4q2G95at5K1d1-vFOtMJO0Aoh9OfGuQlvi'
       })
     )
   })
