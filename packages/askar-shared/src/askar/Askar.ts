@@ -335,6 +335,11 @@ export type StoreSetDefaultProfileOptions = {
   storeHandle: StoreHandle
   profile: string
 }
+export type StoreRenameProfileOptions = {
+  storeHandle: StoreHandle
+  fromName: string
+  toName: string
+}
 
 export type MigrateIndySdkOptions = {
   specUri: string
@@ -426,6 +431,7 @@ export type Askar = {
   storeProvision(options: StoreProvisionOptions): Promise<StoreHandle>
   storeRekey(options: StoreRekeyOptions): Promise<void>
   storeRemove(options: StoreRemoveOptions): Promise<number>
+  storeRenameProfile(options: StoreRenameProfileOptions): Promise<number>
   storeRemoveProfile(options: StoreRemoveProfileOptions): Promise<number>
   storeSetDefaultProfile(options: StoreSetDefaultProfileOptions): Promise<void>
 

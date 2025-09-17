@@ -286,6 +286,21 @@ jsi::Value storeSetDefaultProfile(jsi::Runtime &rt, jsi::Object options) {
   return createReturnValue(rt, code, nullptr);
 }
 
+jsi::Value storeRenameProfile(jsi::Runtime &rt, jsi::Object options) {
+  auto storeHandle = jsiToValue<int64_t>(rt, options, "storeHandle");
+  auto fromName = jsiToValue<std::string>(rt, options, "fromName");
+  auto toName = jsiToValue<std::string>(rt, options, "toName");
+
+  jsi::Function cb = options.getPropertyAsFunction(rt, "cb");
+  State *state = new State(&cb);
+  state->rt = &rt;
+
+  ErrorCode code = askar_store_rename_profile(
+      storeHandle, fromName.c_str(), toName.c_str(), callbackWithResponse, CallbackId(state));
+
+  return createReturnValue(rt, code, nullptr);
+}
+
 jsi::Value sessionClose(jsi::Runtime &rt, jsi::Object options) {
   auto sessionHandle = jsiToValue<int64_t>(rt, options, "sessionHandle");
   auto commit = jsiToValue<int8_t>(rt, options, "commit");

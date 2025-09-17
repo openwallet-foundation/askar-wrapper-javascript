@@ -308,8 +308,15 @@ describe('Store and Session', () => {
 
     strictEqual(await session7.count(firstEntry), 0)
 
+    ok(await store.renameProfile({ fromName: profile, toName: 'newProfileName' }))
+
+    ok((await store.listProfiles()).includes('newProfileName'))
+
+    ok(!(await store.listProfiles()).includes(profile))
+
     await session7.close()
   })
+
 
   test('Copy', async () => {
     const key = getRawKey()
@@ -323,4 +330,5 @@ describe('Store and Session', () => {
       })
     )
   })
+
 })
