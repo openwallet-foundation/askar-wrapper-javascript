@@ -1,5 +1,13 @@
 # @openwallet-foundation/askar-nodejs
 
+## 0.4.1
+
+### Patch Changes
+
+- 8b46324: feat: support profile renaming and copying
+- Updated dependencies [8b46324]
+  - @openwallet-foundation/askar-shared@0.4.1
+
 ## 0.4.0
 
 ### Minor Changes

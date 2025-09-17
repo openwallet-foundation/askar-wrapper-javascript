@@ -1,5 +1,11 @@
 # @openwallet-foundation/askar-shared
 
+## 0.4.1
+
+### Patch Changes
+
+- 8b46324: feat: support profile renaming and copying
+
 ## 0.4.0
 
 ### Minor Changes
