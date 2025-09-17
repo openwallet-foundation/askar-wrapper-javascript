@@ -65,6 +65,7 @@ import type {
   SetCustomLoggerOptions,
   SetMaxLogLevelOptions,
   StoreCloseOptions,
+  StoreCopyProfileOptions,
   StoreCopyToOptions,
   StoreCreateProfileOptions,
   StoreGenerateRawKeyOptions,
@@ -76,6 +77,7 @@ import type {
   StoreRekeyOptions,
   StoreRemoveOptions,
   StoreRemoveProfileOptions,
+  StoreRenameProfileOptions,
   StoreSetDefaultProfileOptions,
 } from '@openwallet-foundation/askar-shared'
 import {
@@ -1086,6 +1088,28 @@ export class NodeJSAskar implements Askar {
     return this.promisify((cb, cbId) =>
       this.nativeAskar.askar_store_set_default_profile(storeHandle, profile, cb, cbId)
     )
+  }
+
+  public async storeRenameProfile(options: StoreRenameProfileOptions): Promise<number> {
+    const { storeHandle, fromProfile, toProfile } = serializeArguments(options)
+
+    const response = await this.promisifyWithResponse<number>(
+      (cb, cbId) => this.nativeAskar.askar_store_rename_profile(storeHandle, fromProfile, toProfile, cb, cbId),
+      FFI_INT8
+    )
+
+    return handleInvalidNullResponse(response)
+  }
+
+  public async storeCopyProfile(options: StoreCopyProfileOptions): Promise<number> {
+    const { fromHandle, toHandle, fromProfile, toProfile } = serializeArguments(options)
+
+    const response = await this.promisifyWithResponse<number>(
+      (cb, cbId) => this.nativeAskar.askar_store_copy_profile(fromHandle, toHandle, fromProfile, toProfile, cb, cbId),
+      FFI_INT8
+    )
+
+    return handleInvalidNullResponse(response)
   }
 
   public async migrateIndySdk(options: MigrateIndySdkOptions): Promise<void> {

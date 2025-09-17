@@ -308,7 +308,44 @@ describe('Store and Session', () => {
 
     strictEqual(await session7.count(firstEntry), 0)
 
+    await session7.insert(firstEntry)
+
+    strictEqual(await session7.count(firstEntry), 1)
+
     await session7.close()
+
+    ok(await store.renameProfile({ fromProfile: profile, toProfile: 'newProfileName' }))
+
+    ok((await store.listProfiles()).includes('newProfileName'))
+
+    ok(!(await store.listProfiles()).includes(profile))
+
+    const session8 = await store.session('newProfileName').open()
+
+    strictEqual(await session8.count(firstEntry), 1)
+
+    await session8.close()
+
+    const destinationStore = await Store.provision({
+      uri: 'sqlite://:memory:',
+      keyMethod: new StoreKeyMethod(KdfMethod.Raw),
+      passKey: getRawKey(),
+      recreate: true,
+    })
+
+    ok(
+      await store.copyProfile({
+        toStore: destinationStore,
+        fromProfile: 'newProfileName',
+        toProfile: 'newerProfileName',
+      })
+    )
+
+    const session9 = await destinationStore.session('newerProfileName').open()
+
+    strictEqual(await session9.count(firstEntry), 1)
+
+    await session9.close()
   })
 
   test('Copy', async () => {

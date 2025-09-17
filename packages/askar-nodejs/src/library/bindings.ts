@@ -231,6 +231,14 @@ export const nativeBindings = {
   askar_store_remove: [FFI_ERROR_CODE, [FFI_STRING, FFI_CALLBACK_PTR, FFI_CALLBACK_ID]],
   askar_store_remove_profile: [FFI_ERROR_CODE, [FFI_STORE_HANDLE, FFI_STRING, FFI_CALLBACK_PTR, FFI_CALLBACK_ID]],
   askar_store_set_default_profile: [FFI_ERROR_CODE, [FFI_STORE_HANDLE, FFI_STRING, FFI_CALLBACK_PTR, FFI_CALLBACK_ID]],
+  askar_store_rename_profile: [
+    FFI_ERROR_CODE,
+    [FFI_STORE_HANDLE, FFI_STRING, FFI_STRING, FFI_CALLBACK_PTR, FFI_CALLBACK_ID],
+  ],
+  askar_store_copy_profile: [
+    FFI_ERROR_CODE,
+    [FFI_STORE_HANDLE, FFI_STORE_HANDLE, FFI_STRING, FFI_STRING, FFI_CALLBACK_PTR, FFI_CALLBACK_ID],
+  ],
 
   askar_migrate_indy_sdk: [
     FFI_ERROR_CODE,
