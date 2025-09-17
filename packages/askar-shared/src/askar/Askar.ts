@@ -337,8 +337,14 @@ export type StoreSetDefaultProfileOptions = {
 }
 export type StoreRenameProfileOptions = {
   storeHandle: StoreHandle
-  fromName: string
-  toName: string
+  fromProfile: string
+  toProfile: string
+}
+export type StoreCopyProfileOptions = {
+  fromHandle: StoreHandle
+  toHandle: StoreHandle
+  fromProfile: string
+  toProfile: string
 }
 
 export type MigrateIndySdkOptions = {
@@ -432,6 +438,7 @@ export type Askar = {
   storeRekey(options: StoreRekeyOptions): Promise<void>
   storeRemove(options: StoreRemoveOptions): Promise<number>
   storeRenameProfile(options: StoreRenameProfileOptions): Promise<number>
+  storeCopyProfile(options: StoreCopyProfileOptions): Promise<number>
   storeRemoveProfile(options: StoreRemoveProfileOptions): Promise<number>
   storeSetDefaultProfile(options: StoreSetDefaultProfileOptions): Promise<void>
 

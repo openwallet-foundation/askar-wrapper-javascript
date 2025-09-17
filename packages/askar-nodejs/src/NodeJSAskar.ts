@@ -65,6 +65,7 @@ import type {
   SetCustomLoggerOptions,
   SetMaxLogLevelOptions,
   StoreCloseOptions,
+  StoreCopyProfileOptions,
   StoreCopyToOptions,
   StoreCreateProfileOptions,
   StoreGenerateRawKeyOptions,
@@ -1089,11 +1090,22 @@ export class NodeJSAskar implements Askar {
     )
   }
 
-public async storeRenameProfile(options: StoreRenameProfileOptions): Promise<number> {
-    const { storeHandle, fromName, toName } = serializeArguments(options)
+  public async storeRenameProfile(options: StoreRenameProfileOptions): Promise<number> {
+    const { storeHandle, fromProfile, toProfile } = serializeArguments(options)
 
     const response = await this.promisifyWithResponse<number>(
-      (cb, cbId) => this.nativeAskar.askar_store_rename_profile(storeHandle, fromName, toName, cb, cbId),
+      (cb, cbId) => this.nativeAskar.askar_store_rename_profile(storeHandle, fromProfile, toProfile, cb, cbId),
+      FFI_INT8
+    )
+
+    return handleInvalidNullResponse(response)
+  }
+
+  public async storeCopyProfile(options: StoreCopyProfileOptions): Promise<number> {
+    const { fromHandle, toHandle, fromProfile, toProfile } = serializeArguments(options)
+
+    const response = await this.promisifyWithResponse<number>(
+      (cb, cbId) => this.nativeAskar.askar_store_copy_profile(fromHandle, toHandle, fromProfile, toProfile, cb, cbId),
       FFI_INT8
     )
 
