@@ -318,7 +318,7 @@ export class NodeJSAskar implements Askar {
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
     const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
-    this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
+    this.nativeAskar.askar_buffer_free(byteBuffer)
 
     return bufferArray
   }
@@ -331,7 +331,7 @@ export class NodeJSAskar implements Askar {
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
     const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
-    this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
+    this.nativeAskar.askar_buffer_free(byteBuffer)
 
     return bufferArray
   }
@@ -344,7 +344,7 @@ export class NodeJSAskar implements Askar {
     this.handleError(errorCode)
     const encryptedBuffer = handleReturnPointer<EncryptedBufferType>(ret)
     const encryptedBufferClass = encryptedBufferStructToClass(encryptedBuffer)
-    this.nativeAskar.askar_buffer_free(encryptedBuffer.secretBuffer as unknown as Buffer)
+    this.nativeAskar.askar_buffer_free(encryptedBuffer.secretBuffer)
 
     return encryptedBufferClass
   }
@@ -377,7 +377,7 @@ export class NodeJSAskar implements Askar {
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
     const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
-    this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
+    this.nativeAskar.askar_buffer_free(byteBuffer)
 
     return bufferArray
   }
@@ -401,7 +401,7 @@ export class NodeJSAskar implements Askar {
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
     const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
-    this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
+    this.nativeAskar.askar_buffer_free(byteBuffer)
 
     return bufferArray
   }
@@ -414,7 +414,7 @@ export class NodeJSAskar implements Askar {
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
     const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
-    this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
+    this.nativeAskar.askar_buffer_free(byteBuffer)
 
     return bufferArray
   }
@@ -426,7 +426,7 @@ export class NodeJSAskar implements Askar {
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
     const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
-    this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
+    this.nativeAskar.askar_buffer_free(byteBuffer)
 
     return bufferArray
   }
@@ -439,7 +439,7 @@ export class NodeJSAskar implements Askar {
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
     const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
-    this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
+    this.nativeAskar.askar_buffer_free(byteBuffer)
 
     return bufferArray
   }
@@ -452,7 +452,7 @@ export class NodeJSAskar implements Askar {
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
     const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
-    this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
+    this.nativeAskar.askar_buffer_free(byteBuffer)
 
     return bufferArray
   }
@@ -678,7 +678,7 @@ export class NodeJSAskar implements Askar {
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
     const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
-    this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
+    this.nativeAskar.askar_buffer_free(byteBuffer)
 
     return bufferArray
   }
@@ -701,7 +701,7 @@ export class NodeJSAskar implements Askar {
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
     const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
-    this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
+    this.nativeAskar.askar_buffer_free(byteBuffer)
 
     return bufferArray
   }
@@ -714,7 +714,7 @@ export class NodeJSAskar implements Askar {
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
     const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
-    this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
+    this.nativeAskar.askar_buffer_free(byteBuffer)
 
     return bufferArray
   }
@@ -727,7 +727,7 @@ export class NodeJSAskar implements Askar {
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
     const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
-    this.nativeAskar.askar_buffer_free(byteBuffer as unknown as Buffer)
+    this.nativeAskar.askar_buffer_free(byteBuffer)
 
     return bufferArray
   }
@@ -761,7 +761,7 @@ export class NodeJSAskar implements Askar {
     this.handleError(errorCode)
     const encryptedBuffer = handleReturnPointer<EncryptedBufferType>(ret)
     const encryptedBufferClass = encryptedBufferStructToClass(encryptedBuffer)
-    this.nativeAskar.askar_buffer_free(encryptedBuffer.secretBuffer as unknown as Buffer)
+    this.nativeAskar.askar_buffer_free(encryptedBuffer.secretBuffer)
 
     return encryptedBufferClass
   }
