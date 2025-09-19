@@ -1,5 +1,12 @@
 # @openwallet-foundation/askar-react-native
 
+## 0.4.2
+
+### Patch Changes
+
+- 3692a12: fix: memory leak from not freeing secret and encrypted buffers
+  - @openwallet-foundation/askar-shared@0.4.2
+
 ## 0.4.1
 
 ### Patch Changes
