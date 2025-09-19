@@ -75,7 +75,9 @@ jsi::Value entryListGetValue(jsi::Runtime &rt, jsi::Object options) {
 
   ErrorCode code = askar_entry_list_get_value(entryListHandle, index, &out);
 
-  return createReturnValue(rt, code, &out);
+  auto ret = createReturnValue(rt, code, &out);
+  askar_buffer_free(out);
+  return ret;
 }
 
 jsi::Value entryListGetName(jsi::Runtime &rt, jsi::Object options) {
@@ -721,7 +723,9 @@ jsi::Value keyGetJwkSecret(jsi::Runtime &rt, jsi::Object options) {
 
   ErrorCode code = askar_key_get_jwk_secret(localKeyHandle, &out);
 
-  return createReturnValue(rt, code, &out);
+  auto ret = createReturnValue(rt, code, &out);
+  askar_buffer_free(out);
+  return ret;
 }
 
 jsi::Value keyGetJwkThumbprint(jsi::Runtime &rt, jsi::Object options) {
@@ -745,7 +749,9 @@ jsi::Value keyGetPublicBytes(jsi::Runtime &rt, jsi::Object options) {
 
   ErrorCode code = askar_key_get_public_bytes(localKeyHandle, &out);
 
-  return createReturnValue(rt, code, &out);
+  auto ret = createReturnValue(rt, code, &out);
+  askar_buffer_free(out);
+  return ret;
 }
 
 jsi::Value keyGetSecretBytes(jsi::Runtime &rt, jsi::Object options) {
@@ -756,7 +762,9 @@ jsi::Value keyGetSecretBytes(jsi::Runtime &rt, jsi::Object options) {
 
   ErrorCode code = askar_key_get_secret_bytes(localKeyHandle, &out);
 
-  return createReturnValue(rt, code, &out);
+  auto ret = createReturnValue(rt, code, &out);
+  askar_buffer_free(out);
+  return ret;
 }
 
 jsi::Value keySignMessage(jsi::Runtime &rt, jsi::Object options) {
@@ -772,7 +780,9 @@ jsi::Value keySignMessage(jsi::Runtime &rt, jsi::Object options) {
       localKeyHandle, message, sigType.length() ? sigType.c_str() : nullptr,
       &out);
 
-  return createReturnValue(rt, code, &out);
+  auto ret = createReturnValue(rt, code, &out);
+  askar_buffer_free(out);
+  return ret;
 }
 
 jsi::Value keyUnwrapKey(jsi::Runtime &rt, jsi::Object options) {
@@ -820,7 +830,9 @@ jsi::Value keyWrapKey(jsi::Runtime &rt, jsi::Object options) {
 
   ErrorCode code = askar_key_wrap_key(localKeyHandle, other, nonce, &out);
 
-  return createReturnValue(rt, code, &out);
+  auto ret = createReturnValue(rt, code, &out);
+  askar_buffer_free(out.buffer);
+  return ret;
 }
 
 jsi::Value keyConvert(jsi::Runtime &rt, jsi::Object options) {
@@ -855,7 +867,9 @@ jsi::Value keyCryptoBox(jsi::Runtime &rt, jsi::Object options) {
   ErrorCode code =
       askar_key_crypto_box(recipientKey, senderKey, message, nonce, &out);
 
-  return createReturnValue(rt, code, &out);
+  auto ret = createReturnValue(rt, code, &out);
+  askar_buffer_free(out);
+  return ret;
 }
 
 jsi::Value keyCryptoBoxOpen(jsi::Runtime &rt, jsi::Object options) {
@@ -869,7 +883,9 @@ jsi::Value keyCryptoBoxOpen(jsi::Runtime &rt, jsi::Object options) {
   ErrorCode code =
       askar_key_crypto_box_open(recipientKey, senderKey, message, nonce, &out);
 
-  return createReturnValue(rt, code, &out);
+  auto ret = createReturnValue(rt, code, &out);
+  askar_buffer_free(out);
+  return ret;
 }
 
 jsi::Value keyCryptoBoxRandomNonce(jsi::Runtime &rt, jsi::Object options) {
@@ -877,7 +893,9 @@ jsi::Value keyCryptoBoxRandomNonce(jsi::Runtime &rt, jsi::Object options) {
 
   ErrorCode code = askar_key_crypto_box_random_nonce(&out);
 
-  return createReturnValue(rt, code, &out);
+  auto ret = createReturnValue(rt, code, &out);
+  askar_buffer_free(out);
+  return ret;
 }
 
 jsi::Value keyCryptoBoxSeal(jsi::Runtime &rt, jsi::Object options) {
@@ -889,7 +907,9 @@ jsi::Value keyCryptoBoxSeal(jsi::Runtime &rt, jsi::Object options) {
 
   ErrorCode code = askar_key_crypto_box_seal(localKeyHandle, message, &out);
 
-  return createReturnValue(rt, code, &out);
+  auto ret = createReturnValue(rt, code, &out);
+  askar_buffer_free(out);
+  return ret;
 }
 
 jsi::Value keyCryptoBoxSealOpen(jsi::Runtime &rt, jsi::Object options) {
@@ -902,7 +922,9 @@ jsi::Value keyCryptoBoxSealOpen(jsi::Runtime &rt, jsi::Object options) {
   ErrorCode code =
       askar_key_crypto_box_seal_open(localKeyHandle, ciphertext, &out);
 
-  return createReturnValue(rt, code, &out);
+  auto ret = createReturnValue(rt, code, &out);
+  askar_buffer_free(out);
+  return ret;
 }
 
 jsi::Value keyDeriveEcdh1pu(jsi::Runtime &rt, jsi::Object options) {
@@ -958,7 +980,9 @@ jsi::Value keyAeadDecrypt(jsi::Runtime &rt, jsi::Object options) {
   ErrorCode code =
       askar_key_aead_decrypt(localKeyHandle, ciphertext, nonce, tag, aad, &out);
 
-  return createReturnValue(rt, code, &out);
+  auto ret = createReturnValue(rt, code, &out);
+  askar_buffer_free(out);
+  return ret;
 }
 
 jsi::Value keyAeadEncrypt(jsi::Runtime &rt, jsi::Object options) {
@@ -974,7 +998,9 @@ jsi::Value keyAeadEncrypt(jsi::Runtime &rt, jsi::Object options) {
   ErrorCode code =
       askar_key_aead_encrypt(localKeyHandle, message, nonce, aad, &out);
 
-  return createReturnValue(rt, code, &out);
+  auto ret = createReturnValue(rt, code, &out);
+  askar_buffer_free(out.buffer);
+  return ret;
 }
 
 jsi::Value keyAeadGetPadding(jsi::Runtime &rt, jsi::Object options) {
@@ -1009,7 +1035,9 @@ jsi::Value keyAeadRandomNonce(jsi::Runtime &rt, jsi::Object options) {
 
   ErrorCode code = askar_key_aead_random_nonce(localKeyHandle, &out);
 
-  return createReturnValue(rt, code, &out);
+  auto ret = createReturnValue(rt, code, &out);
+  askar_buffer_free(out);
+  return ret;
 }
 
 jsi::Value keyEntryListCount(jsi::Runtime &rt, jsi::Object options) {
