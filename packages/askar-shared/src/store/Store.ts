@@ -44,6 +44,18 @@ export class Store {
     return askar.storeListProfiles({ storeHandle: this.handle })
   }
 
+  public async renameProfile({ fromProfile, toProfile }: { fromProfile: string; toProfile: string }) {
+    return await askar.storeRenameProfile({ fromProfile, toProfile, storeHandle: this.handle })
+  }
+
+  public async copyProfile({
+    toStore,
+    fromProfile,
+    toProfile,
+  }: { toStore: Store; fromProfile: string; toProfile: string }) {
+    return await askar.storeCopyProfile({ fromProfile, toProfile, fromHandle: this.handle, toHandle: toStore.handle })
+  }
+
   public async removeProfile(name: string) {
     return await askar.storeRemoveProfile({ profile: name, storeHandle: this.handle })
   }

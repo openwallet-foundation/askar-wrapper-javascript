@@ -1,6 +1,6 @@
 {
   "name": "@openwallet-foundation/askar-react-native",
-  "version": "0.3.2",
+  "version": "0.4.1",
   "license": "Apache-2.0",
   "description": "React Native wrapper for Askar",
   "main": "build/index",
@@ -49,7 +49,7 @@
     "react-native": ">= 0.71"
   },
   "binary": {
-    "version": "v0.4.1",
+    "version": "v0.4.5",
     "host": "https://github.com/openwallet-foundation/askar/releases/download",
     "packageName": "library-ios-android.tar.gz"
   }

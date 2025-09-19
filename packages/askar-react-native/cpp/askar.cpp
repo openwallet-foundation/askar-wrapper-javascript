@@ -286,6 +286,37 @@ jsi::Value storeSetDefaultProfile(jsi::Runtime &rt, jsi::Object options) {
   return createReturnValue(rt, code, nullptr);
 }
 
+jsi::Value storeRenameProfile(jsi::Runtime &rt, jsi::Object options) {
+  auto storeHandle = jsiToValue<int64_t>(rt, options, "storeHandle");
+  auto fromProfile = jsiToValue<std::string>(rt, options, "fromProfile");
+  auto toProfile = jsiToValue<std::string>(rt, options, "toProfile");
+
+  jsi::Function cb = options.getPropertyAsFunction(rt, "cb");
+  State *state = new State(&cb);
+  state->rt = &rt;
+
+  ErrorCode code = askar_store_rename_profile(
+      storeHandle, fromProfile.c_str(), toProfile.c_str(), callbackWithResponse, CallbackId(state));
+
+  return createReturnValue(rt, code, nullptr);
+}
+
+jsi::Value storeCopyProfile(jsi::Runtime &rt, jsi::Object options) {
+  auto fromHandle = jsiToValue<int64_t>(rt, options, "fromHandle");
+  auto toHandle = jsiToValue<int64_t>(rt, options, "toHandle");
+  auto fromProfile = jsiToValue<std::string>(rt, options, "fromProfile");
+  auto toProfile = jsiToValue<std::string>(rt, options, "toProfile");
+
+  jsi::Function cb = options.getPropertyAsFunction(rt, "cb");
+  State *state = new State(&cb);
+  state->rt = &rt;
+
+  ErrorCode code = askar_store_copy_profile(
+      fromHandle, toHandle, fromProfile.c_str(), toProfile.c_str(), callbackWithResponse, CallbackId(state));
+
+  return createReturnValue(rt, code, nullptr);
+}
+
 jsi::Value sessionClose(jsi::Runtime &rt, jsi::Object options) {
   auto sessionHandle = jsiToValue<int64_t>(rt, options, "sessionHandle");
   auto commit = jsiToValue<int8_t>(rt, options, "commit");

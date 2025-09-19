@@ -61,6 +61,7 @@ import type {
   SessionUpdateKeyOptions,
   SessionUpdateOptions,
   StoreCloseOptions,
+  StoreCopyProfileOptions,
   StoreCopyToOptions,
   StoreCreateProfileOptions,
   StoreGenerateRawKeyOptions,
@@ -72,6 +73,7 @@ import type {
   StoreRekeyOptions,
   StoreRemoveOptions,
   StoreRemoveProfileOptions,
+  StoreRenameProfileOptions,
   StoreSetDefaultProfileOptions,
 } from '@openwallet-foundation/askar-shared'
 import type { NativeBindings } from './NativeBindings'
@@ -721,6 +723,24 @@ export class ReactNativeAskar implements Askar {
     const serializedOptions = serializeArguments(options)
     const response = await this.promisifyWithResponse<number>((cb) =>
       this.handleError(this.askar.storeRemoveProfile({ cb, ...serializedOptions }))
+    )
+
+    return handleInvalidNullResponse(response)
+  }
+
+  public async storeRenameProfile(options: StoreRenameProfileOptions): Promise<number> {
+    const serializedOptions = serializeArguments(options)
+    const response = await this.promisifyWithResponse<number>((cb) =>
+      this.handleError(this.askar.storeRenameProfile({ cb, ...serializedOptions }))
+    )
+
+    return handleInvalidNullResponse(response)
+  }
+
+  public async storeCopyProfile(options: StoreCopyProfileOptions): Promise<number> {
+    const serializedOptions = serializeArguments(options)
+    const response = await this.promisifyWithResponse<number>((cb) =>
+      this.handleError(this.askar.storeCopyProfile({ cb, ...serializedOptions }))
     )
 
     return handleInvalidNullResponse(response)
