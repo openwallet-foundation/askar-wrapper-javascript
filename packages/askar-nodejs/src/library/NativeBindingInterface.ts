@@ -1,5 +1,6 @@
 import type { nativeBindings } from './bindings'
 
+import type { ByteBufferType, SecretBufferStruct } from '../ffi'
 // We need a mapping from string type value => type (property 'string' maps to type string)
 interface StringTypeMapping {
   pointer: Buffer
@@ -17,7 +18,11 @@ type ShapeOf<T> = {
   [Property in keyof T]: T[Property]
 }
 type StringTypeArrayToTypes<List extends (keyof StringTypeMapping)[]> = {
-  [Item in keyof List]: List[Item] extends keyof StringTypeMapping ? StringTypeMapping[List[Item]] : Buffer
+  [Item in keyof List]: List[Item] extends keyof StringTypeMapping
+    ? StringTypeMapping[List[Item]]
+    : List[Item] extends Mutable<typeof SecretBufferStruct>
+      ? ByteBufferType | Buffer
+      : Buffer
 }
 
 // biome-ignore lint/suspicious/noExplicitAny:

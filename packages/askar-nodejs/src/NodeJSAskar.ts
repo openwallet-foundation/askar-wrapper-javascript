@@ -91,14 +91,9 @@ import {
   StoreHandle,
   handleInvalidNullResponse,
 } from '@openwallet-foundation/askar-shared'
-import type {
-  ByteBufferType,
-  EncryptedBufferType,
-  NativeCallback,
-  NativeCallbackWithResponse,
-  SecretBufferType,
-} from './ffi'
 import {
+  type ByteBufferType,
+  type EncryptedBufferType,
   FFI_ENTRY_LIST_HANDLE,
   FFI_INT8,
   FFI_INT64,
@@ -108,6 +103,8 @@ import {
   FFI_STORE_HANDLE,
   FFI_STRING,
   FFI_STRING_LIST_HANDLE,
+  type NativeCallback,
+  type NativeCallbackWithResponse,
   allocateAeadParams,
   allocateEncryptedBuffer,
   allocateInt8Buffer,
@@ -319,9 +316,11 @@ export class NodeJSAskar implements Askar {
 
     const errorCode = this.nativeAskar.askar_entry_list_get_value(entryListHandle, index, ret)
     this.handleError(errorCode)
-
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    return new Uint8Array(secretBufferToBuffer(byteBuffer))
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    this.nativeAskar.askar_buffer_free(byteBuffer)
+
+    return bufferArray
   }
 
   public keyAeadDecrypt(options: KeyAeadDecryptOptions): Uint8Array {
@@ -330,9 +329,11 @@ export class NodeJSAskar implements Askar {
 
     const errorCode = this.nativeAskar.askar_key_aead_decrypt(localKeyHandle, ciphertext, nonce, tag, aad, ret)
     this.handleError(errorCode)
-
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    return new Uint8Array(secretBufferToBuffer(byteBuffer))
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    this.nativeAskar.askar_buffer_free(byteBuffer)
+
+    return bufferArray
   }
 
   public keyAeadEncrypt(options: KeyAeadEncryptOptions): EncryptedBuffer {
@@ -341,9 +342,11 @@ export class NodeJSAskar implements Askar {
 
     const errorCode = this.nativeAskar.askar_key_aead_encrypt(localKeyHandle, message, nonce, aad, ret)
     this.handleError(errorCode)
-
     const encryptedBuffer = handleReturnPointer<EncryptedBufferType>(ret)
-    return encryptedBufferStructToClass(encryptedBuffer)
+    const encryptedBufferClass = encryptedBufferStructToClass(encryptedBuffer)
+    this.nativeAskar.askar_buffer_free(encryptedBuffer.secretBuffer)
+
+    return encryptedBufferClass
   }
 
   public keyAeadGetPadding(options: KeyAeadGetPaddingOptions): number {
@@ -372,9 +375,11 @@ export class NodeJSAskar implements Askar {
 
     const errorCode = this.nativeAskar.askar_key_aead_random_nonce(localKeyHandle, ret)
     this.handleError(errorCode)
+    const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    this.nativeAskar.askar_buffer_free(byteBuffer)
 
-    const secretBuffer = handleReturnPointer<SecretBufferType>(ret)
-    return new Uint8Array(secretBufferToBuffer(secretBuffer))
+    return bufferArray
   }
 
   public keyConvert(options: KeyConvertOptions): LocalKeyHandle {
@@ -394,9 +399,11 @@ export class NodeJSAskar implements Askar {
 
     const errorCode = this.nativeAskar.askar_key_crypto_box(recipientKey, senderKey, message, nonce, ret)
     this.handleError(errorCode)
+    const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    this.nativeAskar.askar_buffer_free(byteBuffer)
 
-    const secretBuffer = handleReturnPointer<SecretBufferType>(ret)
-    return new Uint8Array(secretBufferToBuffer(secretBuffer))
+    return bufferArray
   }
 
   public keyCryptoBoxOpen(options: KeyCryptoBoxOpenOptions): Uint8Array {
@@ -405,9 +412,11 @@ export class NodeJSAskar implements Askar {
 
     const errorCode = this.nativeAskar.askar_key_crypto_box_open(recipientKey, senderKey, message, nonce, ret)
     this.handleError(errorCode)
+    const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    this.nativeAskar.askar_buffer_free(byteBuffer)
 
-    const secretBuffer = handleReturnPointer<SecretBufferType>(ret)
-    return new Uint8Array(secretBufferToBuffer(secretBuffer))
+    return bufferArray
   }
 
   public keyCryptoBoxRandomNonce(): Uint8Array {
@@ -415,9 +424,11 @@ export class NodeJSAskar implements Askar {
 
     const errorCode = this.nativeAskar.askar_key_crypto_box_random_nonce(ret)
     this.handleError(errorCode)
+    const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    this.nativeAskar.askar_buffer_free(byteBuffer)
 
-    const secretBuffer = handleReturnPointer<SecretBufferType>(ret)
-    return new Uint8Array(secretBufferToBuffer(secretBuffer))
+    return bufferArray
   }
 
   public keyCryptoBoxSeal(options: KeyCryptoBoxSealOptions): Uint8Array {
@@ -426,9 +437,11 @@ export class NodeJSAskar implements Askar {
 
     const errorCode = this.nativeAskar.askar_key_crypto_box_seal(localKeyHandle, message, ret)
     this.handleError(errorCode)
+    const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    this.nativeAskar.askar_buffer_free(byteBuffer)
 
-    const secretBuffer = handleReturnPointer<SecretBufferType>(ret)
-    return new Uint8Array(secretBufferToBuffer(secretBuffer))
+    return bufferArray
   }
 
   public keyCryptoBoxSealOpen(options: KeyCryptoBoxSealOpenOptions): Uint8Array {
@@ -437,9 +450,11 @@ export class NodeJSAskar implements Askar {
 
     const errorCode = this.nativeAskar.askar_key_crypto_box_seal_open(localKeyHandle, ciphertext, ret)
     this.handleError(errorCode)
+    const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    this.nativeAskar.askar_buffer_free(byteBuffer)
 
-    const secretBuffer = handleReturnPointer<SecretBufferType>(ret)
-    return new Uint8Array(secretBufferToBuffer(secretBuffer))
+    return bufferArray
   }
 
   public keyDeriveEcdh1pu(options: KeyDeriveEcdh1puOptions): LocalKeyHandle {
@@ -661,9 +676,11 @@ export class NodeJSAskar implements Askar {
 
     const errorCode = this.nativeAskar.askar_key_get_jwk_secret(localKeyHandle, ret)
     this.handleError(errorCode)
+    const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    this.nativeAskar.askar_buffer_free(byteBuffer)
 
-    const secretBuffer = handleReturnPointer<SecretBufferType>(ret)
-    return new Uint8Array(secretBufferToBuffer(secretBuffer))
+    return bufferArray
   }
 
   public keyGetJwkThumbprint(options: KeyGetJwkThumbprintOptions): string {
@@ -682,9 +699,11 @@ export class NodeJSAskar implements Askar {
 
     const errorCode = this.nativeAskar.askar_key_get_public_bytes(localKeyHandle, ret)
     this.handleError(errorCode)
+    const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    this.nativeAskar.askar_buffer_free(byteBuffer)
 
-    const secretBuffer = handleReturnPointer<SecretBufferType>(ret)
-    return new Uint8Array(secretBufferToBuffer(secretBuffer))
+    return bufferArray
   }
 
   public keyGetSecretBytes(options: KeyGetSecretBytesOptions): Uint8Array {
@@ -693,9 +712,11 @@ export class NodeJSAskar implements Askar {
 
     const errorCode = this.nativeAskar.askar_key_get_secret_bytes(localKeyHandle, ret)
     this.handleError(errorCode)
+    const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    this.nativeAskar.askar_buffer_free(byteBuffer)
 
-    const secretBuffer = handleReturnPointer<SecretBufferType>(ret)
-    return new Uint8Array(secretBufferToBuffer(secretBuffer))
+    return bufferArray
   }
 
   public keySignMessage(options: KeySignMessageOptions): Uint8Array {
@@ -704,9 +725,11 @@ export class NodeJSAskar implements Askar {
 
     const errorCode = this.nativeAskar.askar_key_sign_message(localKeyHandle, message, sigType, ret)
     this.handleError(errorCode)
+    const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    this.nativeAskar.askar_buffer_free(byteBuffer)
 
-    const secretBuffer = handleReturnPointer<SecretBufferType>(ret)
-    return new Uint8Array(secretBufferToBuffer(secretBuffer))
+    return bufferArray
   }
 
   public keyUnwrapKey(options: KeyUnwrapKeyOptions): LocalKeyHandle {
@@ -736,9 +759,11 @@ export class NodeJSAskar implements Askar {
 
     const errorCode = this.nativeAskar.askar_key_wrap_key(localKeyHandle, other, nonce, ret)
     this.handleError(errorCode)
-
     const encryptedBuffer = handleReturnPointer<EncryptedBufferType>(ret)
-    return encryptedBufferStructToClass(encryptedBuffer)
+    const encryptedBufferClass = encryptedBufferStructToClass(encryptedBuffer)
+    this.nativeAskar.askar_buffer_free(encryptedBuffer.secretBuffer)
+
+    return encryptedBufferClass
   }
 
   public keyGetSupportedBackends(): string[] {
