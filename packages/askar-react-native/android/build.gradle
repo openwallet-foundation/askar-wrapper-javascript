@@ -91,7 +91,8 @@ android {
             abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
             arguments "-DANDROID_STL=c++_shared",
                       "-DREACT_NATIVE_VERSION=${REACT_NATIVE_VERSION}",
-                      "-DNODE_MODULES_DIR=${nodeModules}"
+                      "-DNODE_MODULES_DIR=${nodeModules}",
+                      "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
         }
     }
     
