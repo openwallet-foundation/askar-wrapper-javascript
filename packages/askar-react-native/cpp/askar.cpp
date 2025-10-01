@@ -314,7 +314,7 @@ jsi::Value storeCopyProfile(jsi::Runtime &rt, jsi::Object options) {
   state->rt = &rt;
 
   ErrorCode code = askar_store_copy_profile(
-      fromHandle, toHandle, fromProfile.c_str(), toProfile.c_str(), callbackWithResponse, CallbackId(state));
+      fromHandle, toHandle, fromProfile.c_str(), toProfile.c_str(), callback, CallbackId(state));
 
   return createReturnValue(rt, code, nullptr);
 }
