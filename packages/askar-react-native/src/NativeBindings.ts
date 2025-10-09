@@ -7,6 +7,12 @@ export interface NativeBindings {
   version(options: Record<string, never>): string
   getCurrentError(options: Record<string, never>): string
 
+  argon2DerivePassword(options: {
+    parameters: number
+    password: ArrayBuffer
+    salt: ArrayBuffer
+  }): ReturnObject<Uint8Array>
+
   entryListCount(options: { entryListHandle: string }): ReturnObject<number>
   entryListFree(options: { entryListHandle: string }): ReturnObject<never>
   entryListGetCategory(options: { entryListHandle: string; index: number }): ReturnObject<string>

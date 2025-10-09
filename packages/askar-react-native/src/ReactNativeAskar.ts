@@ -1,4 +1,5 @@
 import type {
+  Argon2DerivePasswordOptions,
   Askar,
   AskarErrorObject,
   EntryListCountOptions,
@@ -185,6 +186,11 @@ export class ReactNativeAskar implements Askar {
 
   public setMaxLogLevel(): void {
     throw new Error('Method not implemented. setMaxLogLevel')
+  }
+
+  public argon2DerivePassword(options: Argon2DerivePasswordOptions): Uint8Array {
+    const serializedOptions = serializeArguments(options)
+    return handleInvalidNullResponse(this.handleError(this.askar.argon2DerivePassword(serializedOptions)))
   }
 
   public entryListCount(options: EntryListCountOptions): number {

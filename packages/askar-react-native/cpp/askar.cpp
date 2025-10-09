@@ -22,6 +22,23 @@ jsi::Value setDefaultLogger(jsi::Runtime &rt, jsi::Object options) {
   return createReturnValue(rt, code, nullptr);
 }
 
+jsi::Value argon2DerivePassword(jsi::Runtime &rt, jsi::Object options) {
+  auto parameters =
+      jsiToValue<int8_t>(rt, options, "parameters");
+  auto password =
+      jsiToValue<ByterBuffer>(rt, options, "password");
+  auto salt =
+      jsiToValue<ByteBuffer>(rt, options, "salt");
+
+  SecretBuffer out;
+
+  ErrorCode code = askar_argon2_derive_password(parameters, password, salt, &out);
+
+  auto ret = createReturnValue(rt, code, &out);
+  askar_buffer_free(out);
+  return ret;
+}
+
 jsi::Value entryListCount(jsi::Runtime &rt, jsi::Object options) {
   auto entryListHandle =
       jsiToValue<EntryListHandle>(rt, options, "entryListHandle");

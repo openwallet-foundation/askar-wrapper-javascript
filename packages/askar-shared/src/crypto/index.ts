@@ -1,5 +1,6 @@
 export * from './handles'
 export * from './Key'
+export * from './Argon2'
 export * from './EcdhEs'
 export * from './Ecdh1PU'
 export * from './CryptoBox'
