@@ -33,6 +33,12 @@ export type SetCustomLoggerOptions = {
 }
 export type SetMaxLogLevelOptions = { logLevel: number }
 
+export type Argon2DerivePasswordOptions = {
+  parameters: number
+  password: Uint8Array
+  salt: Uint8Array
+}
+
 export type EntryListCountOptions = { entryListHandle: EntryListHandle }
 export type EntryListFreeOptions = { entryListHandle: EntryListHandle }
 export type EntryListGetCategoryOptions = {
@@ -362,6 +368,8 @@ export type Askar = {
   setCustomLogger(options: SetCustomLoggerOptions): void
   setDefaultLogger(): void
   setMaxLogLevel(options: SetMaxLogLevelOptions): void
+
+  argon2DerivePassword(options: Argon2DerivePasswordOptions): Uint8Array
 
   entryListCount(options: EntryListCountOptions): number
   entryListFree(options: EntryListFreeOptions): void

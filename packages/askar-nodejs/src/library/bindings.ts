@@ -36,6 +36,8 @@ export const nativeBindings = {
   askar_set_default_logger: [FFI_ERROR_CODE, []],
   askar_set_max_log_level: [FFI_ERROR_CODE, [FFI_INT32]],
 
+  askar_argon2_derive_password: [FFI_ERROR_CODE, [FFI_INT8, ByteBufferStruct, ByteBufferStruct, SecretBufferStructPtr]],
+
   askar_entry_list_count: [FFI_ERROR_CODE, [FFI_ENTRY_LIST_HANDLE, FFI_INT32_PTR]],
   askar_entry_list_free: [FFI_VOID, [FFI_ENTRY_LIST_HANDLE]],
   askar_entry_list_get_category: [FFI_ERROR_CODE, [FFI_ENTRY_LIST_HANDLE, FFI_INT32, FFI_STRING_PTR]],

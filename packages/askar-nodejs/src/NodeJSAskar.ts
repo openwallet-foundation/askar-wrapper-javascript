@@ -1,5 +1,6 @@
 import type {
   AeadParamsOptions,
+  Argon2DerivePasswordOptions,
   Askar,
   AskarErrorObject,
   EncryptedBuffer,
@@ -261,6 +262,21 @@ export class NodeJSAskar implements Askar {
 
     const errorCode = this.nativeAskar.askar_set_max_log_level(logLevel)
     this.handleError(errorCode)
+  }
+
+  public argon2DerivePassword(options: Argon2DerivePasswordOptions) {
+    const { parameters, password, salt } = serializeArguments(options)
+
+    const ret = allocateSecretBuffer()
+
+    const errorCode = this.nativeAskar.askar_argon2_derive_password(parameters, password, salt, ret)
+
+    this.handleError(errorCode)
+    const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
+    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    this.nativeAskar.askar_buffer_free(byteBuffer)
+
+    return bufferArray
   }
 
   public entryListCount(options: EntryListCountOptions): number {

@@ -37,7 +37,7 @@
     "typescript": "catalog:"
   },
   "binary": {
-    "version": "v0.4.5",
+    "version": "v0.4.6",
     "host": "https://github.com/openwallet-foundation/askar/releases/download",
     "packageName": "library-{platform}-{arch}.tar.gz"
   },

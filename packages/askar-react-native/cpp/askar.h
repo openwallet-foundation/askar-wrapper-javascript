@@ -20,6 +20,8 @@ jsi::Value setDefaultLogger(jsi::Runtime &rt, jsi::Object options);
 // jsi::Value setMaxLogLevel(jsi::Runtime &rt, jsi::Object options);
 // jsi::Value clearCustomLogger(jsi::Runtime &rt, jsi::Object options);
 
+jsi::Value argon2DerivePassword(jsi::Runtime &rt, jsi::Object options);
+
 jsi::Value entryListCount(jsi::Runtime &rt, jsi::Object options);
 jsi::Value entryListFree(jsi::Runtime &rt, jsi::Object options);
 jsi::Value entryListGetCategory(jsi::Runtime &rt, jsi::Object options);
