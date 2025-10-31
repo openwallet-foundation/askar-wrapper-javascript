@@ -77,9 +77,6 @@ import type {
   StoreRenameProfileOptions,
   StoreSetDefaultProfileOptions,
 } from '@openwallet-foundation/askar-shared'
-import type { NativeBindings } from './NativeBindings'
-import type { Callback, CallbackWithResponse, ReturnObject } from './serialize'
-
 import {
   AeadParams,
   AskarError,
@@ -92,7 +89,8 @@ import {
   StoreHandle,
   handleInvalidNullResponse,
 } from '@openwallet-foundation/askar-shared'
-
+import type { NativeBindings } from './NativeBindings'
+import type { Callback, CallbackWithResponse, ReturnObject } from './serialize'
 import { serializeArguments } from './serialize'
 
 export class ReactNativeAskar implements Askar {

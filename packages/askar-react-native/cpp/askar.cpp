@@ -26,7 +26,7 @@ jsi::Value argon2DerivePassword(jsi::Runtime &rt, jsi::Object options) {
   auto parameters =
       jsiToValue<int8_t>(rt, options, "parameters");
   auto password =
-      jsiToValue<ByterBuffer>(rt, options, "password");
+      jsiToValue<ByteBuffer>(rt, options, "password");
   auto salt =
       jsiToValue<ByteBuffer>(rt, options, "salt");
 

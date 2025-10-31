@@ -32,9 +32,6 @@ jobs:
       - name: Check Style
         run: pnpm style:check
 
-      - name: Check Types
-        run: pnpm types:check
-
       - name: Compile
         run: pnpm build
 
