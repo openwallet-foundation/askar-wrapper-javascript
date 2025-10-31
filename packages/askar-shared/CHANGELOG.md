@@ -1,5 +1,11 @@
 # @openwallet-foundation/askar-shared
 
+## 0.4.3
+
+### Patch Changes
+
+- 113494f: Added argon2 key derivation
+
 ## 0.4.2
 
 ## 0.4.1
