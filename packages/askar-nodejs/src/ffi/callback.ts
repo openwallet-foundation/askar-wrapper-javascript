@@ -1,5 +1,5 @@
-import { Callback } from '@2060.io/ffi-napi'
-import { refType } from '@2060.io/ref-napi'
+import { Callback } from '@napi-ffi/ffi-napi'
+import { refType } from '@napi-ffi/ref-napi'
 import { allocateCallbackBuffer } from './alloc'
 import { FFI_CALLBACK_ID, FFI_ERROR_CODE, FFI_INT32, FFI_STRING, FFI_VOID } from './primitives'
 

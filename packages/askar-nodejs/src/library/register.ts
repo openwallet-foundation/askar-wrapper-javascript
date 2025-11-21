@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import { Library } from '@2060.io/ffi-napi'
+import { Library } from '@napi-ffi/ffi-napi'
 import type { NativeMethods } from './NativeBindingInterface'
 import { nativeBindings } from './bindings'
 
@@ -50,17 +50,17 @@ const getLibrary = () => {
   if (pathFromEnvironment) platformPaths.unshift(pathFromEnvironment)
 
   // Create the path + file
-  const libaries = platformPaths.map((p) =>
+  const libraries = platformPaths.map((p) =>
     path.join(p, `${extensions[platform].prefix ?? ''}${LIBNAME}${extensions[platform].extension}`)
   )
 
   // Gaurd so we quit if there is no valid path for the library
-  if (!libaries.some(doesPathExist))
-    throw new Error(`Could not find ${LIBNAME} with these paths: ${libaries.join(' ')}`)
+  if (!libraries.some((libraryPath) => doesPathExist(libraryPath)))
+    throw new Error(`Could not find ${LIBNAME} with these paths: ${libraries.join(' ')}`)
 
   // Get the first valid library
   // Casting here as a string because there is a guard of none of the paths
-  const validLibraryPath = libaries.find((l) => doesPathExist(l)) as string
+  const validLibraryPath = libraries.find((l) => doesPathExist(l)) as string
 
   // TODO fix the typing conversion
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment

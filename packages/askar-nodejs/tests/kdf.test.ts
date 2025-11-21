@@ -1,11 +1,8 @@
 import { ok } from 'node:assert'
-import { before, describe, test } from 'node:test'
 import { Argon2, Argon2Parameters } from '@openwallet-foundation/askar-shared'
-import { setup } from './utils'
+import { describe, test } from 'vitest'
 
 describe('Argon2', () => {
-  before(setup)
-
   test('derive password', () => {
     const password = 'my password'
     const salt = 'long enough salt'

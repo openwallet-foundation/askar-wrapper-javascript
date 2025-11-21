@@ -1,6 +1,6 @@
-import { default as ref, refType } from '@2060.io/ref-napi'
-import refArray from 'ref-array-di'
-import refStruct from 'ref-struct-di'
+import refArray from '@napi-ffi/ref-array-di'
+import { default as ref, refType } from '@napi-ffi/ref-napi'
+import refStruct from '@napi-ffi/ref-struct-di'
 import { FFI_INT32, FFI_INT64, FFI_UINT8 } from './primitives'
 
 const CStruct = refStruct(ref)

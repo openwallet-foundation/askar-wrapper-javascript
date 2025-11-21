@@ -1,12 +1,9 @@
 import { deepStrictEqual, ok, strictEqual } from 'node:assert'
-import { before, describe, test } from 'node:test'
-import { Jwk, Key, KeyAlgorithm, KeyMethod } from '@openwallet-foundation/askar-shared'
+import { Jwk, Key, KeyAlgorithm } from '@openwallet-foundation/askar-shared'
+import { describe, test } from 'vitest'
 import { askarNodeJS } from '../src'
-import { setup } from './utils'
 
 describe('keys', () => {
-  before(setup)
-
   test('supported backends', () => {
     const backends = askarNodeJS.keyGetSupportedBackends()
 

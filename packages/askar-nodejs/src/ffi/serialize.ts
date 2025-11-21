@@ -1,4 +1,4 @@
-import { NULL } from '@2060.io/ref-napi'
+import { NULL } from '@napi-ffi/ref-napi'
 import { ArcHandle, Jwk, Key, ScanHandle, SessionHandle, StoreHandle } from '@openwallet-foundation/askar-shared'
 import { uint8arrayToByteBufferStruct } from './conversion'
 import type { ByteBufferStruct, SecretBufferStruct } from './structures'

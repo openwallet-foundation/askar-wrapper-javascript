@@ -15,9 +15,4 @@ export const setupWallet = async () => {
   })
 }
 
-export const setup = () => {
-  registerAskar({ askar: new NodeJSAskar() })
-  askar.setDefaultLogger()
-}
-
 export const base64url = (str: string) => Buffer.from(str).toString('base64url')

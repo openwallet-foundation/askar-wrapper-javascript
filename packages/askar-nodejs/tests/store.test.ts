@@ -1,13 +1,11 @@
 import { deepStrictEqual, doesNotReject, ok, rejects, strictEqual } from 'node:assert'
 import { promises } from 'node:fs'
-import { afterEach, before, beforeEach, describe, test } from 'node:test'
 import { AskarError, KdfMethod, Key, KeyAlgorithm, Store, StoreKeyMethod } from '@openwallet-foundation/askar-shared'
-import { firstEntry, getRawKey, secondEntry, setup, setupWallet, testStoreUri } from './utils'
+import { afterEach, beforeEach, describe, test } from 'vitest'
+import { firstEntry, getRawKey, secondEntry, setupWallet, testStoreUri } from './utils'
 
 describe('Store and Session', () => {
   let store: Store
-
-  before(setup)
 
   beforeEach(async () => {
     store = await setupWallet()

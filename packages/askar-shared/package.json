@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "buffer": "^6.0.3",
-    "tar": "^7.4.3"
+    "tar": "^7.5.2"
   },
   "devDependencies": {
     "typescript": "catalog:"

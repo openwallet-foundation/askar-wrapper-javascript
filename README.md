@@ -4,7 +4,7 @@ Wrapper for Node.js and React Native around [https://github.com/openwallet-found
 
 ## Requirements
 
-This library requires and has been tested with Node.js version `18.x`, `20.x` and `22.x`, or React Native version `0.75.x` and `0.76.x`. Newer versions might also work, but they have not been tested.
+This library requires and has been tested with Node.js version `20.x`, `22.x`, and `24.x` or React Native version `0.75.x` and `0.76.x`. Newer versions might also work, but they have not been tested.
 
 ## Setup
 

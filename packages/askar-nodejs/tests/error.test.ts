@@ -1,11 +1,9 @@
 import { doesNotReject, doesNotThrow, rejects, throws } from 'node:assert'
-import { before, describe, test } from 'node:test'
 import { AskarError, KeyAlgorithm, askar } from '@openwallet-foundation/askar-shared'
-import { setup, setupWallet } from './utils'
+import { describe, test } from 'vitest'
+import { setupWallet } from './utils'
 
 describe('Error', () => {
-  before(setup)
-
   test('set error code to 0 after correct call', () => {
     doesNotThrow(() =>
       askar.keyGenerate({

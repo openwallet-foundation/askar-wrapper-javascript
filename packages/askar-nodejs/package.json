@@ -24,16 +24,18 @@
     "install": "node scripts/install.js"
   },
   "dependencies": {
-    "@2060.io/ffi-napi": "^4.0.9",
-    "@2060.io/ref-napi": "^3.0.6",
+    "@napi-ffi/ffi-napi": "^4.0.3",
+    "@napi-ffi/ref-napi": "^3.0.5",
     "@openwallet-foundation/askar-shared": "workspace:*",
-    "ref-array-di": "^1.2.2",
-    "ref-struct-di": "^1.1.1"
+    "@napi-ffi/ref-array-di": "^1.2.2",
+    "@napi-ffi/ref-struct-di": "^1.1.1"
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "@types/ref-array-di": "^1.2.3",
-    "@types/ref-struct-di": "^1.1.6",
+    "@types/napi-ffi__ref-array-di": "npm:@types/ref-array-di@^1.2.3",
+    "@types/napi-ffi__ref-struct-di": "npm:@types/ref-struct-di@^1.1.6",
+    "@types/napi-ffi__ffi-napi": "npm:@types/ffi-napi@^4.0.10",
+    "@types/napi-ffi__ref-napi": "npm:@types/ref-napi@^3.0.12",
     "typescript": "catalog:"
   },
   "binary": {
@@ -42,6 +44,6 @@
     "packageName": "library-{platform}-{arch}.tar.gz"
   },
   "engines": {
-    "node": ">= 18"
+    "node": ">= 20"
   }
 }

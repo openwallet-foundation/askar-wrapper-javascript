@@ -1,7 +1,7 @@
-import type { Pointer } from '@2060.io/ref-napi'
-import { reinterpret } from '@2060.io/ref-napi'
+import type { TypedArray } from '@napi-ffi/ref-array-di'
+import type { Pointer } from '@napi-ffi/ref-napi'
+import { reinterpret } from '@napi-ffi/ref-napi'
 import { EncryptedBuffer } from '@openwallet-foundation/askar-shared'
-import type { TypedArray } from 'ref-array-di'
 import type { ByteBufferType, EncryptedBufferType } from './structures'
 import { ByteBufferStruct } from './structures'
 

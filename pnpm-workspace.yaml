@@ -7,5 +7,5 @@ catalog:
   tsx: ^4.19.2
   rimraf: ^5.0.5
   "@biomejs/biome": 1.9.4
-  "@types/node": ^20.12.11
+  "@types/node": ^24.10.1
   "@changesets/cli": ^2.27.12

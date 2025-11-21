@@ -1,11 +1,9 @@
 import { deepStrictEqual, strictEqual } from 'node:assert'
-import { before, describe, test } from 'node:test'
 import { Ecdh1PU, EcdhEs, Jwk, Key, KeyAlgorithm } from '@openwallet-foundation/askar-shared'
-import { base64url, setup } from './utils'
+import { describe, test } from 'vitest'
+import { base64url } from './utils'
 
 describe('jose ecdh', () => {
-  before(setup)
-
   test('ecdh es direct', () => {
     const bobKey = Key.generate(KeyAlgorithm.EcSecp256r1)
     const bobJwk = bobKey.jwkPublic
