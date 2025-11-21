@@ -1,41 +1,39 @@
-import { deepStrictEqual, ok, strictEqual } from 'node:assert'
 import { Jwk, Key, KeyAlgorithm } from '@openwallet-foundation/askar-shared'
-import { describe, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { askarNodeJS } from '../src'
 
 describe('keys', () => {
   test('supported backends', () => {
     const backends = askarNodeJS.keyGetSupportedBackends()
 
-    strictEqual(backends.length, 1)
-    ok(backends.includes('software'))
+    expect(backends.length).toBe(1)
+    expect(backends.includes('software')).toBe(true)
   })
 
   test('aes cbc hmac', () => {
     const key = Key.generate(KeyAlgorithm.AesA128CbcHs256)
 
-    strictEqual(key.algorithm, KeyAlgorithm.AesA128CbcHs256)
+    expect(key.algorithm).toBe(KeyAlgorithm.AesA128CbcHs256)
 
     const messageString = 'test message'
     const message = Uint8Array.from(Buffer.from(messageString))
     const aeadNonce = key.aeadRandomNonce
     const params = key.aeadParams
 
-    strictEqual(params.nonceLength, 16)
-    strictEqual(params.tagLength, 16)
+    expect(params.nonceLength).toBe(16)
+    expect(params.tagLength).toBe(16)
 
     const enc = key.aeadEncrypt({ message, nonce: aeadNonce })
     const dec = key.aeadDecrypt(enc.parts)
 
-    deepStrictEqual(dec, message)
+    expect(dec).toEqual(message)
   })
 
   test('Bls G2 Keygen', () => {
     const seed = Uint8Array.from(Buffer.from('testseed000000000000000000000001'))
     const key = Key.fromSeed({ algorithm: KeyAlgorithm.Bls12381G2, seed })
 
-    deepStrictEqual(
-      key.jwkPublic,
+    expect(key.jwkPublic).toEqual(
       new Jwk({
         crv: 'BLS12381G2',
         kty: 'EC',
@@ -49,8 +47,7 @@ describe('keys', () => {
     const seed = Uint8Array.from(Buffer.from('testseed000000000000000000000001'))
     const key = Key.fromSeed({ algorithm: KeyAlgorithm.Bls12381G1, seed })
 
-    deepStrictEqual(
-      key.jwkPublic,
+    expect(key.jwkPublic).toEqual(
       new Jwk({
         crv: 'BLS12381G1',
         kty: 'EC',
@@ -63,36 +60,33 @@ describe('keys', () => {
   test('ed25519', () => {
     const key = Key.generate(KeyAlgorithm.Ed25519)
 
-    strictEqual(key.algorithm, KeyAlgorithm.Ed25519)
+    expect(key.algorithm).toBe(KeyAlgorithm.Ed25519)
 
     const message = Uint8Array.from(Buffer.from('test message'))
     const messageBuffer = Buffer.from('test message')
     const signature = key.signMessage({ message })
 
-    strictEqual(key.verifySignature({ message, signature }), true)
-    strictEqual(key.verifySignature({ message: messageBuffer, signature }), true)
-    strictEqual(key.verifySignature({ message: Buffer.from('other message'), signature }), false)
-    strictEqual(
+    expect(key.verifySignature({ message, signature })).toBe(true)
+    expect(key.verifySignature({ message: messageBuffer, signature })).toBe(true)
+    expect(key.verifySignature({ message: Buffer.from('other message'), signature })).toBe(false)
+    expect(
       key.verifySignature({
         message: Uint8Array.from(Buffer.from('other message')),
         signature,
-      }),
-      false
-    )
-    strictEqual(
+      })
+    ).toBe(false)
+    expect(
       key.verifySignature({
         message,
         signature: Uint8Array.from([8, 1, 1, 1]),
-      }),
-      false
-    )
-    strictEqual(
+      })
+    ).toBe(false)
+    expect(
       key.verifySignature({
         message,
         signature: Buffer.from('random signature'),
-      }),
-      false
-    )
+      })
+    ).toBe(false)
 
     const x25519Key = key.convertkey({ algorithm: KeyAlgorithm.X25519 })
     const x25519Key2 = Key.generate(KeyAlgorithm.X25519)
@@ -102,29 +96,29 @@ describe('keys', () => {
       publicKey: x25519Key2,
     })
 
-    ok(kex instanceof Key)
+    expect(kex instanceof Key).toBe(true)
 
-    strictEqual(key.jwkPublic.kty, 'OKP')
-    strictEqual(key.jwkPublic.crv, 'Ed25519')
+    expect(key.jwkPublic.kty).toBe('OKP')
+    expect(key.jwkPublic.crv).toBe('Ed25519')
 
-    strictEqual(key.jwkSecret.kty, 'OKP')
-    strictEqual(key.jwkSecret.crv, 'Ed25519')
+    expect(key.jwkSecret.kty).toBe('OKP')
+    expect(key.jwkSecret.crv).toBe('Ed25519')
   })
 
   test('p384', () => {
     const key = Key.generate(KeyAlgorithm.EcSecp384r1)
 
-    strictEqual(key.algorithm, KeyAlgorithm.EcSecp384r1)
+    expect(key.algorithm).toBe(KeyAlgorithm.EcSecp384r1)
 
     const message = Uint8Array.from(Buffer.from('test message'))
     const signature = key.signMessage({ message })
 
-    strictEqual(key.verifySignature({ message, signature }), true)
+    expect(key.verifySignature({ message, signature })).toBe(true)
 
-    strictEqual(key.jwkPublic.kty, 'EC')
-    strictEqual(key.jwkPublic.crv, 'P-384')
+    expect(key.jwkPublic.kty).toBe('EC')
+    expect(key.jwkPublic.crv).toBe('P-384')
 
-    strictEqual(key.jwkSecret.kty, 'EC')
-    strictEqual(key.jwkSecret.crv, 'P-384')
+    expect(key.jwkSecret.kty).toBe('EC')
+    expect(key.jwkSecret.crv).toBe('P-384')
   })
 })

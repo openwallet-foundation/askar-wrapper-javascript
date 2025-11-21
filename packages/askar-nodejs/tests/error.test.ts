@@ -1,21 +1,19 @@
-import { doesNotReject, doesNotThrow, rejects, throws } from 'node:assert'
 import { AskarError, askar, KeyAlgorithm } from '@openwallet-foundation/askar-shared'
-import { describe, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { setupWallet } from './utils'
 
 describe('Error', () => {
   test('set error code to 0 after correct call', () => {
-    doesNotThrow(() =>
+    expect(() =>
       askar.keyGenerate({
         algorithm: KeyAlgorithm.AesA128CbcHs256,
         ephemeral: true,
       })
-    )
+    ).not.toThrow()
   })
 
   test('set error code to non 0 after incorrect call', () => {
-    throws(
-      () => askar.keyGenerate({ algorithm: 'incorrect-alg' as KeyAlgorithm, ephemeral: true }),
+    expect(() => askar.keyGenerate({ algorithm: 'incorrect-alg' as KeyAlgorithm, ephemeral: true })).toThrow(
       new AskarError({ code: 8, message: 'Unknown key algorithm' })
     )
   })
@@ -23,20 +21,20 @@ describe('Error', () => {
   test('set error code to 0 correct async call', async () => {
     const store = await setupWallet()
 
-    await doesNotReject(() => store.openSession())
+    await expect(store.openSession()).resolves.toBeDefined()
   })
 
   test('set error code to non 0 incorrect async call where the error is outside the callback', async () => {
     const store = await setupWallet()
 
     // @ts-expect-error: testing invalid call
-    await rejects(() => store.removeProfile(), { code: 5, message: 'Profile name not provided' })
+    await expect(store.removeProfile()).rejects.toMatchObject({ code: 5, message: 'Profile name not provided' })
   })
 
   test('set error code to non 0 incorrect async call where the error is inside the callback', async () => {
     const store = await setupWallet()
     await store.close()
 
-    await rejects(() => store.close(), { code: 5, message: 'Invalid store handle' })
+    await expect(store.close()).rejects.toMatchObject({ code: 5, message: 'Invalid store handle' })
   })
 })

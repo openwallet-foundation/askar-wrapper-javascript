@@ -1,8 +1,7 @@
-import { doesNotReject, rejects } from 'node:assert'
 import fs from 'node:fs'
 import path from 'node:path'
 import { Migration } from '@openwallet-foundation/askar-shared'
-import { beforeEach, describe, test } from 'vitest'
+import { beforeEach, describe, expect, test } from 'vitest'
 
 const DB_TEMPLATE_PATH = path.join(__dirname, 'indy_wallet_sqlite.db')
 const DB_UPGRADE_PATH = path.join(__dirname, 'indy_wallet_sqlite_upgraded.db')
@@ -26,25 +25,23 @@ describe('migration', () => {
   })
 
   test('migrate', async () => {
-    await doesNotReject(() =>
+    await expect(
       Migration.migrate({
         specUri: DB_UPGRADE_PATH,
         kdfLevel: 'RAW',
         walletName: 'walletwallet.0',
         walletKey: 'GfwU1DC7gEZNs3w41tjBiZYj7BNToDoFEqKY6wZXqs1A',
       })
-    )
+    ).resolves.toBeUndefined()
 
     // Double migrate should not work
-    await rejects(
-      () =>
-        Migration.migrate({
-          specUri: DB_UPGRADE_PATH,
-          kdfLevel: 'RAW',
-          walletName: 'walletwallet.0',
-          walletKey: 'GfwU1DC7gEZNs3w41tjBiZYj7BNToDoFEqKY6wZXqs1A',
-        }),
-      { code: 1, message: 'Database is already migrated' }
-    )
+    await expect(
+      Migration.migrate({
+        specUri: DB_UPGRADE_PATH,
+        kdfLevel: 'RAW',
+        walletName: 'walletwallet.0',
+        walletKey: 'GfwU1DC7gEZNs3w41tjBiZYj7BNToDoFEqKY6wZXqs1A',
+      })
+    ).rejects.toMatchObject({ code: 1, message: 'Database is already migrated' })
   })
 })
