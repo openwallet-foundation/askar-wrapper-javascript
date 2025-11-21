@@ -24,7 +24,6 @@
     "@changesets/cli": "catalog:",
     "@types/node": "catalog:",
     "rimraf": "catalog:",
-    "tsx": "catalog:",
     "typescript": "catalog:",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^4.0.12"

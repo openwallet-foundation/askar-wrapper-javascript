@@ -25,7 +25,7 @@ type SerializedArgument =
   | number
   | Callback
   | CallbackWithResponse
-  | ArrayBuffer
+  | Uint8Array
   | typeof ByteBufferStruct
   | typeof SecretBufferStruct
   | Buffer
