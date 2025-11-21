@@ -15,7 +15,7 @@ describe('Error', () => {
 
   test('set error code to non 0 after incorrect call', () => {
     throws(
-      () => askar.keyGenerate({ algorithm: 'incorrect-alg', ephemeral: true }),
+      () => askar.keyGenerate({ algorithm: 'incorrect-alg' as KeyAlgorithm, ephemeral: true }),
       new AskarError({ code: 8, message: 'Unknown key algorithm' })
     )
   })
