@@ -1,5 +1,5 @@
 import { doesNotReject, doesNotThrow, rejects, throws } from 'node:assert'
-import { AskarError, KeyAlgorithm, askar } from '@openwallet-foundation/askar-shared'
+import { AskarError, askar, KeyAlgorithm } from '@openwallet-foundation/askar-shared'
 import { describe, test } from 'vitest'
 import { setupWallet } from './utils'
 

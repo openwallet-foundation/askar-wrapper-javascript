@@ -1,5 +1,4 @@
-import { KdfMethod, LogLevel, Store, StoreKeyMethod, askar, registerAskar } from '@openwallet-foundation/askar-shared'
-import { NodeJSAskar } from '../../src/NodeJSAskar'
+import { KdfMethod, Store, StoreKeyMethod } from '@openwallet-foundation/askar-shared'
 
 export const getRawKey = () => Store.generateRawKey(Buffer.from('00000000000000000000000000000My1'))
 export const testStoreUri = process.env.URI || 'sqlite://:memory:'

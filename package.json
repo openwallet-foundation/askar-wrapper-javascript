@@ -10,7 +10,7 @@
     "node": ">= 20"
   },
   "scripts": {
-    "style:check": "biome check --unsafe .",
+    "style:check": "biome check --unsafe",
     "style:fix": "pnpm style:check --write",
     "types:check": "pnpm -r types:check",
     "build": "pnpm -r build",
@@ -20,7 +20,7 @@
     "changeset-version": "pnpm changeset version && pnpm style:fix"
   },
   "devDependencies": {
-    "@biomejs/biome": "catalog:",
+    "@biomejs/biome": "^2.3.7",
     "@changesets/cli": "catalog:",
     "@types/node": "catalog:",
     "rimraf": "catalog:",

@@ -1,6 +1,6 @@
+import type { ByteBufferType, SecretBufferStruct } from '../ffi'
 import type { nativeBindings } from './bindings'
 
-import type { ByteBufferType, SecretBufferStruct } from '../ffi'
 // We need a mapping from string type value => type (property 'string' maps to type string)
 interface StringTypeMapping {
   pointer: Buffer
@@ -25,10 +25,10 @@ type StringTypeArrayToTypes<List extends (keyof StringTypeMapping)[]> = {
       : Buffer
 }
 
-// biome-ignore lint/suspicious/noExplicitAny:
+// biome-ignore lint/suspicious/noExplicitAny: no-explanation
 type TypedMethods<Base extends Record<string | number | symbol, [any, any[]]>> = {
   [Property in keyof Base]: (
-    // biome-ignore lint/suspicious/noExplicitAny:
+    // biome-ignore lint/suspicious/noExplicitAny: no-explanation
     ...args: StringTypeArrayToTypes<Base[Property][1]> extends any[] ? StringTypeArrayToTypes<Base[Property][1]> : []
   ) => StringTypeMapping[Base[Property][0]]
 }

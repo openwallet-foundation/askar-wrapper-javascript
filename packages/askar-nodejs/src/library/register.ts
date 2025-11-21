@@ -2,8 +2,8 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { Library } from '@napi-ffi/ffi-napi'
-import type { NativeMethods } from './NativeBindingInterface'
 import { nativeBindings } from './bindings'
+import type { NativeMethods } from './NativeBindingInterface'
 
 // TODO(rename): when lib is changed
 const LIBNAME = 'aries_askar'
@@ -68,7 +68,7 @@ const getLibrary = () => {
   return Library(validLibraryPath, nativeBindings)
 }
 
-let nativeAskar: NativeMethods | undefined = undefined
+let nativeAskar: NativeMethods | undefined
 export const getNativeAskar = () => {
   if (!nativeAskar) nativeAskar = getLibrary() as unknown as NativeMethods
   return nativeAskar
