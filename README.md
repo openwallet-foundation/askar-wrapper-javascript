@@ -2,10 +2,6 @@
 
 Wrapper for Node.js and React Native around [https://github.com/openwallet-foundation/askar](askar)
 
-## Requirements
-
-This library requires and has been tested with Node.js version `18.x`, `20.x` and `22.x`, or React Native version `0.75.x` and `0.76.x`. Newer versions might also work, but they have not been tested.
-
 ## Setup
 
 You can import all types and classes from the `@openwallet-foundation/askar-nodejs` or `@openwalletfoundation/askar-react-native` library:
@@ -21,10 +17,10 @@ const key = Key.fromSeed({ algorithm: KeyAlgs.Bls12381G1, seed });
 
 ## Version Compatibility
 
-The JavaScript wrapper is versioned independently from the native bindings. The following table shows the compatibility between the different versions:
+The JavaScript wrapper is versioned independently from the native bindings. The following table shows the compatibility between the different versions. This library has been tested with specific Node.JS and React Native versions. Newer versions might also work, but they have not been tested.
 
-| Askar  | JavaScript Wrapper | React Native |
-| ------ | ------------------ | ------------ |
-| v0.2.9 | v0.1.x             | -            |
-| v0.3.x | v0.2.x             | -            |
-| v0.4.x | v0.3.x             | 0.75, 0.76   |
+| JavaScript Wrapper | Askar  | React Native | Node.JS    |
+| ------------------ | ------ | ------------ | ---------- |
+| v0.3.0 - v0.3.1    | v0.4.1 | -            | -          |
+| v0.4.0 - v0.4.2    | v0.4.5 | 0.75 - 0.79  | 18, 20, 22 |
+| v0.4.3             | v0.4.6 | 0.75 - 0.79  | 18, 20, 22 |
