@@ -1,5 +1,12 @@
 # @openwallet-foundation/askar-nodejs
 
+## 0.4.4
+
+### Patch Changes
+
+- a4f1969: docs: update version compatibility in readme
+  - @openwallet-foundation/askar-shared@0.4.4
+
 ## 0.4.3
 
 ### Patch Changes
