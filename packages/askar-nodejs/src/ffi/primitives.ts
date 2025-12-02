@@ -1,22 +1,20 @@
-import { refType } from '@napi-ffi/ref-napi'
+// Primitives - koffi type names
 
-// Primitives
-
-export const FFI_UINT8 = 'uint8'
-export const FFI_UINT64 = 'uint64'
+export const FFI_UINT8 = 'uint8_t'
+export const FFI_UINT64 = 'uint64_t'
 export const FFI_USIZE = 'size_t'
-export const FFI_INT8 = 'int8'
-export const FFI_INT32 = 'int32'
-export const FFI_INT64 = 'int64'
+export const FFI_INT8 = 'int8_t'
+export const FFI_INT32 = 'int32_t'
+export const FFI_INT64 = 'int64_t'
 export const FFI_STRING = 'string'
 export const FFI_VOID = 'void'
-export const FFI_POINTER = 'pointer'
+export const FFI_POINTER = 'void *'
 
-// Pointers
+// Pointers - koffi uses type declarations directly
 
-export const FFI_INT8_PTR = refType(FFI_INT8)
-export const FFI_STRING_PTR = refType(FFI_STRING)
-export const FFI_INT32_PTR = refType(FFI_INT32)
+export const FFI_INT8_PTR = 'int8_t *'
+export const FFI_STRING_PTR = 'char **'
+export const FFI_INT32_PTR = 'int32_t *'
 
 // Custom
 
