@@ -1,13 +1,10 @@
-import { deepStrictEqual, doesNotReject, ok, rejects, strictEqual } from 'node:assert'
 import { promises } from 'node:fs'
-import { afterEach, before, beforeEach, describe, test } from 'node:test'
 import { AskarError, KdfMethod, Key, KeyAlgorithm, Store, StoreKeyMethod } from '@openwallet-foundation/askar-shared'
-import { firstEntry, getRawKey, secondEntry, setup, setupWallet, testStoreUri } from './utils'
+import { afterEach, beforeEach, describe, expect, test } from 'vitest'
+import { firstEntry, getRawKey, secondEntry, setupWallet, testStoreUri } from './utils'
 
 describe('Store and Session', () => {
   let store: Store
-
-  before(setup)
 
   beforeEach(async () => {
     store = await setupWallet()
@@ -27,7 +24,7 @@ describe('Store and Session', () => {
 
     const session = await argon2iModStore.openSession()
 
-    strictEqual(await session.fetch({ name: 'unknownKey', category: 'unknownCategory' }), null)
+    expect(await session.fetch({ name: 'unknownKey', category: 'unknownCategory' })).toBe(null)
 
     await argon2iModStore.close()
   })
@@ -42,7 +39,7 @@ describe('Store and Session', () => {
 
     const session = await argon2iIntStore.openSession()
 
-    strictEqual(await session.fetch({ name: 'unknownKey', category: 'unknownCategory' }), null)
+    expect(await session.fetch({ name: 'unknownKey', category: 'unknownCategory' })).toBe(null)
 
     await argon2iIntStore.close()
   })
@@ -70,14 +67,14 @@ describe('Store and Session', () => {
 
     await newStore.close()
 
-    await rejects(
-      () =>
-        Store.open({
-          profile: 'rekey',
-          uri: `sqlite://${storagePath}/rekey.db`,
-          keyMethod: new StoreKeyMethod(KdfMethod.Raw),
-          passKey: initialKey,
-        }),
+    await expect(
+      Store.open({
+        profile: 'rekey',
+        uri: `sqlite://${storagePath}/rekey.db`,
+        keyMethod: new StoreKeyMethod(KdfMethod.Raw),
+        passKey: initialKey,
+      })
+    ).rejects.toThrow(
       new AskarError({ code: 4, message: 'Error decrypting profile key\nCaused by: AEAD decryption error' })
     )
 
@@ -98,7 +95,7 @@ describe('Store and Session', () => {
 
     await session.insert(firstEntry)
 
-    strictEqual(await session.count(firstEntry), 1)
+    expect(await session.count(firstEntry)).toBeDefined()
 
     await session.close()
   })
@@ -108,13 +105,13 @@ describe('Store and Session', () => {
 
     await session.insert(firstEntry)
 
-    strictEqual(await session.count(firstEntry), 1)
+    expect(await session.count(firstEntry)).toBe(1)
 
     const updatedEntry = { ...firstEntry, value: 'bar', tags: { update: 'baz' } }
 
     await session.replace(updatedEntry)
 
-    strictEqual(await session.count(updatedEntry), 1)
+    expect(await session.count(updatedEntry)).toBe(1)
 
     await session.close()
   })
@@ -124,11 +121,11 @@ describe('Store and Session', () => {
 
     await session.insert(firstEntry)
 
-    strictEqual(await session.count(firstEntry), 1)
+    expect(await session.count(firstEntry)).toBe(1)
 
     await session.remove(firstEntry)
 
-    strictEqual(await session.count(firstEntry), 0)
+    expect(await session.count(firstEntry)).toBe(0)
 
     await session.close()
   })
@@ -139,11 +136,11 @@ describe('Store and Session', () => {
     await session.insert(firstEntry)
     await session.insert(secondEntry)
 
-    strictEqual(await session.count(firstEntry), 2)
+    expect(await session.count(firstEntry)).toBe(2)
 
     await session.removeAll({ category: firstEntry.category })
 
-    strictEqual(await session.count(firstEntry), 0)
+    expect(await session.count(firstEntry)).toBe(0)
 
     await session.close()
   })
@@ -154,13 +151,13 @@ describe('Store and Session', () => {
     await session.insert(firstEntry)
     await session.insert(secondEntry)
 
-    strictEqual(await session.count(firstEntry), 2)
-    strictEqual(await session.count({}), 2)
+    expect(await session.count(firstEntry)).toBe(2)
+    expect(await session.count({})).toBe(2)
 
-    strictEqual((await session.fetchAll({})).length, 2)
+    expect((await session.fetchAll({})).length).toBe(2)
     await session.removeAll({ category: firstEntry.category })
 
-    strictEqual(await session.count(firstEntry), 0)
+    expect(await session.count(firstEntry)).toBe(0)
 
     await session.close()
   })
@@ -175,9 +172,9 @@ describe('Store and Session', () => {
       a.name === 'testEntry' ? -1 : 1
     )
 
-    strictEqual(found.length, 2)
-    deepStrictEqual(found[0], firstEntry)
-    deepStrictEqual(found[1], { ...secondEntry, value: JSON.stringify(secondEntry.value) })
+    expect(found.length).toBe(2)
+    expect(found[0]).toEqual(firstEntry)
+    expect(found[1]).toEqual({ ...secondEntry, value: JSON.stringify(secondEntry.value) })
 
     await session.close()
     await scanStore.close()
@@ -188,19 +185,19 @@ describe('Store and Session', () => {
 
     await txn.insert(firstEntry)
 
-    strictEqual(await txn.count(firstEntry), 1)
+    expect(await txn.count(firstEntry)).toBe(1)
 
-    deepStrictEqual(await txn.fetch(firstEntry), firstEntry)
+    expect(await txn.fetch(firstEntry)).toEqual(firstEntry)
 
     const found = await txn.fetchAll(firstEntry)
 
-    deepStrictEqual(found[0], firstEntry)
+    expect(found[0]).toEqual(firstEntry)
 
     await txn.commit()
 
     const session = await store.openSession()
 
-    deepStrictEqual(await session.fetch(firstEntry), firstEntry)
+    expect(await session.fetch(firstEntry)).toEqual(firstEntry)
 
     await session.close()
   })
@@ -216,18 +213,18 @@ describe('Store and Session', () => {
 
     const fetchedKey1 = await session.fetchKey({ name: keyName })
 
-    strictEqual(fetchedKey1?.name, keyName)
-    deepStrictEqual(fetchedKey1?.tags, { a: 'b' })
-    deepStrictEqual(fetchedKey1?.metadata, 'metadata')
+    expect(fetchedKey1?.name).toBe(keyName)
+    expect(fetchedKey1?.tags).toEqual({ a: 'b' })
+    expect(fetchedKey1?.metadata).toBe('metadata')
 
     await session.updateKey({ name: keyName, metadata: 'updated metadata', tags: { a: 'c' } })
     const fetchedKey2 = await session.fetchKey({ name: keyName })
 
-    strictEqual(fetchedKey2?.name, keyName)
-    deepStrictEqual(fetchedKey2?.tags, { a: 'c' })
-    deepStrictEqual(fetchedKey2?.metadata, 'updated metadata')
+    expect(fetchedKey2?.name).toBe(keyName)
+    expect(fetchedKey2?.tags).toEqual({ a: 'c' })
+    expect(fetchedKey2?.metadata).toBe('updated metadata')
 
-    ok(key.jwkThumbprint === fetchedKey1?.key.jwkThumbprint)
+    expect(key.jwkThumbprint === fetchedKey1?.key.jwkThumbprint).toBe(true)
 
     const found = await session.fetchAllKeys({
       algorithm: KeyAlgorithm.Ed25519,
@@ -235,13 +232,13 @@ describe('Store and Session', () => {
       tagFilter: { a: 'c' },
     })
 
-    strictEqual(found[0].name, keyName)
-    deepStrictEqual(found[0].tags, { a: 'c' })
-    deepStrictEqual(found[0].metadata, 'updated metadata')
+    expect(found[0].name).toBe(keyName)
+    expect(found[0].tags).toEqual({ a: 'c' })
+    expect(found[0].metadata).toBe('updated metadata')
 
     await session.removeKey({ name: keyName })
 
-    strictEqual(await session.fetchKey({ name: keyName }), null)
+    expect(await session.fetchKey({ name: keyName })).toBe(null)
 
     await session.close()
 
@@ -263,11 +260,11 @@ describe('Store and Session', () => {
 
     const session2 = await store.session(profile).open()
 
-    strictEqual(await session2.count(firstEntry), 0)
+    expect(await session2.count(firstEntry)).toBe(0)
 
     await session2.insert(firstEntry)
 
-    strictEqual(await session2.count(firstEntry), 1)
+    expect(await session2.count(firstEntry)).toBe(1)
 
     await session2.close()
 
@@ -276,53 +273,53 @@ describe('Store and Session', () => {
       const store2 = await Store.open({ uri: testStoreUri, keyMethod: new StoreKeyMethod(KdfMethod.Raw), passKey: key })
       const session3 = await store2.openSession()
 
-      strictEqual(await session3.count(firstEntry), 0)
+      expect(await session3.count(firstEntry)).toBe(0)
 
       await session3.close()
       await store2.close()
     }
 
-    await rejects(() => store.createProfile(profile), AskarError)
+    await expect(store.createProfile(profile)).rejects.toThrow(AskarError)
 
     const session4 = await store.session(profile).open()
 
-    strictEqual(await session4.count(firstEntry), 1)
+    expect(await session4.count(firstEntry)).toBe(1)
 
     await session4.close()
 
     await store.setDefaultProfile(profile)
 
-    deepStrictEqual(await store.getDefaultProfile(), profile)
+    expect(await store.getDefaultProfile()).toBe(profile)
 
-    ok((await store.listProfiles()).includes(profile))
+    expect((await store.listProfiles()).includes(profile)).toBe(true)
 
     await store.removeProfile(profile)
 
-    await rejects(() => store.session(profile).open(), AskarError)
+    await expect(store.session(profile).open()).rejects.toThrow(AskarError)
 
-    await rejects(() => store.session('unknown profile').open(), AskarError)
+    await expect(store.session('unknown profile').open()).rejects.toThrow(AskarError)
 
-    deepStrictEqual(await store.createProfile(profile), profile)
+    expect(await store.createProfile(profile)).toBe(profile)
 
     const session7 = await store.session(profile).open()
 
-    strictEqual(await session7.count(firstEntry), 0)
+    expect(await session7.count(firstEntry)).toBe(0)
 
     await session7.insert(firstEntry)
 
-    strictEqual(await session7.count(firstEntry), 1)
+    expect(await session7.count(firstEntry)).toBe(1)
 
     await session7.close()
 
-    ok(await store.renameProfile({ fromProfile: profile, toProfile: 'newProfileName' }))
+    expect(await store.renameProfile({ fromProfile: profile, toProfile: 'newProfileName' })).toBe(1)
 
-    ok((await store.listProfiles()).includes('newProfileName'))
+    expect((await store.listProfiles()).includes('newProfileName')).toBe(true)
 
-    ok(!(await store.listProfiles()).includes(profile))
+    expect((await store.listProfiles()).includes(profile)).toBe(false)
 
     const session8 = await store.session('newProfileName').open()
 
-    strictEqual(await session8.count(firstEntry), 1)
+    expect(await session8.count(firstEntry)).toBe(1)
 
     await session8.close()
 
@@ -333,17 +330,17 @@ describe('Store and Session', () => {
       recreate: true,
     })
 
-    ok(
+    expect(
       await store.copyProfile({
         toStore: destinationStore,
         fromProfile: 'newProfileName',
         toProfile: 'newerProfileName',
       })
-    )
+    ).toBeDefined()
 
     const session9 = await destinationStore.session('newerProfileName').open()
 
-    strictEqual(await session9.count(firstEntry), 1)
+    expect(await session9.count(firstEntry)).toBe(1)
 
     await session9.close()
   })
@@ -351,13 +348,13 @@ describe('Store and Session', () => {
   test('Copy', async () => {
     const key = getRawKey()
 
-    await doesNotReject(() =>
+    await expect(
       store.copyTo({
         uri: 'sqlite://:memory:',
         keyMethod: new StoreKeyMethod(KdfMethod.Raw),
         passKey: key,
         recreate: true,
       })
-    )
+    ).resolves.toBeUndefined()
   })
 })

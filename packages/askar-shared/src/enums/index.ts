@@ -1,5 +1,5 @@
-export * from './KeyBackend'
 export * from './KeyAlgorithm'
+export * from './KeyBackend'
 export * from './KeyMethod'
-export * from './SignatureAlgorithm'
 export * from './LogLevel'
+export * from './SignatureAlgorithm'

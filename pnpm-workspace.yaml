@@ -3,9 +3,8 @@ packages:
   - "examples/*"
 
 catalog:
-  typescript: ~5.4.5
-  tsx: ^4.19.2
+  typescript: ~5.9.3
   rimraf: ^5.0.5
   "@biomejs/biome": 1.9.4
-  "@types/node": ^20.12.11
-  "@changesets/cli": ^2.27.12
+  "@types/node": ^24.10.1
+  "@changesets/cli": ^2.29.7

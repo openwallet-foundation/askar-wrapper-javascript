@@ -1,7 +1,6 @@
-import type { EntryObject } from '.'
-import type { EntryListHandle } from '../crypto'
-
 import { askar } from '../askar'
+import type { EntryListHandle } from '../crypto'
+import type { EntryObject } from '.'
 
 import { Entry } from './Entry'
 

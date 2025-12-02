@@ -24,3 +24,4 @@ The JavaScript wrapper is versioned independently from the native bindings. The 
 | v0.3.0 - v0.3.1    | v0.4.1 | -            | -          |
 | v0.4.0 - v0.4.2    | v0.4.5 | 0.75 - 0.79  | 18, 20, 22 |
 | v0.4.3             | v0.4.6 | 0.75 - 0.79  | 18, 20, 22 |
+| v0.5.0             | v0.4.6 | 0.75 - 0.79  | 20, 22, 24 |

@@ -1,2 +1,2 @@
-export * from './initialize'
 export * from './fixtures'
+export * from './initialize'

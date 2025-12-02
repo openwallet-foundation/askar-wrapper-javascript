@@ -1,7 +1,6 @@
-import type { KeyEntryObject } from '.'
-import type { KeyEntryListHandle } from '../crypto'
-
 import { askar } from '../askar'
+import type { KeyEntryListHandle } from '../crypto'
+import type { KeyEntryObject } from '.'
 
 import { KeyEntry } from './KeyEntry'
 

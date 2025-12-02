@@ -1,39 +1,7 @@
-import type { nativeBindings } from './bindings'
+// With koffi, we don't need complex type mappings since koffi handles
+// the function signatures directly from the string declarations
 
-import type { ByteBufferType, SecretBufferStruct } from '../ffi'
-// We need a mapping from string type value => type (property 'string' maps to type string)
-interface StringTypeMapping {
-  pointer: Buffer
-  'char*': Buffer
-  string: string
-  int64: number
-  int32: number
-  int8: number
-  int: number
-  size_t: number
+export type NativeMethods = {
+  // biome-ignore lint/suspicious/noExplicitAny: koffi generates typed functions from string signatures
+  [key: string]: (...args: any[]) => any
 }
-
-// Needed so TS stops complaining about index signatures
-type ShapeOf<T> = {
-  [Property in keyof T]: T[Property]
-}
-type StringTypeArrayToTypes<List extends (keyof StringTypeMapping)[]> = {
-  [Item in keyof List]: List[Item] extends keyof StringTypeMapping
-    ? StringTypeMapping[List[Item]]
-    : List[Item] extends Mutable<typeof SecretBufferStruct>
-      ? ByteBufferType | Buffer
-      : Buffer
-}
-
-// biome-ignore lint/suspicious/noExplicitAny:
-type TypedMethods<Base extends Record<string | number | symbol, [any, any[]]>> = {
-  [Property in keyof Base]: (
-    // biome-ignore lint/suspicious/noExplicitAny:
-    ...args: StringTypeArrayToTypes<Base[Property][1]> extends any[] ? StringTypeArrayToTypes<Base[Property][1]> : []
-  ) => StringTypeMapping[Base[Property][0]]
-}
-type Mutable<T> = {
-  -readonly [K in keyof T]: Mutable<T[K]>
-}
-
-export type NativeMethods = TypedMethods<ShapeOf<Mutable<typeof nativeBindings>>>
