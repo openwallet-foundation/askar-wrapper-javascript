@@ -1,6 +1,5 @@
-import type { EntryListHandle } from '../crypto'
-
 import { Buffer } from 'buffer'
+import type { EntryListHandle } from '../crypto'
 
 export type EntryObject = {
   name: string

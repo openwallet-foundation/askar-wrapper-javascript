@@ -1,11 +1,8 @@
-import type { KeyAlgorithm, SignatureAlgorithm } from '../enums'
-import type { KeyBackend } from '../enums'
-import type { LocalKeyHandle } from './handles'
-
 import { Buffer } from 'buffer'
-
 import { askar } from '../askar'
+import type { KeyAlgorithm, KeyBackend, SignatureAlgorithm } from '../enums'
 import { KeyMethod, keyAlgorithmFromString } from '../enums'
+import type { LocalKeyHandle } from './handles'
 
 import { Jwk } from './Jwk'
 

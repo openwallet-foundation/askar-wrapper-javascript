@@ -1,10 +1,8 @@
-import type { StoreHandle } from '../crypto'
-import type { StoreKeyMethod } from './StoreKeyMethod'
-
 import { askar } from '../askar'
-
+import type { StoreHandle } from '../crypto'
 import { OpenSession } from './OpenSession'
 import { Scan } from './Scan'
+import type { StoreKeyMethod } from './StoreKeyMethod'
 
 export class Store {
   private _handle: StoreHandle
@@ -52,7 +50,11 @@ export class Store {
     toStore,
     fromProfile,
     toProfile,
-  }: { toStore: Store; fromProfile: string; toProfile: string }) {
+  }: {
+    toStore: Store
+    fromProfile: string
+    toProfile: string
+  }) {
     return await askar.storeCopyProfile({ fromProfile, toProfile, fromHandle: this.handle, toHandle: toStore.handle })
   }
 

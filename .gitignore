@@ -17,3 +17,5 @@ packages/askar-react-native/android/.cxx
 examples/askar-react-native-example/android
 examples/askar-react-native-example/ios
 examples/askar-react-native-example/.expo
+
+indy_wallet_sqlite_upgraded.db
