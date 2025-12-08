@@ -1,5 +1,5 @@
 import { Buffer } from 'buffer'
-import { askar } from '../askar'
+import { NativeAskar } from '../askar'
 import type { Key, SessionHandle } from '../crypto'
 import type { KeyAlgorithm } from '../enums'
 import { EntryOperation } from '../enums/EntryOperation'
@@ -28,7 +28,7 @@ export class Session {
 
   public async count({ category, tagFilter }: { category?: string; tagFilter?: Record<string, unknown> }) {
     if (!this.handle) throw AskarError.customError({ message: 'Cannot count from closed session' })
-    return await askar.sessionCount({ tagFilter, category, sessionHandle: this.handle })
+    return await NativeAskar.instance.sessionCount({ tagFilter, category, sessionHandle: this.handle })
   }
 
   public async fetch({
@@ -44,7 +44,7 @@ export class Session {
   }) {
     if (!this.handle) throw AskarError.customError({ message: 'Cannot fetch from a closed session' })
 
-    const handle = await askar.sessionFetch({ forUpdate, name, category, sessionHandle: this.handle })
+    const handle = await NativeAskar.instance.sessionFetch({ forUpdate, name, category, sessionHandle: this.handle })
     if (!handle) return null
 
     const entry = new Entry({ list: handle, position: 0 })
@@ -73,7 +73,7 @@ export class Session {
     isJson?: boolean
   }) {
     if (!this.handle) throw AskarError.customError({ message: 'Cannot fetch all from a closed session' })
-    const handle = await askar.sessionFetchAll({
+    const handle = await NativeAskar.instance.sessionFetchAll({
       forUpdate,
       limit,
       tagFilter,
@@ -109,7 +109,7 @@ export class Session {
     if (!this.handle) throw AskarError.customError({ message: 'Cannot insert with a closed session' })
     const serializedValue = typeof value === 'string' ? value : JSON.stringify(value)
 
-    await askar.sessionUpdate({
+    await NativeAskar.instance.sessionUpdate({
       value: Uint8Array.from(Buffer.from(serializedValue)),
       expiryMs,
       tags,
@@ -136,7 +136,7 @@ export class Session {
     if (!this.handle) throw AskarError.customError({ message: 'Cannot replace with a closed session' })
     const serializedValue = typeof value === 'string' ? value : JSON.stringify(value)
 
-    await askar.sessionUpdate({
+    await NativeAskar.instance.sessionUpdate({
       value: Uint8Array.from(Buffer.from(serializedValue)),
       expiryMs,
       tags,
@@ -150,7 +150,7 @@ export class Session {
   public async remove({ category, name }: { category: string; name: string }) {
     if (!this.handle) throw AskarError.customError({ message: 'Cannot remove with a closed session' })
 
-    await askar.sessionUpdate({
+    await NativeAskar.instance.sessionUpdate({
       name,
       category,
       sessionHandle: this.handle,
@@ -161,7 +161,7 @@ export class Session {
   public async removeAll({ category, tagFilter }: { category?: string; tagFilter?: Record<string, unknown> }) {
     if (!this.handle) throw AskarError.customError({ message: 'Cannot remove all with a closed session' })
 
-    await askar.sessionRemoveAll({
+    await NativeAskar.instance.sessionRemoveAll({
       category,
       sessionHandle: this.handle,
       tagFilter,
@@ -183,7 +183,7 @@ export class Session {
   }) {
     if (!this.handle) throw AskarError.customError({ message: 'Cannot insert a key with a closed session' })
 
-    await askar.sessionInsertKey({
+    await NativeAskar.instance.sessionInsertKey({
       expiryMs,
       tags,
       metadata,
@@ -196,7 +196,7 @@ export class Session {
   public async fetchKey({ name, forUpdate = false }: { name: string; forUpdate?: boolean }) {
     if (!this.handle) throw AskarError.customError({ message: 'Cannot fetch a key with a closed session' })
 
-    const handle = await askar.sessionFetchKey({ forUpdate, name, sessionHandle: this.handle })
+    const handle = await NativeAskar.instance.sessionFetchKey({ forUpdate, name, sessionHandle: this.handle })
     if (!handle) return null
 
     const keyEntryList = new KeyEntryList({ handle })
@@ -220,7 +220,7 @@ export class Session {
     forUpdate?: boolean
   }) {
     if (!this.handle) throw AskarError.customError({ message: 'Cannot fetch all keys with a closed session' })
-    const handle = await askar.sessionFetchAllKeys({
+    const handle = await NativeAskar.instance.sessionFetchAllKeys({
       forUpdate,
       limit,
       tagFilter,
@@ -249,12 +249,12 @@ export class Session {
     expiryMs?: number
   }) {
     if (!this.handle) throw AskarError.customError({ message: 'Cannot update a key with a closed session' })
-    await askar.sessionUpdateKey({ expiryMs, tags, metadata, name, sessionHandle: this.handle })
+    await NativeAskar.instance.sessionUpdateKey({ expiryMs, tags, metadata, name, sessionHandle: this.handle })
   }
 
   public async removeKey({ name }: { name: string }) {
     if (!this.handle) throw AskarError.customError({ message: 'Cannot remove a key with a closed session' })
-    await askar.sessionRemoveKey({ name, sessionHandle: this.handle })
+    await NativeAskar.instance.sessionRemoveKey({ name, sessionHandle: this.handle })
   }
 
   /**

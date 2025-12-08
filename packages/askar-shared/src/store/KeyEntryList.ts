@@ -1,7 +1,6 @@
-import { askar } from '../askar'
+import { NativeAskar } from '../askar'
 import type { KeyEntryListHandle } from '../crypto'
 import type { KeyEntryObject } from '.'
-
 import { KeyEntry } from './KeyEntry'
 
 export class KeyEntryList {
@@ -10,7 +9,7 @@ export class KeyEntryList {
 
   public constructor({ handle }: { handle: KeyEntryListHandle }) {
     this._handle = handle
-    this._len = askar.keyEntryListCount({ keyEntryListHandle: handle })
+    this._len = NativeAskar.instance.keyEntryListCount({ keyEntryListHandle: handle })
   }
 
   public get handle() {

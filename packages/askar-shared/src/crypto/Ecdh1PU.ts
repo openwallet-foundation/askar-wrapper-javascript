@@ -1,4 +1,4 @@
-import { askar } from '../askar'
+import { NativeAskar } from '../askar'
 import type { KeyAlgorithm } from '../enums'
 import { Key } from './Key'
 
@@ -29,7 +29,7 @@ export class Ecdh1PU {
     ccTag?: Uint8Array
   }): Key {
     return new Key(
-      askar.keyDeriveEcdh1pu({
+      NativeAskar.instance.keyDeriveEcdh1pu({
         algId: this.algId,
         receive,
         apv: this.apv,

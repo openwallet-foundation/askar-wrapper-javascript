@@ -1,4 +1,4 @@
-import { askar } from '../askar'
+import { NativeAskar } from '../askar'
 import type { EntryListHandle, ScanHandle } from '../crypto'
 import { AskarError } from '../error'
 import type { Entry, EntryObject } from './Entry'
@@ -53,7 +53,7 @@ export class Scan {
   private async forEachRow(cb: (row: Entry, index?: number) => void) {
     if (!this.handle) {
       if (!this.store?.handle) throw AskarError.customError({ message: 'Cannot scan from closed store' })
-      this._handle = await askar.scanStart({
+      this._handle = await NativeAskar.instance.scanStart({
         storeHandle: this.store.handle,
         profile: this.profile,
         category: this.category,
@@ -73,7 +73,7 @@ export class Scan {
       let recordCount = 0
       // Loop while limit not reached (or no limit specified)
       while (!this.limit || recordCount < this.limit) {
-        const listHandle = await askar.scanNext({ scanHandle: this._handle })
+        const listHandle = await NativeAskar.instance.scanNext({ scanHandle: this._handle })
         if (!listHandle) break
 
         this._listHandle = listHandle
@@ -86,7 +86,7 @@ export class Scan {
         }
       }
     } finally {
-      askar.scanFree({ scanHandle: this._handle })
+      NativeAskar.instance.scanFree({ scanHandle: this._handle })
     }
   }
 

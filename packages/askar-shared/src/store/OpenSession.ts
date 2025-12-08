@@ -1,4 +1,4 @@
-import { askar } from '../askar'
+import { NativeAskar } from '../askar'
 import type { StoreHandle } from '../crypto'
 import { AskarError } from '../error'
 
@@ -20,7 +20,7 @@ export class OpenSession {
   public async open() {
     if (!this.store) throw AskarError.customError({ message: 'Cannot start session from closed store' })
     if (this.session) throw AskarError.customError({ message: 'Session already opened' })
-    const sessionHandle = await askar.sessionStart({
+    const sessionHandle = await NativeAskar.instance.sessionStart({
       profile: this.profile,
       asTransaction: this.isTxn,
       storeHandle: this.store,

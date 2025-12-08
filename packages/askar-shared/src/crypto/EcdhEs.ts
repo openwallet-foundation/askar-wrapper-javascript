@@ -1,4 +1,4 @@
-import { askar } from '../askar'
+import { askar, NativeAskar } from '../askar'
 import type { KeyAlgorithm } from '../enums'
 
 import { Jwk } from './Jwk'
@@ -27,7 +27,7 @@ export class EcdhEs {
     receive: boolean
   }): Key {
     return new Key(
-      askar.keyDeriveEcdhEs({
+      NativeAskar.instance.keyDeriveEcdhEs({
         algId: this.algId,
         receive,
         apv: this.apv,

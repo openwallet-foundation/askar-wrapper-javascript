@@ -1,4 +1,4 @@
-import { askar } from '../askar'
+import { NativeAskar } from '../askar'
 
 export enum Argon2Parameters {
   Moderate = 0,
@@ -7,6 +7,6 @@ export enum Argon2Parameters {
 
 export class Argon2 {
   public static derivePassword(parameters: Argon2Parameters, password: Uint8Array, salt: Uint8Array): Uint8Array {
-    return askar.argon2DerivePassword({ parameters, password, salt })
+    return NativeAskar.instance.argon2DerivePassword({ parameters, password, salt })
   }
 }

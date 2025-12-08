@@ -82,7 +82,7 @@ importers:
         specifier: workspace:*
         version: link:../askar-shared
       koffi:
-        specifier: ^2.9.0
+        specifier: ^2.14.1
         version: 2.14.1
     devDependencies:
       '@types/node':

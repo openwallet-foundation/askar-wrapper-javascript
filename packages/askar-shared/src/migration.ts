@@ -1,4 +1,4 @@
-import { askar } from './askar'
+import { NativeAskar } from './askar'
 
 type MigrationOptions = {
   walletName: string
@@ -9,6 +9,6 @@ type MigrationOptions = {
 
 export class Migration {
   public static async migrate(options: MigrationOptions): Promise<void> {
-    await askar.migrateIndySdk(options)
+    await NativeAskar.instance.migrateIndySdk(options)
   }
 }

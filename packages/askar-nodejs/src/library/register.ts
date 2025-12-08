@@ -54,7 +54,7 @@ const getLibrary = () => {
     path.join(p, `${extensions[platform].prefix ?? ''}${LIBNAME}${extensions[platform].extension}`)
   )
 
-  // Gaurd so we quit if there is no valid path for the library
+  // Guard so we quit if there is no valid path for the library
   if (!libraries.some((libraryPath) => doesPathExist(libraryPath)))
     throw new Error(`Could not find ${LIBNAME} with these paths: ${libraries.join(' ')}`)
 
