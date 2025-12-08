@@ -1,4 +1,4 @@
-import { askar } from '../askar'
+import { NativeAskar } from '../askar'
 import type { EntryListHandle } from '../crypto'
 import type { EntryObject } from '.'
 
@@ -10,7 +10,7 @@ export class EntryList {
 
   public constructor({ handle, length }: { handle: EntryListHandle; length?: number }) {
     this._handle = handle
-    this._length = length || askar.entryListCount({ entryListHandle: handle })
+    this._length = length || NativeAskar.instance.entryListCount({ entryListHandle: handle })
   }
 
   public get handle() {

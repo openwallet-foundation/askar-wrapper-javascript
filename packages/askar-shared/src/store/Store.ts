@@ -1,4 +1,4 @@
-import { askar } from '../askar'
+import { NativeAskar } from '../askar'
 import type { StoreHandle } from '../crypto'
 import { OpenSession } from './OpenSession'
 import { Scan } from './Scan'
@@ -19,7 +19,7 @@ export class Store {
   }
 
   public static generateRawKey(seed?: Uint8Array) {
-    return askar.storeGenerateRawKey({ seed })
+    return NativeAskar.instance.storeGenerateRawKey({ seed })
   }
 
   public get uri() {
@@ -27,23 +27,23 @@ export class Store {
   }
 
   public async createProfile(name?: string) {
-    return askar.storeCreateProfile({ storeHandle: this.handle, profile: name })
+    return NativeAskar.instance.storeCreateProfile({ storeHandle: this.handle, profile: name })
   }
 
   public async getDefaultProfile() {
-    return askar.storeGetDefaultProfile({ storeHandle: this.handle })
+    return NativeAskar.instance.storeGetDefaultProfile({ storeHandle: this.handle })
   }
 
   public async setDefaultProfile(name: string) {
-    return askar.storeSetDefaultProfile({ storeHandle: this.handle, profile: name })
+    return NativeAskar.instance.storeSetDefaultProfile({ storeHandle: this.handle, profile: name })
   }
 
   public async listProfiles() {
-    return askar.storeListProfiles({ storeHandle: this.handle })
+    return NativeAskar.instance.storeListProfiles({ storeHandle: this.handle })
   }
 
   public async renameProfile({ fromProfile, toProfile }: { fromProfile: string; toProfile: string }) {
-    return await askar.storeRenameProfile({ fromProfile, toProfile, storeHandle: this.handle })
+    return await NativeAskar.instance.storeRenameProfile({ fromProfile, toProfile, storeHandle: this.handle })
   }
 
   public async copyProfile({
@@ -55,15 +55,20 @@ export class Store {
     fromProfile: string
     toProfile: string
   }) {
-    return await askar.storeCopyProfile({ fromProfile, toProfile, fromHandle: this.handle, toHandle: toStore.handle })
+    return await NativeAskar.instance.storeCopyProfile({
+      fromProfile,
+      toProfile,
+      fromHandle: this.handle,
+      toHandle: toStore.handle,
+    })
   }
 
   public async removeProfile(name: string) {
-    return await askar.storeRemoveProfile({ profile: name, storeHandle: this.handle })
+    return await NativeAskar.instance.storeRemoveProfile({ profile: name, storeHandle: this.handle })
   }
 
   public async rekey({ keyMethod, passKey }: { keyMethod?: StoreKeyMethod; passKey: string }) {
-    return await askar.storeRekey({ keyMethod: keyMethod?.toUri(), passKey, storeHandle: this.handle })
+    return await NativeAskar.instance.storeRekey({ keyMethod: keyMethod?.toUri(), passKey, storeHandle: this.handle })
   }
 
   public static async provision({
@@ -79,7 +84,7 @@ export class Store {
     profile?: string
     recreate: boolean
   }) {
-    const handle = await askar.storeProvision({
+    const handle = await NativeAskar.instance.storeProvision({
       specUri: uri,
       keyMethod: keyMethod?.toUri(),
       profile,
@@ -100,7 +105,12 @@ export class Store {
     passKey?: string
     profile?: string
   }) {
-    const handle = await askar.storeOpen({ profile, passKey, keyMethod: keyMethod?.toUri(), specUri: uri })
+    const handle = await NativeAskar.instance.storeOpen({
+      profile,
+      passKey,
+      keyMethod: keyMethod?.toUri(),
+      specUri: uri,
+    })
     return new Store({ uri, handle })
   }
 
@@ -113,7 +123,7 @@ export class Store {
   }
 
   public static async remove(uri: string) {
-    return await askar.storeRemove({ specUri: uri })
+    return await NativeAskar.instance.storeRemove({ specUri: uri })
   }
 
   public session(profile?: string) {
@@ -152,7 +162,7 @@ export class Store {
     passKey?: string
     recreate: boolean
   }) {
-    await askar.storeCopyTo({
+    await NativeAskar.instance.storeCopyTo({
       storeHandle: this.handle,
       targetUri: uri,
       keyMethod: keyMethod?.toUri(),

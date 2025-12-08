@@ -1,4 +1,4 @@
-import { askar } from '../askar'
+import { NativeAskar } from '../askar'
 import { AskarError } from '../error'
 
 type ArcHandleType = Uint8Array | string | null
@@ -28,7 +28,7 @@ export class StoreHandle {
   }
 
   public async close() {
-    await askar.storeClose({ storeHandle: this })
+    await NativeAskar.instance.storeClose({ storeHandle: this })
   }
 
   public static fromHandle(handle: number | null) {
@@ -44,7 +44,7 @@ export class ScanHandle {
   }
 
   public free() {
-    askar.scanFree({ scanHandle: this })
+    NativeAskar.instance.scanFree({ scanHandle: this })
   }
 
   public static fromHandle(handle: number | null) {
@@ -60,7 +60,7 @@ export class SessionHandle {
   }
 
   public async close(commit: boolean) {
-    await askar.sessionClose({ commit, sessionHandle: this })
+    await NativeAskar.instance.sessionClose({ commit, sessionHandle: this })
   }
 
   public static fromHandle(handle: number | null) {
@@ -70,23 +70,23 @@ export class SessionHandle {
 
 export class EntryListHandle extends ArcHandle {
   public getCategory(index: number) {
-    return askar.entryListGetCategory({ index, entryListHandle: this })
+    return NativeAskar.instance.entryListGetCategory({ index, entryListHandle: this })
   }
 
   public getName(index: number) {
-    return askar.entryListGetName({ index, entryListHandle: this })
+    return NativeAskar.instance.entryListGetName({ index, entryListHandle: this })
   }
 
   public getValue(index: number) {
-    return askar.entryListGetValue({ index, entryListHandle: this })
+    return NativeAskar.instance.entryListGetValue({ index, entryListHandle: this })
   }
 
   public getTags(index: number) {
-    return askar.entryListGetTags({ index, entryListHandle: this })
+    return NativeAskar.instance.entryListGetTags({ index, entryListHandle: this })
   }
 
   public free() {
-    askar.entryListFree({ entryListHandle: this })
+    NativeAskar.instance.entryListFree({ entryListHandle: this })
   }
 
   public static fromHandle(handle: ArcHandleType) {
@@ -96,27 +96,27 @@ export class EntryListHandle extends ArcHandle {
 
 export class KeyEntryListHandle extends ArcHandle {
   public getAlgorithm(index: number) {
-    return askar.keyEntryListGetAlgorithm({ index, keyEntryListHandle: this })
+    return NativeAskar.instance.keyEntryListGetAlgorithm({ index, keyEntryListHandle: this })
   }
 
   public getName(index: number) {
-    return askar.keyEntryListGetName({ index, keyEntryListHandle: this })
+    return NativeAskar.instance.keyEntryListGetName({ index, keyEntryListHandle: this })
   }
 
   public getTags(index: number) {
-    return askar.keyEntryListGetTags({ index, keyEntryListHandle: this })
+    return NativeAskar.instance.keyEntryListGetTags({ index, keyEntryListHandle: this })
   }
 
   public getMetadata(index: number) {
-    return askar.keyEntryListGetMetadata({ index, keyEntryListHandle: this })
+    return NativeAskar.instance.keyEntryListGetMetadata({ index, keyEntryListHandle: this })
   }
 
   public loadKey(index: number) {
-    return askar.keyEntryListLoadLocal({ index, keyEntryListHandle: this })
+    return NativeAskar.instance.keyEntryListLoadLocal({ index, keyEntryListHandle: this })
   }
 
   public free() {
-    askar.keyEntryListFree({ keyEntryListHandle: this })
+    NativeAskar.instance.keyEntryListFree({ keyEntryListHandle: this })
   }
 
   public static fromHandle(handle: ArcHandleType) {
@@ -126,7 +126,7 @@ export class KeyEntryListHandle extends ArcHandle {
 
 export class LocalKeyHandle extends ArcHandle {
   public free() {
-    askar.keyFree({ localKeyHandle: this })
+    NativeAskar.instance.keyFree({ localKeyHandle: this })
   }
 
   public static fromHandle(handle: ArcHandleType) {

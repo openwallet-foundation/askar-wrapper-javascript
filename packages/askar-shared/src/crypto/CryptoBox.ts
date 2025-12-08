@@ -1,9 +1,9 @@
-import { askar } from '../askar'
+import { NativeAskar } from '../askar'
 import type { Key } from './Key'
 
 export class CryptoBox {
   public static randomNonce() {
-    return askar.keyCryptoBoxRandomNonce()
+    return NativeAskar.instance.keyCryptoBoxRandomNonce()
   }
 
   public static cryptoBox({
@@ -17,7 +17,7 @@ export class CryptoBox {
     message: Uint8Array
     nonce: Uint8Array
   }) {
-    return askar.keyCryptoBox({ nonce, message, senderKey, recipientKey })
+    return NativeAskar.instance.keyCryptoBox({ nonce, message, senderKey, recipientKey })
   }
 
   public static open({
@@ -31,14 +31,14 @@ export class CryptoBox {
     message: Uint8Array
     nonce: Uint8Array
   }) {
-    return askar.keyCryptoBoxOpen({ nonce, message, senderKey, recipientKey })
+    return NativeAskar.instance.keyCryptoBoxOpen({ nonce, message, senderKey, recipientKey })
   }
 
   public static seal({ recipientKey, message }: { recipientKey: Key; message: Uint8Array }) {
-    return askar.keyCryptoBoxSeal({ message, localKeyHandle: recipientKey.handle })
+    return NativeAskar.instance.keyCryptoBoxSeal({ message, localKeyHandle: recipientKey.handle })
   }
 
   public static sealOpen({ recipientKey, ciphertext }: { recipientKey: Key; ciphertext: Uint8Array }) {
-    return askar.keyCryptoBoxSealOpen({ ciphertext, localKeyHandle: recipientKey.handle })
+    return NativeAskar.instance.keyCryptoBoxSealOpen({ ciphertext, localKeyHandle: recipientKey.handle })
   }
 }
