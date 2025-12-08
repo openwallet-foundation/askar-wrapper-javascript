@@ -1,4 +1,4 @@
-import { registerAskar } from '@openwallet-foundation/askar-shared'
+import { NativeAskar } from '@openwallet-foundation/askar-shared'
 import { NativeModules } from 'react-native'
 import type { NativeBindings } from './NativeBindings'
 
@@ -17,4 +17,4 @@ if (!_askar) {
 
 declare let _askar: NativeBindings
 
-registerAskar({ askar: new ReactNativeAskar(_askar) })
+NativeAskar.register(new ReactNativeAskar(_askar))
