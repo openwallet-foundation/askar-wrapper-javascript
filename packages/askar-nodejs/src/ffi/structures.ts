@@ -34,3 +34,31 @@ export const AeadParamsStruct = koffi.struct('AeadParams', {
   nonceLength: FFI_INT32,
   tagLength: FFI_INT32,
 })
+
+// Argon2Config structure
+export const Argon2ConfigStruct = koffi.struct('Argon2Config', {
+  algorithm: FFI_INT32,
+  version: FFI_INT32,
+  parallelism: FFI_INT32,
+  mem_cost: FFI_INT32,
+  time_cost: FFI_INT32,
+})
+
+export type Argon2ConfigType = {
+  algorithm: number
+  version: number
+  parallelism: number
+  mem_cost: number
+  time_cost: number
+}
+
+// FfiHandleList structure
+export const FfiHandleListStruct = koffi.struct('FfiHandleList', {
+  len: FFI_INT32,
+  data: koffi.pointer('size_t'),
+})
+
+export type FfiHandleListType = {
+  len: number
+  data: number[]
+}

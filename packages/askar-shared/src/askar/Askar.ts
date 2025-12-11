@@ -37,6 +37,13 @@ export type Argon2DerivePasswordOptions = {
   parameters: number
   password: Uint8Array
   salt: Uint8Array
+  config?: {
+    algorithm: number
+    version: number
+    parallelism: number
+    mem_cost: number
+    time_cost: number
+  }
 }
 
 export type EntryListCountOptions = { entryListHandle: EntryListHandle }
@@ -57,6 +64,13 @@ export type EntryListGetValueOptions = {
   entryListHandle: EntryListHandle
   index: number
 }
+
+export type HandleList = {
+  data: number[]
+  len: number
+}
+
+export type HandleListFreeOptions = { handleList: HandleList }
 
 export type KeyAeadDecryptOptions = {
   localKeyHandle: LocalKeyHandle
@@ -314,6 +328,8 @@ export type StoreGenerateRawKeyOptions = { seed?: Uint8Array }
 export type StoreGetProfileNameOptions = { storeHandle: StoreHandle }
 export type StoreGetDefaultProfileOptions = { storeHandle: StoreHandle }
 export type StoreListProfilesOptions = { storeHandle: StoreHandle }
+export type StoreListScansOptions = { storeHandle: StoreHandle }
+export type StoreListSessionsOptions = { storeHandle: StoreHandle }
 export type StoreOpenOptions = {
   specUri: string
   keyMethod?: string
@@ -378,6 +394,8 @@ export type Askar = {
   entryListGetTags(options: EntryListGetTagsOptions): string | null
   entryListGetValue(options: EntryListGetValueOptions): Uint8Array
 
+  handleListFree(options: HandleListFreeOptions): void
+
   keyAeadDecrypt(options: KeyAeadDecryptOptions): Uint8Array
   keyAeadEncrypt(options: KeyAeadEncryptOptions): EncryptedBuffer
   keyAeadGetPadding(options: KeyAeadGetPaddingOptions): number
@@ -441,6 +459,8 @@ export type Askar = {
   storeGetDefaultProfile(options: StoreGetDefaultProfileOptions): Promise<string>
   storeGetProfileName(options: StoreGetProfileNameOptions): Promise<string>
   storeListProfiles(options: StoreListProfilesOptions): Promise<string[]>
+  storeListScans(options: StoreListScansOptions): Promise<ScanHandle[]>
+  storeListSessions(options: StoreListSessionsOptions): Promise<SessionHandle[]>
   storeOpen(options: StoreOpenOptions): Promise<StoreHandle>
   storeProvision(options: StoreProvisionOptions): Promise<StoreHandle>
   storeRekey(options: StoreRekeyOptions): Promise<void>

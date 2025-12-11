@@ -6,6 +6,20 @@ export const uint8ArrayToByteBufferStruct = (buffer: Uint8Array = new Uint8Array
   return { data: buffer, len: buffer.length }
 }
 
+export type NodeJsHandleList = {
+  len: number
+  data: unknown
+}
+
+export const decodeHandleList = (handleList: NodeJsHandleList): number[] => {
+  // With koffi, pointer data needs to be decoded
+  const { data, len } = handleList
+
+  // If data is a koffi external pointer, decode it as uint8 array
+  const decoded = koffi.decode(data, 'size_t', len)
+  return decoded
+}
+
 export const byteBufferToUint8Array = (byteBuffer: ByteBufferType): Uint8Array => {
   // With koffi, pointer data needs to be decoded
   const { data, len } = byteBuffer

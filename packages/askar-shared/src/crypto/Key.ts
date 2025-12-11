@@ -1,5 +1,5 @@
 import { Buffer } from 'buffer'
-import { askar, NativeAskar } from '../askar'
+import { NativeAskar } from '../askar'
 import type { KeyAlgorithm, KeyBackend, SignatureAlgorithm } from '../enums'
 import { KeyMethod, keyAlgorithmFromString } from '../enums'
 import type { LocalKeyHandle } from './handles'
