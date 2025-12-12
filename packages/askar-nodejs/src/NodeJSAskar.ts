@@ -10,7 +10,6 @@ import type {
   EntryListGetNameOptions,
   EntryListGetTagsOptions,
   EntryListGetValueOptions,
-  HandleListFreeOptions,
   KeyAeadDecryptOptions,
   KeyAeadEncryptOptions,
   KeyAeadGetPaddingOptions,
@@ -360,7 +359,7 @@ export class NodeJSAskar implements Askar {
     return uint8Array
   }
 
-  public handleListFree(options: HandleListFreeOptions): void {
+  private handleListFree(options: { handleList: NodeJsHandleList }): void {
     this.nativeAskar.askar_handle_list_free(options.handleList)
   }
 

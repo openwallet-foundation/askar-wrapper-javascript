@@ -70,8 +70,6 @@ export type HandleList = {
   len: number
 }
 
-export type HandleListFreeOptions = { handleList: HandleList }
-
 export type KeyAeadDecryptOptions = {
   localKeyHandle: LocalKeyHandle
   ciphertext: Uint8Array
@@ -393,8 +391,6 @@ export type Askar = {
   entryListGetName(options: EntryListGetNameOptions): string
   entryListGetTags(options: EntryListGetTagsOptions): string | null
   entryListGetValue(options: EntryListGetValueOptions): Uint8Array
-
-  handleListFree(options: HandleListFreeOptions): void
 
   keyAeadDecrypt(options: KeyAeadDecryptOptions): Uint8Array
   keyAeadEncrypt(options: KeyAeadEncryptOptions): EncryptedBuffer

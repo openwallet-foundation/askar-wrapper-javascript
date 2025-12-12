@@ -8,7 +8,6 @@ import type {
   EntryListGetNameOptions,
   EntryListGetTagsOptions,
   EntryListGetValueOptions,
-  HandleListFreeOptions,
   KeyAeadDecryptOptions,
   KeyAeadEncryptOptions,
   KeyAeadGetPaddingOptions,
@@ -227,10 +226,6 @@ export class ReactNativeAskar implements Askar {
     const serializedOptions = serializeArguments(options)
     const buf = handleInvalidNullResponse(this.handleError(this.askar.entryListGetValue(serializedOptions)))
     return new Uint8Array(buf)
-  }
-
-  public handleListFree(_options: HandleListFreeOptions): void {
-    throw new Error('Method askar_handle_list_free is not implemented in React Native')
   }
 
   public keyAeadDecrypt(options: KeyAeadDecryptOptions): Uint8Array {
