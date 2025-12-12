@@ -180,6 +180,24 @@ describe('Store and Session', () => {
     await scanStore.close()
   })
 
+  test('open sessions and scans', async () => {
+    const store = await setupWallet()
+    const session = await store.openSession()
+
+    const openSessions = await store.listOpenSessions()
+    expect(openSessions).toHaveLength(1)
+    expect(openSessions[0].handle).toEqual(session.handle?.handle)
+
+    await session.close()
+    await expect(store.listOpenSessions()).resolves.toHaveLength(0)
+
+    await expect(store.listOpenScans()).resolves.toHaveLength(0)
+    await store.scan({ category: firstEntry.category }).fetchAll()
+    await expect(store.listOpenScans()).resolves.toHaveLength(0)
+
+    await store.close()
+  })
+
   test('Transaction basic', async () => {
     const txn = await store.openSession(true)
 

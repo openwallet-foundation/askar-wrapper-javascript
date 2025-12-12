@@ -69,6 +69,8 @@ import type {
   StoreGetDefaultProfileOptions,
   StoreGetProfileNameOptions,
   StoreListProfilesOptions,
+  StoreListScansOptions,
+  StoreListSessionsOptions,
   StoreOpenOptions,
   StoreProvisionOptions,
   StoreRekeyOptions,
@@ -188,7 +190,9 @@ export class ReactNativeAskar implements Askar {
 
   public argon2DerivePassword(options: Argon2DerivePasswordOptions): Uint8Array {
     const serializedOptions = serializeArguments(options)
-    return handleInvalidNullResponse(this.handleError(this.askar.argon2DerivePassword(serializedOptions)))
+    return handleInvalidNullResponse(
+      this.handleError(this.askar.argon2DerivePassword({ ...serializedOptions, config: options.config }))
+    )
   }
 
   public entryListCount(options: EntryListCountOptions): number {
@@ -689,6 +693,14 @@ export class ReactNativeAskar implements Askar {
     }
     this.handleError(this.askar.stringListFree({ stringListHandle }))
     return ret
+  }
+
+  public async storeListScans(_options: StoreListScansOptions): Promise<ScanHandle[]> {
+    throw new Error('Method askar_store_list_scans is not implemented in React Native')
+  }
+
+  public async storeListSessions(_options: StoreListSessionsOptions): Promise<SessionHandle[]> {
+    throw new Error('Method askar_store_list_sessions is not implemented in React Native')
   }
 
   public async storeOpen(options: StoreOpenOptions): Promise<StoreHandle> {

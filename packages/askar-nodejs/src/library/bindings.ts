@@ -23,6 +23,8 @@ const ByteBufferType = 'ByteBuffer'
 const SecretBufferType = 'ByteBuffer' // SecretBuffer is same as ByteBuffer
 const EncryptedBufferType = 'EncryptedBuffer'
 const AeadParamsType = 'AeadParams'
+const Argon2ConfigType = 'Argon2Config'
+const FfiHandleListType = 'FfiHandleList'
 
 // Callback signatures for koffi - must NOT be pointers in signatures
 // koffi expects callback types without the * pointer syntax
@@ -46,7 +48,7 @@ export const nativeBindings = {
   askar_set_default_logger: `${FFI_ERROR_CODE} askar_set_default_logger()`,
   askar_set_max_log_level: `${FFI_ERROR_CODE} askar_set_max_log_level(${FFI_INT32} maxLevel)`,
 
-  askar_argon2_derive_password: `${FFI_ERROR_CODE} askar_argon2_derive_password(${FFI_INT8} parameters, ${ByteBufferType} password, ${ByteBufferType} salt, _Out_ ${SecretBufferType} *ret)`,
+  askar_argon2_derive_password: `${FFI_ERROR_CODE} askar_argon2_derive_password(${FFI_INT8} parameters, ${ByteBufferType} password, ${ByteBufferType} salt, ${Argon2ConfigType} *config, _Out_ ${SecretBufferType} *ret)`,
 
   askar_entry_list_count: `${FFI_ERROR_CODE} askar_entry_list_count(${FFI_ENTRY_LIST_HANDLE} handle, _Out_ ${FFI_INT32_PTR} count)`,
   askar_entry_list_free: `${FFI_VOID} askar_entry_list_free(${FFI_ENTRY_LIST_HANDLE} handle)`,
@@ -54,6 +56,8 @@ export const nativeBindings = {
   askar_entry_list_get_name: `${FFI_ERROR_CODE} askar_entry_list_get_name(${FFI_ENTRY_LIST_HANDLE} handle, ${FFI_INT32} index, _Out_ ${FFI_STRING_PTR} name)`,
   askar_entry_list_get_tags: `${FFI_ERROR_CODE} askar_entry_list_get_tags(${FFI_ENTRY_LIST_HANDLE} handle, ${FFI_INT32} index, _Out_ ${FFI_STRING_PTR} tags)`,
   askar_entry_list_get_value: `${FFI_ERROR_CODE} askar_entry_list_get_value(${FFI_ENTRY_LIST_HANDLE} handle, ${FFI_INT32} index, _Out_ ${SecretBufferType} *value)`,
+
+  askar_handle_list_free: `${FFI_VOID} askar_handle_list_free(${FfiHandleListType} handle)`,
 
   askar_string_list_count: `${FFI_ERROR_CODE} askar_string_list_count(${FFI_STRING_LIST_HANDLE} handle, _Out_ ${FFI_INT32_PTR} count)`,
   askar_string_list_free: `${FFI_VOID} askar_string_list_free(${FFI_STRING_LIST_HANDLE} handle)`,
@@ -123,6 +127,8 @@ export const nativeBindings = {
   askar_store_get_profile_name: `${FFI_ERROR_CODE} askar_store_get_profile_name(${FFI_STORE_HANDLE} handle, ${CallbackString} cb, ${FFI_CALLBACK_ID} cbId)`,
   askar_store_get_default_profile: `${FFI_ERROR_CODE} askar_store_get_default_profile(${FFI_STORE_HANDLE} handle, ${CallbackString} cb, ${FFI_CALLBACK_ID} cbId)`,
   askar_store_list_profiles: `${FFI_ERROR_CODE} askar_store_list_profiles(${FFI_STORE_HANDLE} handle, ${CallbackHandle} cb, ${FFI_CALLBACK_ID} cbId)`,
+  askar_store_list_scans: `${FFI_ERROR_CODE} askar_store_list_scans(${FFI_STORE_HANDLE} handle, ${CallbackHandle} cb, ${FFI_CALLBACK_ID} cbId)`,
+  askar_store_list_sessions: `${FFI_ERROR_CODE} askar_store_list_sessions(${FFI_STORE_HANDLE} handle, ${CallbackHandle} cb, ${FFI_CALLBACK_ID} cbId)`,
   askar_store_open: `${FFI_ERROR_CODE} askar_store_open(${FFI_STRING} specUri, ${FFI_STRING} keyMethod, ${FFI_STRING} passKey, ${FFI_STRING} profile, ${CallbackHandle} cb, ${FFI_CALLBACK_ID} cbId)`,
   askar_store_provision: `${FFI_ERROR_CODE} askar_store_provision(${FFI_STRING} specUri, ${FFI_STRING} keyMethod, ${FFI_STRING} passKey, ${FFI_STRING} profile, ${FFI_INT8} recreate, ${CallbackHandle} cb, ${FFI_CALLBACK_ID} cbId)`,
   askar_store_rekey: `${FFI_ERROR_CODE} askar_store_rekey(${FFI_STORE_HANDLE} handle, ${FFI_STRING} keyMethod, ${FFI_STRING} passKey, ${CallbackBasic} cb, ${FFI_CALLBACK_ID} cbId)`,

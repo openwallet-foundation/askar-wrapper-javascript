@@ -73,6 +73,8 @@ import type {
   StoreGetDefaultProfileOptions,
   StoreGetProfileNameOptions,
   StoreListProfilesOptions,
+  StoreListScansOptions,
+  StoreListSessionsOptions,
   StoreOpenOptions,
   StoreProvisionOptions,
   StoreRekeyOptions,
@@ -103,6 +105,7 @@ import {
   allocateStringListHandle,
   type ByteBufferType,
   deallocateCallbackBuffer,
+  decodeHandleList,
   type EncryptedBufferType,
   encryptedBufferStructToClass,
   FFI_ENTRY_LIST_HANDLE,
@@ -116,6 +119,7 @@ import {
   FFI_STRING_LIST_HANDLE,
   type NativeCallback,
   type NativeCallbackWithResponse,
+  type NodeJsHandleList,
   secretBufferToUint8Array,
   serializeArguments,
   toNativeCallback,
@@ -278,7 +282,14 @@ export class NodeJSAskar implements Askar {
 
     const ret = allocateSecretBuffer()
 
-    const errorCode = this.nativeAskar.askar_argon2_derive_password(parameters, password, salt, ret)
+    const errorCode = this.nativeAskar.askar_argon2_derive_password(
+      parameters,
+      password,
+      salt,
+      // NOTE: we should not serialize the config, it should be passed as struct
+      options.config ?? null,
+      ret
+    )
 
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
@@ -346,6 +357,10 @@ export class NodeJSAskar implements Askar {
     this.nativeAskar.askar_buffer_free(byteBuffer)
 
     return uint8Array
+  }
+
+  private handleListFree(options: { handleList: NodeJsHandleList }): void {
+    this.nativeAskar.askar_handle_list_free(options.handleList)
   }
 
   public keyAeadDecrypt(options: KeyAeadDecryptOptions): Uint8Array {
@@ -1120,6 +1135,37 @@ export class NodeJSAskar implements Askar {
     }
     this.nativeAskar.askar_string_list_free(listHandle)
     return ret
+  }
+
+  public async storeListScans(options: StoreListScansOptions): Promise<ScanHandle[]> {
+    const { storeHandle } = serializeArguments(options)
+    const handleList = await this.promisifyWithResponse<NodeJsHandleList>(
+      (cb, cbId) => this.nativeAskar.askar_store_list_scans(storeHandle, cb, cbId),
+      'FfiHandleList'
+    )
+    if (!handleList) return []
+
+    const scanHandleList = decodeHandleList(handleList).map((scanHandle) => ScanHandle.fromHandle(scanHandle))
+    this.handleListFree({ handleList })
+
+    return scanHandleList
+  }
+
+  public async storeListSessions(options: StoreListSessionsOptions): Promise<SessionHandle[]> {
+    const { storeHandle } = serializeArguments(options)
+    const handleList = await this.promisifyWithResponse<NodeJsHandleList>(
+      (cb, cbId) => this.nativeAskar.askar_store_list_sessions(storeHandle, cb, cbId),
+      'FfiHandleList'
+    )
+
+    if (!handleList) return []
+
+    const sessionHandleList = decodeHandleList(handleList).map((sessionHandle) =>
+      SessionHandle.fromHandle(sessionHandle)
+    )
+    this.handleListFree({ handleList })
+
+    return sessionHandleList
   }
 
   public async storeOpen(options: StoreOpenOptions): Promise<StoreHandle> {

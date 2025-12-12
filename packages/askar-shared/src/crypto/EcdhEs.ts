@@ -1,4 +1,4 @@
-import { askar, NativeAskar } from '../askar'
+import { NativeAskar } from '../askar'
 import type { KeyAlgorithm } from '../enums'
 
 import { Jwk } from './Jwk'

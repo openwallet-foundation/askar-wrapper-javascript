@@ -46,6 +46,14 @@ export class Store {
     return await NativeAskar.instance.storeRenameProfile({ fromProfile, toProfile, storeHandle: this.handle })
   }
 
+  public async listOpenSessions() {
+    return await NativeAskar.instance.storeListSessions({ storeHandle: this._handle })
+  }
+
+  public async listOpenScans() {
+    return await NativeAskar.instance.storeListScans({ storeHandle: this._handle })
+  }
+
   public async copyProfile({
     toStore,
     fromProfile,

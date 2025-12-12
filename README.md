@@ -17,11 +17,11 @@ const key = Key.fromSeed({ algorithm: KeyAlgs.Bls12381G1, seed });
 
 ## Version Compatibility
 
-The JavaScript wrapper is versioned independently from the native bindings. The following table shows the compatibility between the different versions. This library has been tested with specific Node.JS and React Native versions. Newer versions might also work, but they have not been tested.
+The JavaScript wrapper is versioned independently from the native bindings. The following table shows the compatibility between the different versions. This library has been tested with specific Node.JS and React Native versions. Newer or older versions might also work, but they have not been tested.
 
 | JavaScript Wrapper | Askar  | React Native | Node.JS    |
 | ------------------ | ------ | ------------ | ---------- |
 | v0.3.0 - v0.3.1    | v0.4.1 | -            | -          |
 | v0.4.0 - v0.4.2    | v0.4.5 | 0.75 - 0.79  | 18, 20, 22 |
 | v0.4.3             | v0.4.6 | 0.75 - 0.79  | 18, 20, 22 |
-| v0.5.0             | v0.4.6 | 0.75 - 0.79  | 20, 22, 24 |
+| v0.5.0             | v0.5.0 | 0.76 - 0.81  | 20, 22, 24 |
