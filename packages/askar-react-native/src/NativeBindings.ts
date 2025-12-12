@@ -11,6 +11,13 @@ export interface NativeBindings {
     parameters: number
     password: ArrayBuffer
     salt: ArrayBuffer
+    config?: {
+      algorithm: number
+      version: number
+      parallelism: number
+      mem_cost: number
+      time_cost: number
+    }
   }): ReturnObject<Uint8Array>
 
   entryListCount(options: { entryListHandle: string }): ReturnObject<number>
