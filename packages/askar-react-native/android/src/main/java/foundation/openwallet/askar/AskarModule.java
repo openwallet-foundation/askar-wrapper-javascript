@@ -9,7 +9,6 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.turbomodule.core.CallInvokerHolderImpl;
-import id.animo.SecureEnvironment;
 
 @Keep
 @DoNotStrip
@@ -37,7 +36,6 @@ public class AskarModule extends ReactContextBaseJavaModule {
     @ReactMethod(isBlockingSynchronousMethod = true)
     public boolean install() {
         try {
-            SecureEnvironment.set_env();
             ReactContext context = getReactApplicationContext();
             long jsContextPointer = context.getJavaScriptContextHolder().get();
             CallInvokerHolderImpl holder = (CallInvokerHolderImpl) context.getCatalystInstance().getJSCallInvokerHolder();
