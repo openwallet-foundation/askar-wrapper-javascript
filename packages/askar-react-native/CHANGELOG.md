@@ -1,5 +1,31 @@
 # @openwallet-foundation/askar-react-native
 
+## 0.5.0
+
+### Minor Changes
+
+- f626ebc: chore: drop support for Node 18
+- f0ae878: feat: update to Askar 0.5.0 release.
+
+  - This adds support for providing a custom Argon2 config.
+  - In addition it adds methods to list the open sessions and scans on a store. Note however that these methods are only implemented in the Node.JS wrapper for now, they will be added to the React Native wrapper at a later stage.
+
+### Patch Changes
+
+- da00274: fix: remove references to native secure env library. This was removed in the latest Askar release
+- a4f1969: docs: update version compatibility in readme
+- e9dafe3: chore: remove jcenter from gradle. After being deprecated in old gradle versions, with Gradle 9.0.0 jCenter is removed. In order to make the package compatible it is necessary to remove jCenter
+- 9121e2a: fix: wrap the askar registration with a `NativeAskar` class that exposes two static members: a `.instance` getter and `register` method.
+
+  Previously when you did not import the native askar library on the first line (or above all logic that uses Askar) the reference to Askar would be undefined. (i.e. askar-shared is imported before askar-react-native or askar-nodejs)
+
+  The `registerAskar` method and `askar` property are kept for backwards compatibility, but these are still prone to the same error. `registerAskar` integrated with the new `NativeAskar` class, and so all usages within the shared library, as well as the nodejs and react-native wrappers will be fixed. We recommend to update to the new `NativeAskar` class for all other usages.
+
+- Updated dependencies [f626ebc]
+- Updated dependencies [f0ae878]
+- Updated dependencies [9121e2a]
+  - @openwallet-foundation/askar-shared@0.5.0
+
 ## 0.4.3
 
 ### Patch Changes
