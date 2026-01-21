@@ -1,7 +1,11 @@
+import { deepStrictEqual } from 'node:assert'
+import { before, describe, test } from 'node:test'
 import { CryptoBox, Key, KeyAlgorithm } from '@openwallet-foundation/askar-shared'
-import { describe, expect, test } from 'vitest'
+import { setup } from './utils/initialize'
 
 describe('CryptoBox', () => {
+  before(setup)
+
   test('seal', () => {
     const x25519Key = Key.generate(KeyAlgorithm.X25519)
 
@@ -13,7 +17,7 @@ describe('CryptoBox', () => {
       ciphertext: sealed,
     })
 
-    expect(opened).toEqual(message)
+    deepStrictEqual(opened, message)
 
     x25519Key.handle.free()
   })

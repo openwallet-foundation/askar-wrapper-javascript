@@ -1,9 +1,12 @@
 import { NativeAskar } from '../askar'
 import type { EntryListHandle, ScanHandle } from '../crypto'
-import { AskarError } from '../error'
 import type { Entry, EntryObject } from './Entry'
-import { EntryList } from './EntryList'
 import type { Store } from './Store'
+
+import { askar } from '../askar'
+import { AskarError } from '../error'
+
+import { EntryList } from './EntryList'
 
 export class Scan {
   private _handle?: ScanHandle

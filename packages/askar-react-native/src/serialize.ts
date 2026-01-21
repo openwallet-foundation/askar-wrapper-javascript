@@ -22,7 +22,7 @@ type Argument =
   | Key
   | Jwk
 
-type SerializedArgument = string | number | Callback | CallbackWithResponse | ArrayBuffer | ArrayBufferLike | Uint8Array
+type SerializedArgument = string | number | Callback | CallbackWithResponse | ArrayBuffer
 
 type SerializedArguments = Record<string, SerializedArgument>
 

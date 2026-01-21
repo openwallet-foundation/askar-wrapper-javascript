@@ -2,6 +2,7 @@ import { Buffer } from 'buffer'
 import { NativeAskar } from '../askar'
 import type { Key, SessionHandle } from '../crypto'
 import type { KeyAlgorithm } from '../enums'
+
 import { EntryOperation } from '../enums/EntryOperation'
 import { AskarError } from '../error'
 

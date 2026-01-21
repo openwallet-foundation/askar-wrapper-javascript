@@ -1,8 +1,11 @@
+import { deepStrictEqual, strictEqual } from 'node:assert'
+import { before, describe, test } from 'node:test'
 import { Ecdh1PU, EcdhEs, Jwk, Key, KeyAlgorithm } from '@openwallet-foundation/askar-shared'
-import { describe, expect, test } from 'vitest'
-import { base64url } from './utils'
+import { base64url, setup } from './utils'
 
 describe('jose ecdh', () => {
+  before(setup)
+
   test('ecdh es direct', () => {
     const bobKey = Key.generate(KeyAlgorithm.EcSecp256r1)
     const bobJwk = bobKey.jwkPublic
@@ -52,7 +55,7 @@ describe('jose ecdh', () => {
       aad: Uint8Array.from(Buffer.from(protectedB64)),
     })
 
-    expect(Buffer.from(messageReceived).toString()).toBe(messageString)
+    strictEqual(Buffer.from(messageReceived).toString(), messageString)
 
     ephemeralKey.handle.free()
     bobKey.handle.free()
@@ -109,7 +112,7 @@ describe('jose ecdh', () => {
 
     const messageReceived = cekReceiver.aeadDecrypt({ ciphertext, tag, nonce, aad: protectedB64Bytes })
 
-    expect(messageReceived).toEqual(message)
+    deepStrictEqual(messageReceived, message)
 
     ephemeralKey.handle.free()
     bobKey.handle.free()
@@ -170,7 +173,7 @@ describe('jose ecdh', () => {
       aad: protectedB64Bytes,
     })
 
-    expect(messageReceived).toEqual(message)
+    deepStrictEqual(messageReceived, message)
 
     aliceKey.handle.free()
     bobKey.handle.free()
@@ -217,8 +220,8 @@ describe('jose ecdh', () => {
     const base64urlApu = base64url(apu)
     const base64urlApv = base64url(apv)
 
-    expect(base64urlApu).toBe('QWxpY2U')
-    expect(base64urlApv).toBe('Qm9iIGFuZCBDaGFybGll')
+    strictEqual(base64urlApu, 'QWxpY2U')
+    strictEqual(base64urlApv, 'Qm9iIGFuZCBDaGFybGll')
 
     const protectedJson = {
       alg: 'ECDH-1PU+A128KW',
@@ -248,8 +251,8 @@ describe('jose ecdh', () => {
 
     const { ciphertext, tag: ccTag } = enc.parts
 
-    expect(Buffer.from(ciphertext).toString('base64url')).toBe('Az2IWsISEMDJvyc5XRL-3-d-RgNBOGolCsxFFoUXFYw')
-    expect(Buffer.from(ccTag).toString('base64url')).toBe('HLb4fTlm8spGmij3RyOs2gJ4DpHM4hhVRwdF_hGb3WQ')
+    strictEqual(Buffer.from(ciphertext).toString('base64url'), 'Az2IWsISEMDJvyc5XRL-3-d-RgNBOGolCsxFFoUXFYw')
+    strictEqual(Buffer.from(ccTag).toString('base64url'), 'HLb4fTlm8spGmij3RyOs2gJ4DpHM4hhVRwdF_hGb3WQ')
 
     const derived = new Ecdh1PU({
       apv: Uint8Array.from(Buffer.from(apv)),
@@ -264,10 +267,11 @@ describe('jose ecdh', () => {
       receive: false,
     })
 
-    expect(derived.secretBytes).toEqual(Uint8Array.from(Buffer.from('df4c37a0668306a11e3d6b0074b5d8df', 'hex')))
+    deepStrictEqual(derived.secretBytes, Uint8Array.from(Buffer.from('df4c37a0668306a11e3d6b0074b5d8df', 'hex')))
 
     const encryptedKey = derived.wrapKey({ other: cek }).ciphertextWithTag
-    expect(encryptedKey).toEqual(
+    deepStrictEqual(
+      encryptedKey,
       Uint8Array.from(
         Buffer.from(
           'pOMVA9_PtoRe7xXW1139NzzN1UhiFoio8lGto9cf0t8PyU-sjNXH8-LIRLycq8CHJQbDwvQeU1cSl55cQ0hGezJu2N9IY0QN',
@@ -289,7 +293,7 @@ describe('jose ecdh', () => {
       recipientKey: bob,
     })
 
-    expect(encryptedKey2.ciphertextWithTag).toEqual(encryptedKey)
+    deepStrictEqual(encryptedKey2.ciphertextWithTag, encryptedKey)
 
     const derivedReceiver = new Ecdh1PU({
       apv: Uint8Array.from(Buffer.from(apv)),
@@ -313,7 +317,7 @@ describe('jose ecdh', () => {
       tag: ccTag,
     })
 
-    expect(messageReceived).toEqual(message)
+    deepStrictEqual(messageReceived, message)
 
     const cekReceiver2 = new Ecdh1PU({
       apv: Uint8Array.from(Buffer.from(apv)),
@@ -329,7 +333,7 @@ describe('jose ecdh', () => {
       ccTag,
     })
 
-    expect(cekReceiver2.jwkSecret).toEqual(cek.jwkSecret)
+    deepStrictEqual(cekReceiver2.jwkSecret, cek.jwkSecret)
 
     cek.handle.free()
     cekReceiver.handle.free()

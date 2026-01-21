@@ -84,12 +84,12 @@ import {
   AskarError,
   EncryptedBuffer,
   EntryListHandle,
-  handleInvalidNullResponse,
   KeyEntryListHandle,
   LocalKeyHandle,
   ScanHandle,
   SessionHandle,
   StoreHandle,
+  handleInvalidNullResponse,
 } from '@openwallet-foundation/askar-shared'
 import type { NativeBindings } from './NativeBindings'
 import type { Callback, CallbackWithResponse, ReturnObject } from './serialize'

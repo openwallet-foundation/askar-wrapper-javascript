@@ -1,8 +1,7 @@
+import { NULL } from '@2060.io/ref-napi'
 import { ArcHandle, Jwk, Key, ScanHandle, SessionHandle, StoreHandle } from '@openwallet-foundation/askar-shared'
-import { uint8ArrayToByteBufferStruct } from './conversion'
-import type { ByteBufferType, SecretBufferType } from './structures'
-
-const NULL = null
+import { uint8arrayToByteBufferStruct } from './conversion'
+import type { ByteBufferStruct, SecretBufferStruct } from './structures'
 
 export type Callback = (err: number) => void
 export type CallbackWithResponse = (err: number, response: string) => void
@@ -26,43 +25,42 @@ type SerializedArgument =
   | number
   | Callback
   | CallbackWithResponse
-  | ByteBufferType
-  | Uint8Array
-  | ByteBufferType
-  | SecretBufferType
-  | null
+  | ArrayBuffer
+  | typeof ByteBufferStruct
+  | typeof SecretBufferStruct
+  | Buffer
 
 type SerializedArguments = Record<string, SerializedArgument>
 
-export type SerializedOptions<Type> = {
+export type SerializedOptions<Type> = Required<{
   [Property in keyof Type]: Type[Property] extends string
     ? string
     : Type[Property] extends number | boolean | Date | StoreHandle | SessionHandle | ScanHandle
       ? number
       : Type[Property] extends Record<string, unknown> | unknown[]
         ? string
-        : Type[Property] extends Uint8Array | Key | ArcHandle | Jwk
-          ? Uint8Array
+        : Type[Property] extends Buffer | Uint8Array | Key | ArcHandle | Jwk
+          ? Buffer
           : Type[Property] extends Callback
             ? Callback
             : Type[Property] extends CallbackWithResponse
               ? CallbackWithResponse
               : Type[Property] extends boolean | undefined
-                ? number | undefined
+                ? number
                 : Type[Property] extends unknown[] | undefined
-                  ? string | undefined
+                  ? string
                   : Type[Property] extends Record<string, unknown> | undefined
-                    ? string | undefined
+                    ? string
                     : Type[Property] extends Date | undefined
-                      ? number | undefined
+                      ? number
                       : Type[Property] extends string | undefined
-                        ? string | undefined
+                        ? string
                         : Type[Property] extends number | undefined
-                          ? number | undefined
+                          ? number
                           : Type[Property] extends Uint8Array | undefined
-                            ? Uint8Array | undefined
+                            ? Buffer
                             : unknown
-}
+}>
 
 const serialize = (arg: Argument): SerializedArgument => {
   switch (typeof arg) {
@@ -91,11 +89,14 @@ const serialize = (arg: Argument): SerializedArgument => {
       if (arg instanceof Key) {
         return arg.handle.handle
       }
+      if (arg instanceof Buffer) {
+        return uint8arrayToByteBufferStruct(arg) as unknown as Buffer
+      }
       if (arg instanceof Uint8Array) {
-        return uint8ArrayToByteBufferStruct(arg)
+        return uint8arrayToByteBufferStruct(Buffer.from(arg)) as unknown as Buffer
       }
       if (arg instanceof Jwk) {
-        return uint8ArrayToByteBufferStruct(arg.toUint8Array())
+        return uint8arrayToByteBufferStruct(Buffer.from(arg.toUint8Array())) as unknown as Buffer
       }
       return JSON.stringify(arg)
     default:
