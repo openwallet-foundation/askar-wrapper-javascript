@@ -7,14 +7,15 @@ on:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
+permissions:
+  contents: write
+  id-token: write # Needed for npm trusted publishing
+  pull-requests: write
+
 jobs:
   release-stable:
     runs-on: ubuntu-24.04
     name: Release Stable
-    permissions:
-      contents: write
-      id-token: write # Needed for npm trusted publishing
-      pull-requests: write
     outputs:
       published: ${{ steps.changesets.outputs.published }}
     steps:
@@ -59,8 +60,6 @@ jobs:
     runs-on: ubuntu-24.04
     name: Release Unstable
     needs: release-stable
-    permissions:
-      id-token: write # Needed for npm trusted publishing
     if: always() && github.event_name == 'push' && needs.release-stable.outputs.published == 'false'
     steps:
       - name: Checkout Repo
