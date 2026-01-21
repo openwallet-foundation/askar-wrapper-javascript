@@ -1,5 +1,7 @@
 import { NativeAskar } from '../askar'
 import type { StoreHandle } from '../crypto'
+
+import { askar } from '../askar'
 import { AskarError } from '../error'
 
 import { Session } from './Session'

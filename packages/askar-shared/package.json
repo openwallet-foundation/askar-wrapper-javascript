@@ -1,6 +1,6 @@
 {
   "name": "@openwallet-foundation/askar-shared",
-  "version": "0.5.0",
+  "version": "0.4.3",
   "license": "Apache-2.0",
   "description": "Shared library for using Askar with NodeJS and React Native",
   "main": "build/index",
@@ -16,10 +16,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "files": [
-    "build",
-    "installBinary.js"
-  ],
+  "files": ["build", "installBinary.js"],
   "scripts": {
     "types:check": "pnpm compile --noEmit",
     "build": "pnpm clean && pnpm compile",
@@ -28,7 +25,7 @@
   },
   "dependencies": {
     "buffer": "^6.0.3",
-    "tar": "^7.5.2"
+    "tar": "^7.4.3"
   },
   "devDependencies": {
     "typescript": "catalog:"

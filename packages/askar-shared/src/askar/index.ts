@@ -1,2 +1,2 @@
-export * from './Askar'
 export * from './register'
+export * from './Askar'

@@ -1,8 +1,11 @@
 import { NativeAskar } from '../askar'
 import type { StoreHandle } from '../crypto'
+import type { StoreKeyMethod } from './StoreKeyMethod'
+
+import { askar } from '../askar'
+
 import { OpenSession } from './OpenSession'
 import { Scan } from './Scan'
-import type { StoreKeyMethod } from './StoreKeyMethod'
 
 export class Store {
   private _handle: StoreHandle

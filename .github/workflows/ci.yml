@@ -23,7 +23,7 @@ jobs:
       - name: Setup NodeJS
         uses: actions/setup-node@v6
         with:
-          node-version: 24
+          node-version: 22
           cache: "pnpm"
 
       - name: Install dependencies
@@ -43,7 +43,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [20, 22, 24]
+        node-version: [18, 20, 22]
 
     steps:
       - name: Checkout Repo

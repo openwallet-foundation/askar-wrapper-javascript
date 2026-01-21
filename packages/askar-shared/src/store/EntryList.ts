@@ -1,6 +1,8 @@
+import type { EntryObject } from '.'
 import { NativeAskar } from '../askar'
 import type { EntryListHandle } from '../crypto'
-import type { EntryObject } from '.'
+
+import { askar } from '../askar'
 
 import { Entry } from './Entry'
 

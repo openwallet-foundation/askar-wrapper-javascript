@@ -2,11 +2,11 @@
 
 Wrapper for Node.Js around Askar
 
-See the [project README](https://github.com/openwallet-foundation/askar-wrapper-javascript) for version compatibility between Askar and this JavaScript Wrapper.
+See the [project README](https://github.com/openwallet-foundation/askar-wrapper-javascript) for version compatability between Askar and this JavaScript Wrapper.
 
 ## Requirements
 
-This library requires and has been tested with Node.js version `20.x`, `22.x`, and `24.x`. Newer versions might also work, but they have not been tested.
+This library requires and has been tested with Node.js version `18.x`, `20.x` and `22.x`. Newer versions might also work, but they have not been tested.
 
 ## Installation
 

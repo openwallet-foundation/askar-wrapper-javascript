@@ -1,9 +1,9 @@
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import * as koffi from 'koffi'
-import { nativeBindings } from './bindings'
+import { Library } from '@2060.io/ffi-napi'
 import type { NativeMethods } from './NativeBindingInterface'
+import { nativeBindings } from './bindings'
 
 // TODO(rename): when lib is changed
 const LIBNAME = 'aries_askar'
@@ -62,20 +62,14 @@ const getLibrary = () => {
   // Casting here as a string because there is a guard of none of the paths
   const validLibraryPath = libraries.find((l) => doesPathExist(l)) as string
 
-  // Load the library using koffi
-  const lib = koffi.load(validLibraryPath)
-
-  // Bind all the native functions
-  const methods: Partial<NativeMethods> = {}
-  for (const [name, signature] of Object.entries(nativeBindings)) {
-    methods[name as keyof NativeMethods] = lib.func(signature)
-  }
-
-  return methods as NativeMethods
+  // TODO fix the typing conversion
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
+  return Library(validLibraryPath, nativeBindings)
 }
 
-let nativeAskar: NativeMethods | undefined
+let nativeAskar: NativeMethods | undefined = undefined
 export const getNativeAskar = () => {
-  if (!nativeAskar) nativeAskar = getLibrary()
+  if (!nativeAskar) nativeAskar = getLibrary() as unknown as NativeMethods
   return nativeAskar
 }

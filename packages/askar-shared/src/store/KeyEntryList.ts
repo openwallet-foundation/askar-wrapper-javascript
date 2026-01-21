@@ -1,6 +1,6 @@
+import type { KeyEntryObject } from '.'
 import { NativeAskar } from '../askar'
 import type { KeyEntryListHandle } from '../crypto'
-import type { KeyEntryObject } from '.'
 import { KeyEntry } from './KeyEntry'
 
 export class KeyEntryList {
