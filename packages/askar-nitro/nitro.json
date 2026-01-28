@@ -1,0 +1,17 @@
+{
+  "$schema": "https://nitro.margelo.com/nitro.schema.json",
+  "cxxNamespace": ["askarnitro"],
+  "ios": {
+    "iosModuleName": "NitroAskarNitro"
+  },
+  "android": {
+    "androidNamespace": ["askarnitro"],
+    "androidCxxLibName": "NitroAskarNitro"
+  },
+  "autolinking": {
+    "Askar": {
+      "cpp": "HybridAskar"
+    }
+  },
+  "ignorePaths": ["**/node_modules"]
+}

@@ -8,6 +8,12 @@ build
 
 packages/askar-nodejs/native
 packages/askar-nodejs/native/version.json
+
+packages/askar-nitro/native
+packages/askar-nitro/native/version.json
+packages/askar-nitro/android/build
+packages/askar-nitro/android/.cxx
+
 packages/askar-react-native/native
 packages/askar-react-native/native/version.json
 packages/askar-react-native/android/build
