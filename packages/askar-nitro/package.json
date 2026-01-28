@@ -1,0 +1,59 @@
+{
+  "name": "@openwallet-foundation/askar-nitro",
+  "version": "0.0.1",
+  "author": "Me",
+  "homepage": "here.com",
+  "description": "askar-nitro",
+  "main": "build/index",
+  "src": "src/index",
+  "files": [
+    "src",
+    "react-native.config.js",
+    "lib",
+    "nitrogen",
+    "android/build.gradle",
+    "android/gradle.properties",
+    "android/fix-prefab.gradle",
+    "android/CMakeLists.txt",
+    "android/src",
+    "ios/**/*.h",
+    "ios/**/*.m",
+    "ios/**/*.mm",
+    "ios/**/*.cpp",
+    "ios/**/*.swift",
+    "app.plugin.js",
+    "nitro.json",
+    "*.podspec",
+    "README.md"
+  ],
+  "scripts": {
+    "types:check": "pnpm compile --noEmit",
+    "build": "pnpm clean && pnpm compile",
+    "clean": "rimraf -rf ./build",
+    "compile": "tsc -p ./tsconfig.build.json",
+    "install": "node scripts/install.js",
+    "specs": "pnpm types:check false && nitrogen --logLevel=\"debug\""
+  },
+  "keywords": ["react-native", "nitro"],
+  "dependencies": {
+    "@openwallet-foundation/askar-shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.03",
+    "nitrogen": "*",
+    "react": "19.2.0",
+    "react-native": "0.83.0",
+    "react-native-nitro-modules": "*",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "react-native-nitro-modules": "*"
+  },
+  "binary": {
+    "version": "v0.5.0",
+    "host": "https://github.com/openwallet-foundation/askar/releases/download",
+    "packageName": "library-ios-android.tar.gz"
+  }
+}

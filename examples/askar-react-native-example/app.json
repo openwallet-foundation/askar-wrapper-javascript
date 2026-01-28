@@ -15,7 +15,8 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "foundation.openwallet.askar.example"
+      "bundleIdentifier": "foundation.openwallet.askar.example",
+      "appleTeamId": "G9667JTP83"
     },
     "android": {
       "adaptiveIcon": {

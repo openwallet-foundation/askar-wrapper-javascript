@@ -1,4 +1,4 @@
-import { askar } from '@openwallet-foundation/askar-react-native'
+import { askar as askarNitro } from '@openwallet-foundation/askar-nitro'
 import { StyleSheet, Text, View } from 'react-native'
 
 const styles = StyleSheet.create({
@@ -12,6 +12,6 @@ const styles = StyleSheet.create({
 
 export const App = () => (
   <View style={styles.container}>
-    <Text>{askar.version()}</Text>
+    <Text>{askarNitro.version()}</Text>
   </View>
 )
