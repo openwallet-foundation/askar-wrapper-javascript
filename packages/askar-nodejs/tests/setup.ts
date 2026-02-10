@@ -1,2 +1,2 @@
-// this registers askar
+// Register askar
 import '@openwallet-foundation/askar-nodejs'

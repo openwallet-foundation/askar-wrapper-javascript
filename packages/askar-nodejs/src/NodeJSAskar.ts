@@ -1,4 +1,3 @@
-import { NULL } from '@2060.io/ref-napi'
 import type {
   AeadParamsOptions,
   Argon2DerivePasswordOptions,
@@ -67,8 +66,8 @@ import type {
   SetCustomLoggerOptions,
   SetMaxLogLevelOptions,
   StoreCloseOptions,
-  StoreCopyToOptions,
   StoreCopyProfileOptions,
+  StoreCopyToOptions,
   StoreCreateProfileOptions,
   StoreGenerateRawKeyOptions,
   StoreGetDefaultProfileOptions,
@@ -97,21 +96,21 @@ import {
 } from '@openwallet-foundation/askar-shared'
 import * as koffi from 'koffi'
 import {
-  Argon2ConfigStruct,
-  type Argon2ConfigType,
   type ByteBufferType,
   type EncryptedBufferType,
-  FFI_ENTRY_LIST_HANDLE,
-  FFI_INT8,
-  FFI_INT64,
-  FFI_KEY_ENTRY_LIST_HANDLE,
-  FFI_SCAN_HANDLE,
-  FFI_SESSION_HANDLE,
-  FFI_STORE_HANDLE,
-  FFI_STRING,
-  FFI_STRING_LIST_HANDLE,
-  type NativeCallback,
-  type NativeCallbackWithResponse,
+  FFI_CALLBACK_ENTRY_LIST_HANDLE,
+  FFI_CALLBACK_HANDLE_LIST,
+  FFI_CALLBACK_INT8,
+  FFI_CALLBACK_INT64,
+  FFI_CALLBACK_KEY_ENTRY_LIST_HANDLE,
+  FFI_CALLBACK_LOG,
+  FFI_CALLBACK_NO_RESULT,
+  FFI_CALLBACK_SCAN_HANDLE,
+  FFI_CALLBACK_SESSION_HANDLE,
+  FFI_CALLBACK_STORE_HANDLE,
+  FFI_CALLBACK_STRING,
+  FFI_CALLBACK_STRING_LIST_HANDLE,
+  type FfiHandleListType,
   allocateAeadParams,
   allocateEncryptedBuffer,
   allocateInt8Buffer,
@@ -120,82 +119,54 @@ import {
   allocateSecretBuffer,
   allocateStringBuffer,
   allocateStringListHandle,
-  deallocateCallbackBuffer,
+  decodeHandleList,
   encryptedBufferStructToClass,
-  secretBufferToBuffer,
+  secretBufferToUint8Array,
   serializeArguments,
 } from './ffi'
 import { getNativeAskar } from './library'
 
-function handleNullableReturnPointer<Return>(returnValue: Buffer): Return | null {
-  if (returnValue.address() === 0) return null
-  return returnValue.deref() as Return
+function handleNullableReturnPointer<Return>(returnValue: [unknown]): Return | null {
+  const value = returnValue[0]
+  if (value === null || value === undefined) return null
+  return value as Return
 }
 
-function handleReturnPointer<Return>(returnValue: Buffer): Return {
-  if (returnValue.address() === 0) {
+function handleReturnPointer<Return>(returnValue: [unknown] | unknown): Return {
+  const value = Array.isArray(returnValue) ? returnValue[0] : returnValue
+  if (value === null || value === undefined) {
     throw AskarError.customError({ message: 'Unexpected null pointer' })
   }
 
-  return returnValue.deref() as Return
+  return value as Return
 }
 
 export class NodeJSAskar implements Askar {
-  storeListScans(options: StoreListScansOptions): Promise<ScanHandle[]> {
-    throw new Error('Method not implemented.')
-  }
-  storeListSessions(options: StoreListSessionsOptions): Promise<SessionHandle[]> {
-    throw new Error('Method not implemented.')
-  }
-  private promisify = async (method: (nativeCallbackPtr: Buffer, id: number) => number): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      const cb: NativeCallback = (id, errorCode) => {
-        deallocateCallbackBuffer(id)
+  private callbackId = 1
 
-  private async promisify<R = number>(
-    nativeCall: (
-      cb: (callbackId: number, errorCode: number, response: string | number | undefined | null) => void,
-      cbId: number
-    ) => number,
-    callbackType: string | koffi.IKoffiCType
-  ) {
-    return new Promise<R>((resolve, reject) => {
+  private promisify = async <R>(
+    method: (_: unknown, id: number) => number,
+    callbackType: koffi.TypeSpec
+  ): Promise<R | null> => {
+    return new Promise((resolve, reject) => {
       let keepAlive: NodeJS.Immediate | undefined
       const scheduleKeepAlive = () => {
         keepAlive = setImmediate(scheduleKeepAlive)
       }
       scheduleKeepAlive()
 
-  private promisifyWithResponse = async <Return, Response = string>(
-    method: (nativeCallbackWithResponsePtr: Buffer, id: number) => number,
-    responseFfiType = FFI_STRING
-  ): Promise<Return | null> => {
-    return new Promise((resolve, reject) => {
-      const cb: NativeCallbackWithResponse<Response> = (id, errorCode, response) => {
-        deallocateCallbackBuffer(id)
+      const registeredCallback = koffi.register((_cbId: number, errorCode: number, result: R) => {
+        clearImmediate(keepAlive)
+        koffi.unregister(registeredCallback)
 
         if (errorCode !== 0) {
-          const error = this.getAskarError(errorCode)
-          reject(error)
-        }
-
-        if (typeof response === 'string') {
-          if (responseFfiType === FFI_STRING) resolve(response as unknown as Return)
-          try {
-            resolve(JSON.parse(response) as Return)
-          } catch (error) {
-            reject(error)
-          }
-        } else if (typeof response === 'number') {
-          resolve(response as unknown as Return)
-        } else if (response instanceof Buffer) {
-          if (response.address() === 0) resolve(null)
-          resolve(response as unknown as Return)
+          reject(this.getAskarError(errorCode))
+        } else {
+          resolve(result)
         }
       }, koffi.pointer(callbackType))
 
-      // biome-ignore lint/suspicious/noExplicitAny: ignored here as the return type is a koffi registered callback, which is a function, but we just need a typed function
-      const errorCode = nativeCall(registeredCallback as any, this.callbackId++)
+      const errorCode = method(registeredCallback, this.callbackId++)
       if (errorCode !== 0) {
         clearImmediate(keepAlive)
         koffi.unregister(registeredCallback)
@@ -233,6 +204,10 @@ export class NodeJSAskar implements Askar {
     throw this.getAskarError(errorCode)
   }
 
+  private handleListFree(options: { handleList: FfiHandleListType }): void {
+    this.nativeAskar.askar_handle_list_free(options.handleList)
+  }
+
   public get nativeAskar() {
     return getNativeAskar()
   }
@@ -243,9 +218,7 @@ export class NodeJSAskar implements Askar {
 
   public getCurrentError(): AskarErrorObject {
     const error = allocateStringBuffer()
-
     this.nativeAskar.askar_get_current_error(error)
-
     const serializedError = handleReturnPointer<string>(error)
 
     return JSON.parse(serializedError) as AskarErrorObject
@@ -256,7 +229,7 @@ export class NodeJSAskar implements Askar {
   }
 
   public setCustomLogger({ logLevel, flush = false, enabled = false, logger }: SetCustomLoggerOptions): void {
-    const registeredCallback = koffi.register(logger, koffi.pointer(FFI_CALLBACK_LOG))
+    const registeredCallback = koffi.register(logger, FFI_CALLBACK_LOG)
     const errorCode = this.nativeAskar.askar_set_custom_logger(0, registeredCallback, +enabled, +flush, logLevel)
     this.handleError(errorCode)
   }
@@ -274,29 +247,25 @@ export class NodeJSAskar implements Askar {
   }
 
   public argon2DerivePassword(options: Argon2DerivePasswordOptions) {
-    const { password, salt } = serializeArguments(options)
+    const { parameters, password, salt } = serializeArguments(options)
 
     const ret = allocateSecretBuffer()
 
-    // Create Argon2Config struct pointer or use NULL if not provided
-    const config = options.config
-      ? Argon2ConfigStruct({
-          algorithm: options.config.algorithm,
-          version: options.config.version,
-          parallelism: options.config.parallelism,
-          mem_cost: options.config.mem_cost,
-          time_cost: options.config.time_cost,
-        }).ref()
-      : NULL
-
-    const errorCode = this.nativeAskar.askar_argon2_derive_password(options.parameters, password, salt, config, ret)
+    const errorCode = this.nativeAskar.askar_argon2_derive_password(
+      parameters,
+      password,
+      salt,
+      // NOTE: we should not serialize the config, it should be passed as struct
+      options.config ?? null,
+      ret
+    )
 
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const uint8Array = secretBufferToUint8Array(byteBuffer)
     this.nativeAskar.askar_buffer_free(byteBuffer)
 
-    return bufferArray
+    return uint8Array
   }
 
   public entryListCount(options: EntryListCountOptions): number {
@@ -353,27 +322,38 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_entry_list_get_value(entryListHandle, index, ret)
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const uint8Array = secretBufferToUint8Array(byteBuffer)
     this.nativeAskar.askar_buffer_free(byteBuffer)
 
-    return bufferArray
+    return uint8Array
   }
 
   public keyAeadDecrypt(options: KeyAeadDecryptOptions): Uint8Array {
-    const { aad, ciphertext, localKeyHandle, nonce, tag } = serializeArguments(options)
+    const { ciphertext, localKeyHandle, nonce, aad, tag } = serializeArguments({
+      localKeyHandle: options.localKeyHandle,
+      nonce: options.nonce,
+      ciphertext: options.ciphertext,
+      tag: options.tag ?? new Uint8Array(0),
+      aad: options.aad ?? new Uint8Array(0),
+    })
     const ret = allocateSecretBuffer()
 
     const errorCode = this.nativeAskar.askar_key_aead_decrypt(localKeyHandle, ciphertext, nonce, tag, aad, ret)
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const uint8Array = secretBufferToUint8Array(byteBuffer)
     this.nativeAskar.askar_buffer_free(byteBuffer)
 
-    return bufferArray
+    return uint8Array
   }
 
   public keyAeadEncrypt(options: KeyAeadEncryptOptions): EncryptedBuffer {
-    const { localKeyHandle, aad, nonce, message } = serializeArguments(options)
+    const { localKeyHandle, message, nonce, aad } = serializeArguments({
+      localKeyHandle: options.localKeyHandle,
+      message: options.message,
+      nonce: options.nonce ?? new Uint8Array(0),
+      aad: options.aad ?? new Uint8Array(0),
+    })
     const ret = allocateEncryptedBuffer()
 
     const errorCode = this.nativeAskar.askar_key_aead_encrypt(localKeyHandle, message, nonce, aad, ret)
@@ -412,10 +392,10 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_aead_random_nonce(localKeyHandle, ret)
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const uint8Array = secretBufferToUint8Array(byteBuffer)
     this.nativeAskar.askar_buffer_free(byteBuffer)
 
-    return bufferArray
+    return uint8Array
   }
 
   public keyConvert(options: KeyConvertOptions): LocalKeyHandle {
@@ -436,10 +416,10 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_crypto_box(recipientKey, senderKey, message, nonce, ret)
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const uint8Array = secretBufferToUint8Array(byteBuffer)
     this.nativeAskar.askar_buffer_free(byteBuffer)
 
-    return bufferArray
+    return uint8Array
   }
 
   public keyCryptoBoxOpen(options: KeyCryptoBoxOpenOptions): Uint8Array {
@@ -449,10 +429,10 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_crypto_box_open(recipientKey, senderKey, message, nonce, ret)
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const uint8Array = secretBufferToUint8Array(byteBuffer)
     this.nativeAskar.askar_buffer_free(byteBuffer)
 
-    return bufferArray
+    return uint8Array
   }
 
   public keyCryptoBoxRandomNonce(): Uint8Array {
@@ -461,10 +441,10 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_crypto_box_random_nonce(ret)
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const uint8Array = secretBufferToUint8Array(byteBuffer)
     this.nativeAskar.askar_buffer_free(byteBuffer)
 
-    return bufferArray
+    return uint8Array
   }
 
   public keyCryptoBoxSeal(options: KeyCryptoBoxSealOptions): Uint8Array {
@@ -473,12 +453,11 @@ export class NodeJSAskar implements Askar {
 
     const errorCode = this.nativeAskar.askar_key_crypto_box_seal(localKeyHandle, message, ret)
     this.handleError(errorCode)
-
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const uint8Array = secretBufferToUint8Array(byteBuffer)
     this.nativeAskar.askar_buffer_free(byteBuffer)
 
-    return bufferArray
+    return uint8Array
   }
 
   public keyCryptoBoxSealOpen(options: KeyCryptoBoxSealOpenOptions): Uint8Array {
@@ -487,17 +466,25 @@ export class NodeJSAskar implements Askar {
 
     const errorCode = this.nativeAskar.askar_key_crypto_box_seal_open(localKeyHandle, ciphertext, ret)
     this.handleError(errorCode)
-
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const uint8Array = secretBufferToUint8Array(byteBuffer)
     this.nativeAskar.askar_buffer_free(byteBuffer)
 
-    return bufferArray
+    return uint8Array
   }
 
   public keyDeriveEcdh1pu(options: KeyDeriveEcdh1puOptions): LocalKeyHandle {
-    const { senderKey, recipientKey, algorithm, algId, apu, apv, ccTag, ephemeralKey, receive } =
-      serializeArguments(options)
+    const { senderKey, recipientKey, algorithm, algId, apu, apv, ephemeralKey, receive, ccTag } = serializeArguments({
+      senderKey: options.senderKey,
+      recipientKey: options.recipientKey,
+      algorithm: options.algorithm,
+      algId: options.algId,
+      apu: options.apu,
+      apv: options.apv,
+      ephemeralKey: options.ephemeralKey,
+      receive: options.receive,
+      ccTag: options.ccTag ?? new Uint8Array(0),
+    })
 
     const ret = allocatePointer()
 
@@ -669,7 +656,7 @@ export class NodeJSAskar implements Askar {
 
   public keyGenerate(options: KeyGenerateOptions): LocalKeyHandle {
     const { algorithm, ephemeral, keyBackend } = serializeArguments(options)
-    const ret = allocateLocalKeyHandle()
+    const ret = allocatePointer()
 
     const errorCode = this.nativeAskar.askar_key_generate(algorithm, keyBackend, ephemeral, ret)
     this.handleError(errorCode)
@@ -715,10 +702,10 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_get_jwk_secret(localKeyHandle, ret)
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const uint8Array = secretBufferToUint8Array(byteBuffer)
     this.nativeAskar.askar_buffer_free(byteBuffer)
 
-    return bufferArray
+    return uint8Array
   }
 
   public keyGetJwkThumbprint(options: KeyGetJwkThumbprintOptions): string {
@@ -738,10 +725,10 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_get_public_bytes(localKeyHandle, ret)
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const uint8Array = secretBufferToUint8Array(byteBuffer)
     this.nativeAskar.askar_buffer_free(byteBuffer)
 
-    return bufferArray
+    return uint8Array
   }
 
   public keyGetSecretBytes(options: KeyGetSecretBytesOptions): Uint8Array {
@@ -751,10 +738,10 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_get_secret_bytes(localKeyHandle, ret)
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const uint8Array = secretBufferToUint8Array(byteBuffer)
     this.nativeAskar.askar_buffer_free(byteBuffer)
 
-    return bufferArray
+    return uint8Array
   }
 
   public keySignMessage(options: KeySignMessageOptions): Uint8Array {
@@ -764,14 +751,20 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_sign_message(localKeyHandle, message, sigType, ret)
     this.handleError(errorCode)
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
-    const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
+    const uint8Array = secretBufferToUint8Array(byteBuffer)
     this.nativeAskar.askar_buffer_free(byteBuffer)
 
-    return bufferArray
+    return uint8Array
   }
 
   public keyUnwrapKey(options: KeyUnwrapKeyOptions): LocalKeyHandle {
-    const { localKeyHandle, algorithm, ciphertext, nonce, tag } = serializeArguments(options)
+    const { localKeyHandle, algorithm, ciphertext, nonce, tag } = serializeArguments({
+      localKeyHandle: options.localKeyHandle,
+      algorithm: options.algorithm,
+      ciphertext: options.ciphertext,
+      nonce: options.nonce ?? new Uint8Array(0),
+      tag: options.tag ?? new Uint8Array(0),
+    })
     const ret = allocatePointer()
 
     const errorCode = this.nativeAskar.askar_key_unwrap_key(localKeyHandle, algorithm, ciphertext, nonce, tag, ret)
@@ -792,7 +785,10 @@ export class NodeJSAskar implements Askar {
   }
 
   public keyWrapKey(options: KeyWrapKeyOptions): EncryptedBuffer {
-    const { localKeyHandle, nonce, other } = serializeArguments(options)
+    const { localKeyHandle, nonce, other } = serializeArguments({
+      ...options,
+      nonce: options.nonce ?? new Uint8Array(0),
+    })
     const ret = allocateEncryptedBuffer()
 
     const errorCode = this.nativeAskar.askar_key_wrap_key(localKeyHandle, other, nonce, ret)
@@ -809,12 +805,12 @@ export class NodeJSAskar implements Askar {
 
     const keyGetSupportedBackendsErrorCode = this.nativeAskar.askar_key_get_supported_backends(stringListHandlePtr)
     this.handleError(keyGetSupportedBackendsErrorCode)
-    const stringListHandle = stringListHandlePtr.deref() as Buffer
+    const stringListHandle = stringListHandlePtr[0]
 
     const listCountPtr = allocateInt32Buffer()
     const stringListCountErrorCode = this.nativeAskar.askar_string_list_count(stringListHandle, listCountPtr)
     this.handleError(stringListCountErrorCode)
-    const count = listCountPtr.deref() as number
+    const count = listCountPtr[0]
 
     const supportedBackends = []
 
@@ -822,9 +818,8 @@ export class NodeJSAskar implements Askar {
       const strPtr = allocateStringBuffer()
       const errorCode = this.nativeAskar.askar_string_list_get_item(stringListHandle, i, strPtr)
       this.handleError(errorCode)
-      supportedBackends.push(strPtr.deref() as string)
+      supportedBackends.push(strPtr[0] as string)
     }
-
     this.nativeAskar.askar_string_list_free(stringListHandle)
 
     return supportedBackends
@@ -842,30 +837,35 @@ export class NodeJSAskar implements Askar {
 
     const handle = await this.promisify<Uint8Array>(
       (cb, cbId) => this.nativeAskar.askar_scan_next(scanHandle, cb, cbId),
-      FFI_CALLBACK_ARC_HANDLE
+      FFI_CALLBACK_ENTRY_LIST_HANDLE
     )
 
     return EntryListHandle.fromHandle(handle)
   }
 
   public async scanStart(options: ScanStartOptions): Promise<ScanHandle> {
-    const { category, limit, offset, profile, storeHandle, tagFilter, orderBy, descending } =
-      serializeArguments(options)
-    const handle = await this.promisifyWithResponse<number>(
+    const { category, limit, offset, profile, storeHandle, tagFilter, orderBy, descending } = serializeArguments({
+      ...options,
+      offset: options.offset ?? 0,
+      limit: options.limit ?? -1,
+      descending: options.descending ?? 0,
+    })
+
+    const handle = await this.promisify<number>(
       (cb, cbId) =>
         this.nativeAskar.askar_scan_start(
           storeHandle,
           profile,
           category,
           tagFilter,
-          +offset || 0,
-          +limit || -1,
+          offset,
+          limit,
           orderBy,
           descending,
           cb,
           cbId
         ),
-      FFI_CALLBACK_USIZE
+      FFI_CALLBACK_SCAN_HANDLE
     )
 
     return ScanHandle.fromHandle(handle)
@@ -874,7 +874,7 @@ export class NodeJSAskar implements Askar {
   public async sessionClose(options: SessionCloseOptions): Promise<void> {
     const { commit, sessionHandle } = serializeArguments(options)
 
-    return await this.promisify(
+    await this.promisify(
       (cb, cbId) => this.nativeAskar.askar_session_close(sessionHandle, commit, cb, cbId),
       FFI_CALLBACK_NO_RESULT
     )
@@ -892,17 +892,20 @@ export class NodeJSAskar implements Askar {
 
   public async sessionFetch(options: SessionFetchOptions): Promise<EntryListHandle | null> {
     const { name, category, sessionHandle, forUpdate } = serializeArguments(options)
-
     const handle = await this.promisify<Uint8Array>(
       (cb, cbId) => this.nativeAskar.askar_session_fetch(sessionHandle, category, name, forUpdate, cb, cbId),
-      FFI_CALLBACK_ARC_HANDLE
+      FFI_CALLBACK_ENTRY_LIST_HANDLE
     )
 
     return EntryListHandle.fromHandle(handle)
   }
 
   public async sessionFetchAll(options: SessionFetchAllOptions): Promise<EntryListHandle | null> {
-    const { forUpdate, sessionHandle, tagFilter, limit, category, orderBy, descending } = serializeArguments(options)
+    const { forUpdate, sessionHandle, tagFilter, limit, category, orderBy, descending } = serializeArguments({
+      ...options,
+      limit: options.limit ?? -1,
+      descending: options.descending ?? 0,
+    })
 
     const handle = await this.promisify<Uint8Array>(
       (cb, cbId) =>
@@ -910,21 +913,24 @@ export class NodeJSAskar implements Askar {
           sessionHandle,
           category,
           tagFilter,
-          +limit || -1,
+          limit,
           orderBy,
           descending,
           forUpdate,
           cb,
           cbId
         ),
-      FFI_CALLBACK_ARC_HANDLE
+      FFI_CALLBACK_ENTRY_LIST_HANDLE
     )
 
     return EntryListHandle.fromHandle(handle)
   }
 
   public async sessionFetchAllKeys(options: SessionFetchAllKeysOptions): Promise<KeyEntryListHandle | null> {
-    const { forUpdate, limit, tagFilter, sessionHandle, algorithm, thumbprint } = serializeArguments(options)
+    const { forUpdate, limit, tagFilter, sessionHandle, algorithm, thumbprint } = serializeArguments({
+      ...options,
+      limit: options.limit ?? -1,
+    })
 
     const handle = await this.promisify<Uint8Array>(
       (cb, cbId) =>
@@ -933,12 +939,12 @@ export class NodeJSAskar implements Askar {
           algorithm,
           thumbprint,
           tagFilter,
-          +limit || -1,
+          limit,
           forUpdate,
           cb,
           cbId
         ),
-      FFI_CALLBACK_ARC_HANDLE
+      FFI_CALLBACK_KEY_ENTRY_LIST_HANDLE
     )
 
     return KeyEntryListHandle.fromHandle(handle)
@@ -949,26 +955,31 @@ export class NodeJSAskar implements Askar {
 
     const handle = await this.promisify<Uint8Array>(
       (cb, cbId) => this.nativeAskar.askar_session_fetch_key(sessionHandle, name, forUpdate, cb, cbId),
-      FFI_CALLBACK_ARC_HANDLE
+      FFI_CALLBACK_KEY_ENTRY_LIST_HANDLE
     )
 
     return KeyEntryListHandle.fromHandle(handle)
   }
 
   public async sessionInsertKey(options: SessionInsertKeyOptions): Promise<void> {
-    const { name, sessionHandle, expiryMs, localKeyHandle, metadata, tags } = serializeArguments(options)
+    const { name, sessionHandle, expiryMs, localKeyHandle, metadata, tags } = serializeArguments({
+      ...options,
+      expiryMs: options.expiryMs ?? -1,
+    })
 
-    return this.promisify((cb, cbId) =>
-      this.nativeAskar.askar_session_insert_key(
-        sessionHandle,
-        localKeyHandle,
-        name,
-        metadata,
-        tags,
-        +expiryMs || -1,
-        cb,
-        cbId
-      )
+    await this.promisify(
+      (cb, cbId) =>
+        this.nativeAskar.askar_session_insert_key(
+          sessionHandle,
+          localKeyHandle,
+          name,
+          metadata,
+          tags,
+          expiryMs,
+          cb,
+          cbId
+        ),
+      FFI_CALLBACK_NO_RESULT
     )
   }
 
@@ -986,7 +997,7 @@ export class NodeJSAskar implements Askar {
   public async sessionRemoveKey(options: SessionRemoveKeyOptions): Promise<void> {
     const { sessionHandle, name } = serializeArguments(options)
 
-    return this.promisify(
+    await this.promisify(
       (cb, cbId) => this.nativeAskar.askar_session_remove_key(sessionHandle, name, cb, cbId),
       FFI_CALLBACK_NO_RESULT
     )
@@ -997,55 +1008,69 @@ export class NodeJSAskar implements Askar {
 
     const handle = await this.promisify<number>(
       (cb, cbId) => this.nativeAskar.askar_session_start(storeHandle, profile, asTransaction, cb, cbId),
-      FFI_CALLBACK_USIZE
+      FFI_CALLBACK_SESSION_HANDLE
     )
 
     return SessionHandle.fromHandle(handle)
   }
 
   public async sessionUpdate(options: SessionUpdateOptions): Promise<void> {
-    const { name, sessionHandle, category, expiryMs, tags, operation, value } = serializeArguments(options)
+    const { name, sessionHandle, category, expiryMs, tags, operation, value } = serializeArguments({
+      ...options,
+      expiryMs: options.expiryMs ?? -1,
+      value: options.value ?? new Uint8Array(0),
+    })
 
-    return this.promisify((cb, cbId) =>
-      this.nativeAskar.askar_session_update(
-        sessionHandle,
-        operation,
-        category,
-        name,
-        value,
-        tags,
-        +expiryMs || -1,
-        cb,
-        cbId
-      )
+    await this.promisify(
+      (cb, cbId) =>
+        this.nativeAskar.askar_session_update(
+          sessionHandle,
+          operation,
+          category,
+          name,
+          value,
+          tags,
+          expiryMs,
+          cb,
+          cbId
+        ),
+      FFI_CALLBACK_NO_RESULT
     )
   }
 
   public async sessionUpdateKey(options: SessionUpdateKeyOptions): Promise<void> {
-    const { expiryMs, tags, name, sessionHandle, metadata } = serializeArguments(options)
+    const { expiryMs, tags, name, sessionHandle, metadata } = serializeArguments({
+      ...options,
+      expiryMs: options.expiryMs ?? -1,
+    })
 
-    return this.promisify((cb, cbId) =>
-      this.nativeAskar.askar_session_update_key(sessionHandle, name, metadata, tags, +expiryMs || -1, cb, cbId)
+    await this.promisify(
+      (cb, cbId) => this.nativeAskar.askar_session_update_key(sessionHandle, name, metadata, tags, expiryMs, cb, cbId),
+      FFI_CALLBACK_NO_RESULT
     )
   }
 
-  public storeClose(options: StoreCloseOptions): Promise<void> {
+  public async storeClose(options: StoreCloseOptions): Promise<void> {
     const { storeHandle } = serializeArguments(options)
 
-    return this.promisify(
+    await this.promisify(
       (cb, cbId) => this.nativeAskar.askar_store_close(storeHandle, cb, cbId),
       FFI_CALLBACK_NO_RESULT
     )
   }
 
-  // TODO: change when updating to 0.6.0
-  public storeCopyTo(options: StoreCopyToOptions): Promise<void> {
-    const { storeHandle, targetUri, passKey, keyMethod, recreate } = serializeArguments(options)
+  public async storeCopyTo(options: StoreCopyToOptions): Promise<StoreHandle> {
+    const { storeHandle, targetUri, passKey, keyMethod, recreate } = serializeArguments({
+      ...options,
+      recreate: options.recreate ?? 0,
+    })
 
-    return this.promisify(
+    const response = await this.promisify<number>(
       (cb, cbId) => this.nativeAskar.askar_store_copy(storeHandle, targetUri, keyMethod, passKey, recreate, cb, cbId),
-      FFI_CALLBACK_USIZE
+      FFI_CALLBACK_STORE_HANDLE
     )
+
+    return StoreHandle.fromHandle(response)
   }
 
   public async storeCreateProfile(options: StoreCreateProfileOptions): Promise<string> {
@@ -1059,13 +1084,16 @@ export class NodeJSAskar implements Askar {
   }
 
   public storeGenerateRawKey(options: StoreGenerateRawKeyOptions): string {
-    const { seed } = serializeArguments(options)
+    const { seed } = serializeArguments({
+      ...options,
+      seed: options.seed ?? new Uint8Array(0),
+    })
     const ret = allocateStringBuffer()
 
     const errorCode = this.nativeAskar.askar_store_generate_raw_key(seed, ret)
     this.handleError(errorCode)
 
-    return ret.deref() as string
+    return ret[0] as string
   }
 
   public async storeGetDefaultProfile(options: StoreGetDefaultProfileOptions): Promise<string> {
@@ -1081,7 +1109,6 @@ export class NodeJSAskar implements Askar {
 
   public async storeGetProfileName(options: StoreGetProfileNameOptions): Promise<string> {
     const { storeHandle } = serializeArguments(options)
-
     const response = await this.promisify<string>(
       (cb, cbId) => this.nativeAskar.askar_store_get_profile_name(storeHandle, cb, cbId),
       FFI_CALLBACK_STRING
@@ -1092,9 +1119,10 @@ export class NodeJSAskar implements Askar {
 
   public async storeListProfiles(options: StoreListProfilesOptions): Promise<string[]> {
     const { storeHandle } = serializeArguments(options)
-    const listHandle = await this.promisifyWithResponse<Buffer>(
+
+    const listHandle = await this.promisify<Uint8Array>(
       (cb, cbId) => this.nativeAskar.askar_store_list_profiles(storeHandle, cb, cbId),
-      FFI_CALLBACK_STRING_LIST
+      FFI_CALLBACK_STRING_LIST_HANDLE
     )
 
     if (listHandle === null) {
@@ -1102,19 +1130,50 @@ export class NodeJSAskar implements Askar {
     }
 
     const counti32 = allocateInt32Buffer()
-
     const errorCode = this.nativeAskar.askar_string_list_count(listHandle, counti32)
     this.handleError(errorCode)
-    const count = counti32.deref() as number
+    const count = counti32[0]
     const ret = []
     const strval = allocateStringBuffer()
     for (let i = 0; i < count; i++) {
       const errorCode = this.nativeAskar.askar_string_list_get_item(listHandle, i, strval)
       this.handleError(errorCode)
-      ret.push(strval.deref() as string)
+      ret.push(strval[0] as string)
     }
     this.nativeAskar.askar_string_list_free(listHandle)
     return ret
+  }
+
+  public async storeListScans(options: StoreListScansOptions): Promise<ScanHandle[]> {
+    const { storeHandle } = serializeArguments(options)
+    const handleList = await this.promisify<FfiHandleListType>(
+      (cb, cbId) => this.nativeAskar.askar_store_list_scans(storeHandle, cb, cbId),
+      FFI_CALLBACK_HANDLE_LIST
+    )
+
+    if (!handleList) return []
+
+    const scanHandleList = decodeHandleList(handleList).map((scanHandle) => ScanHandle.fromHandle(scanHandle))
+    this.handleListFree({ handleList })
+
+    return scanHandleList
+  }
+
+  public async storeListSessions(options: StoreListSessionsOptions): Promise<SessionHandle[]> {
+    const { storeHandle } = serializeArguments(options)
+    const handleList = await this.promisify<FfiHandleListType>(
+      (cb, cbId) => this.nativeAskar.askar_store_list_sessions(storeHandle, cb, cbId),
+      FFI_CALLBACK_HANDLE_LIST
+    )
+
+    if (!handleList) return []
+
+    const sessionHandleList = decodeHandleList(handleList).map((sessionHandle) =>
+      SessionHandle.fromHandle(sessionHandle)
+    )
+    this.handleListFree({ handleList })
+
+    return sessionHandleList
   }
 
   public async storeOpen(options: StoreOpenOptions): Promise<StoreHandle> {
@@ -1122,7 +1181,7 @@ export class NodeJSAskar implements Askar {
 
     const handle = await this.promisify<number>(
       (cb, cbId) => this.nativeAskar.askar_store_open(specUri, keyMethod, passKey, profile, cb, cbId),
-      FFI_CALLBACK_USIZE
+      FFI_CALLBACK_STORE_HANDLE
     )
 
     return StoreHandle.fromHandle(handle)
@@ -1133,7 +1192,7 @@ export class NodeJSAskar implements Askar {
 
     const handle = await this.promisify<number>(
       (cb, cbId) => this.nativeAskar.askar_store_provision(specUri, keyMethod, passKey, profile, recreate, cb, cbId),
-      FFI_CALLBACK_USIZE
+      FFI_CALLBACK_STORE_HANDLE
     )
 
     return StoreHandle.fromHandle(handle)
@@ -1142,7 +1201,7 @@ export class NodeJSAskar implements Askar {
   public async storeRekey(options: StoreRekeyOptions): Promise<void> {
     const { passKey, keyMethod, storeHandle } = serializeArguments(options)
 
-    return this.promisify(
+    await this.promisify(
       (cb, cbId) => this.nativeAskar.askar_store_rekey(storeHandle, keyMethod, passKey, cb, cbId),
       FFI_CALLBACK_NO_RESULT
     )
@@ -1173,7 +1232,7 @@ export class NodeJSAskar implements Askar {
   public async storeSetDefaultProfile(options: StoreSetDefaultProfileOptions): Promise<void> {
     const { storeHandle, profile } = serializeArguments(options)
 
-    return this.promisify(
+    await this.promisify(
       (cb, cbId) => this.nativeAskar.askar_store_set_default_profile(storeHandle, profile, cb, cbId),
       FFI_CALLBACK_NO_RESULT
     )
@@ -1201,6 +1260,7 @@ export class NodeJSAskar implements Askar {
 
   public async migrateIndySdk(options: MigrateIndySdkOptions): Promise<void> {
     const { specUri, kdfLevel, walletKey, walletName } = serializeArguments(options)
+
     await this.promisify(
       (cb, cbId) => this.nativeAskar.askar_migrate_indy_sdk(specUri, walletName, walletKey, kdfLevel, cb, cbId),
       FFI_CALLBACK_NO_RESULT

@@ -1,29 +1,44 @@
-import type { Pointer } from '@2060.io/ref-napi'
-import { reinterpret } from '@2060.io/ref-napi'
 import { EncryptedBuffer } from '@openwallet-foundation/askar-shared'
-import type { TypedArray } from 'ref-array-di'
-import type { ByteBufferType, EncryptedBufferType } from './structures'
-import { ByteBufferStruct } from './structures'
+import * as koffi from 'koffi'
+import { FFI_UINT8, FFI_USIZE } from './primitives'
+import type { ByteBufferType, EncryptedBufferType, FfiHandleListType } from './structures'
 
-export const byteBufferClassToStruct = ({ len, data }: ByteBufferType) => {
-  return ByteBufferStruct({
-    len,
-    data: data as Pointer<TypedArray<number, number>>,
-  })
+export const uint8ArrayToByteBufferStruct = (buffer: Uint8Array = new Uint8Array(0)): ByteBufferType => {
+  return { data: buffer, len: buffer.length }
 }
 
-export const secretBufferClassToStruct = byteBufferClassToStruct
-
-export const uint8arrayToByteBufferStruct = (buf: Buffer) => {
-  return byteBufferClassToStruct({ data: buf, len: buf.length })
+export type NodeJsHandleList = {
+  len: number
+  data: unknown
 }
 
-export const byteBufferToBuffer = ({ data, len }: ByteBufferType) => reinterpret(data, len)
+export const decodeHandleList = (handleList: FfiHandleListType): number[] => {
+  // With koffi, pointer data needs to be decoded
+  const { data, len } = handleList
 
-export const secretBufferToBuffer = byteBufferToBuffer
+  // If data is a koffi external pointer, decode it as uint8 array
+  const decoded = koffi.decode(data, FFI_USIZE, len)
+  return decoded
+}
+
+export const byteBufferToUint8Array = (byteBuffer: ByteBufferType): Uint8Array => {
+  // With koffi, pointer data needs to be decoded
+  const { data, len } = byteBuffer
+
+  // Check if data is already a Uint8Array
+  if (data instanceof Uint8Array) {
+    return data.slice(0, len)
+  }
+
+  // If data is a koffi external pointer, decode it as uint8 array
+  const decoded = koffi.decode(data, FFI_UINT8, len)
+  return decoded
+}
+
+export const secretBufferToUint8Array = byteBufferToUint8Array
 
 export const encryptedBufferStructToClass = ({ secretBuffer, tagPos, noncePos }: EncryptedBufferType) => {
-  const buffer = Uint8Array.from(secretBufferToBuffer(secretBuffer))
+  const buffer = Uint8Array.from(secretBufferToUint8Array(secretBuffer))
 
   return new EncryptedBuffer({ tagPos, noncePos, buffer })
 }

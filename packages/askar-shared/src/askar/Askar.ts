@@ -449,7 +449,7 @@ export type Askar = {
   sessionUpdateKey(options: SessionUpdateKeyOptions): Promise<void>
 
   storeClose(options: StoreCloseOptions): Promise<void>
-  storeCopyTo(options: StoreCopyToOptions): Promise<void>
+  storeCopyTo(options: StoreCopyToOptions): Promise<StoreHandle>
   storeCreateProfile(options: StoreCreateProfileOptions): Promise<string>
   storeGenerateRawKey(options: StoreGenerateRawKeyOptions): string
   storeGetDefaultProfile(options: StoreGetDefaultProfileOptions): Promise<string>

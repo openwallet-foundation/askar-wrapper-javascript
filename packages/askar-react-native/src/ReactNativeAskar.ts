@@ -62,8 +62,8 @@ import type {
   SessionUpdateKeyOptions,
   SessionUpdateOptions,
   StoreCloseOptions,
-  StoreCopyToOptions,
   StoreCopyProfileOptions,
+  StoreCopyToOptions,
   StoreCreateProfileOptions,
   StoreGenerateRawKeyOptions,
   StoreGetDefaultProfileOptions,
@@ -643,9 +643,14 @@ export class ReactNativeAskar implements Askar {
   }
 
   // TODO: change when updating to 0.6.0
-  public storeCopyTo(options: StoreCopyToOptions): Promise<void> {
+  public async storeCopyTo(options: StoreCopyToOptions): Promise<StoreHandle> {
     const serializedOptions = serializeArguments(options)
-    return this.promisify((cb) => this.handleError(this.askar.storeCopy({ cb, ...serializedOptions })))
+
+    const handle = await this.promisifyWithResponse<number>((cb) => {
+      this.handleError(this.askar.storeCopy({ cb, ...serializedOptions }))
+    })
+
+    return StoreHandle.fromHandle(handle)
   }
 
   public async storeCreateProfile(options: StoreCreateProfileOptions): Promise<string> {

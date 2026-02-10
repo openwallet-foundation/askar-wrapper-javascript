@@ -15,7 +15,7 @@
     "types:check": "pnpm -r types:check",
     "build": "pnpm -r build",
     "clean": "pnpm -r clean",
-    "test": "node --import tsx --test packages/**/tests/*.test.ts",
+    "test": "vitest",
     "release": "pnpm build && pnpm changeset publish --no-git-tag",
     "changeset-version": "pnpm changeset version && pnpm style:fix"
   },
@@ -25,7 +25,9 @@
     "@types/node": "catalog:",
     "rimraf": "catalog:",
     "tsx": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^4.0.12"
   },
-  "packageManager": "pnpm@9.15.3+sha256.c1da43727ccbc1ed42aff4fd6bdb4b1e91e65a818e6efff5b240fbf070ba4eaf"
+  "packageManager": "pnpm@10.29.2"
 }
