@@ -67,8 +67,8 @@ import type {
   SetCustomLoggerOptions,
   SetMaxLogLevelOptions,
   StoreCloseOptions,
-  StoreCopyProfileOptions,
   StoreCopyToOptions,
+  StoreCopyProfileOptions,
   StoreCreateProfileOptions,
   StoreGenerateRawKeyOptions,
   StoreGetDefaultProfileOptions,
@@ -95,6 +95,7 @@ import {
   StoreHandle,
   handleInvalidNullResponse,
 } from '@openwallet-foundation/askar-shared'
+import * as koffi from 'koffi'
 import {
   Argon2ConfigStruct,
   type Argon2ConfigType,
@@ -123,9 +124,6 @@ import {
   encryptedBufferStructToClass,
   secretBufferToBuffer,
   serializeArguments,
-  toNativeCallback,
-  toNativeCallbackWithResponse,
-  toNativeLogCallback,
 } from './ffi'
 import { getNativeAskar } from './library'
 
@@ -154,18 +152,19 @@ export class NodeJSAskar implements Askar {
       const cb: NativeCallback = (id, errorCode) => {
         deallocateCallbackBuffer(id)
 
-        try {
-          this.handleError(errorCode)
-        } catch (e) {
-          reject(e)
-        }
-
-        resolve()
+  private async promisify<R = number>(
+    nativeCall: (
+      cb: (callbackId: number, errorCode: number, response: string | number | undefined | null) => void,
+      cbId: number
+    ) => number,
+    callbackType: string | koffi.IKoffiCType
+  ) {
+    return new Promise<R>((resolve, reject) => {
+      let keepAlive: NodeJS.Immediate | undefined
+      const scheduleKeepAlive = () => {
+        keepAlive = setImmediate(scheduleKeepAlive)
       }
-      const { nativeCallback, id } = toNativeCallback(cb)
-      method(nativeCallback, +id)
-    })
-  }
+      scheduleKeepAlive()
 
   private promisifyWithResponse = async <Return, Response = string>(
     method: (nativeCallbackWithResponsePtr: Buffer, id: number) => number,
@@ -193,14 +192,15 @@ export class NodeJSAskar implements Askar {
           if (response.address() === 0) resolve(null)
           resolve(response as unknown as Return)
         }
+      }, koffi.pointer(callbackType))
 
-        reject(AskarError.customError({ message: `could not parse return type properly (type: ${typeof response})` }))
+      // biome-ignore lint/suspicious/noExplicitAny: ignored here as the return type is a koffi registered callback, which is a function, but we just need a typed function
+      const errorCode = nativeCall(registeredCallback as any, this.callbackId++)
+      if (errorCode !== 0) {
+        clearImmediate(keepAlive)
+        koffi.unregister(registeredCallback)
+        reject(this.getAskarError(errorCode))
       }
-      const { nativeCallback, id } = toNativeCallbackWithResponse(cb, responseFfiType)
-      const errorCode = method(nativeCallback, +id)
-      if (errorCode !== 0) deallocateCallbackBuffer(+id)
-
-      this.handleError(errorCode)
     })
   }
 
@@ -243,7 +243,9 @@ export class NodeJSAskar implements Askar {
 
   public getCurrentError(): AskarErrorObject {
     const error = allocateStringBuffer()
+
     this.nativeAskar.askar_get_current_error(error)
+
     const serializedError = handleReturnPointer<string>(error)
 
     return JSON.parse(serializedError) as AskarErrorObject
@@ -253,14 +255,10 @@ export class NodeJSAskar implements Askar {
     this.nativeAskar.askar_clear_custom_logger()
   }
 
-  // TODO: the id has to be deallocated when its done, but how?
   public setCustomLogger({ logLevel, flush = false, enabled = false, logger }: SetCustomLoggerOptions): void {
-    const { id, nativeCallback } = toNativeLogCallback(logger)
-
-    // TODO: flush and enabled are just guessed
-    const errorCode = this.nativeAskar.askar_set_custom_logger(0, nativeCallback, +enabled, +flush, logLevel)
+    const registeredCallback = koffi.register(logger, koffi.pointer(FFI_CALLBACK_LOG))
+    const errorCode = this.nativeAskar.askar_set_custom_logger(0, registeredCallback, +enabled, +flush, logLevel)
     this.handleError(errorCode)
-    deallocateCallbackBuffer(+id)
   }
 
   public setDefaultLogger(): void {
@@ -475,6 +473,7 @@ export class NodeJSAskar implements Askar {
 
     const errorCode = this.nativeAskar.askar_key_crypto_box_seal(localKeyHandle, message, ret)
     this.handleError(errorCode)
+
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
     const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
     this.nativeAskar.askar_buffer_free(byteBuffer)
@@ -488,6 +487,7 @@ export class NodeJSAskar implements Askar {
 
     const errorCode = this.nativeAskar.askar_key_crypto_box_seal_open(localKeyHandle, ciphertext, ret)
     this.handleError(errorCode)
+
     const byteBuffer = handleReturnPointer<ByteBufferType>(ret)
     const bufferArray = new Uint8Array(Buffer.from(secretBufferToBuffer(byteBuffer)))
     this.nativeAskar.askar_buffer_free(byteBuffer)
@@ -669,7 +669,7 @@ export class NodeJSAskar implements Askar {
 
   public keyGenerate(options: KeyGenerateOptions): LocalKeyHandle {
     const { algorithm, ephemeral, keyBackend } = serializeArguments(options)
-    const ret = allocatePointer()
+    const ret = allocateLocalKeyHandle()
 
     const errorCode = this.nativeAskar.askar_key_generate(algorithm, keyBackend, ephemeral, ret)
     this.handleError(errorCode)
@@ -824,6 +824,7 @@ export class NodeJSAskar implements Askar {
       this.handleError(errorCode)
       supportedBackends.push(strPtr.deref() as string)
     }
+
     this.nativeAskar.askar_string_list_free(stringListHandle)
 
     return supportedBackends
@@ -839,9 +840,9 @@ export class NodeJSAskar implements Askar {
   public async scanNext(options: ScanNextOptions): Promise<EntryListHandle | null> {
     const { scanHandle } = serializeArguments(options)
 
-    const handle = await this.promisifyWithResponse<Uint8Array>(
+    const handle = await this.promisify<Uint8Array>(
       (cb, cbId) => this.nativeAskar.askar_scan_next(scanHandle, cb, cbId),
-      FFI_ENTRY_LIST_HANDLE
+      FFI_CALLBACK_ARC_HANDLE
     )
 
     return EntryListHandle.fromHandle(handle)
@@ -864,7 +865,7 @@ export class NodeJSAskar implements Askar {
           cb,
           cbId
         ),
-      FFI_SCAN_HANDLE
+      FFI_CALLBACK_USIZE
     )
 
     return ScanHandle.fromHandle(handle)
@@ -873,14 +874,17 @@ export class NodeJSAskar implements Askar {
   public async sessionClose(options: SessionCloseOptions): Promise<void> {
     const { commit, sessionHandle } = serializeArguments(options)
 
-    return await this.promisify((cb, cbId) => this.nativeAskar.askar_session_close(sessionHandle, commit, cb, cbId))
+    return await this.promisify(
+      (cb, cbId) => this.nativeAskar.askar_session_close(sessionHandle, commit, cb, cbId),
+      FFI_CALLBACK_NO_RESULT
+    )
   }
 
   public async sessionCount(options: SessionCountOptions): Promise<number> {
     const { sessionHandle, tagFilter, category } = serializeArguments(options)
-    const response = await this.promisifyWithResponse<number, number>(
+    const response = await this.promisify<number>(
       (cb, cbId) => this.nativeAskar.askar_session_count(sessionHandle, category, tagFilter, cb, cbId),
-      FFI_INT64
+      FFI_CALLBACK_INT64
     )
 
     return handleInvalidNullResponse(response)
@@ -888,9 +892,10 @@ export class NodeJSAskar implements Askar {
 
   public async sessionFetch(options: SessionFetchOptions): Promise<EntryListHandle | null> {
     const { name, category, sessionHandle, forUpdate } = serializeArguments(options)
-    const handle = await this.promisifyWithResponse<Uint8Array>(
+
+    const handle = await this.promisify<Uint8Array>(
       (cb, cbId) => this.nativeAskar.askar_session_fetch(sessionHandle, category, name, forUpdate, cb, cbId),
-      FFI_ENTRY_LIST_HANDLE
+      FFI_CALLBACK_ARC_HANDLE
     )
 
     return EntryListHandle.fromHandle(handle)
@@ -899,7 +904,7 @@ export class NodeJSAskar implements Askar {
   public async sessionFetchAll(options: SessionFetchAllOptions): Promise<EntryListHandle | null> {
     const { forUpdate, sessionHandle, tagFilter, limit, category, orderBy, descending } = serializeArguments(options)
 
-    const handle = await this.promisifyWithResponse<Uint8Array>(
+    const handle = await this.promisify<Uint8Array>(
       (cb, cbId) =>
         this.nativeAskar.askar_session_fetch_all(
           sessionHandle,
@@ -912,7 +917,7 @@ export class NodeJSAskar implements Askar {
           cb,
           cbId
         ),
-      FFI_ENTRY_LIST_HANDLE
+      FFI_CALLBACK_ARC_HANDLE
     )
 
     return EntryListHandle.fromHandle(handle)
@@ -921,7 +926,7 @@ export class NodeJSAskar implements Askar {
   public async sessionFetchAllKeys(options: SessionFetchAllKeysOptions): Promise<KeyEntryListHandle | null> {
     const { forUpdate, limit, tagFilter, sessionHandle, algorithm, thumbprint } = serializeArguments(options)
 
-    const handle = await this.promisifyWithResponse<Uint8Array>(
+    const handle = await this.promisify<Uint8Array>(
       (cb, cbId) =>
         this.nativeAskar.askar_session_fetch_all_keys(
           sessionHandle,
@@ -933,7 +938,7 @@ export class NodeJSAskar implements Askar {
           cb,
           cbId
         ),
-      FFI_KEY_ENTRY_LIST_HANDLE
+      FFI_CALLBACK_ARC_HANDLE
     )
 
     return KeyEntryListHandle.fromHandle(handle)
@@ -942,9 +947,9 @@ export class NodeJSAskar implements Askar {
   public async sessionFetchKey(options: SessionFetchKeyOptions): Promise<KeyEntryListHandle | null> {
     const { forUpdate, sessionHandle, name } = serializeArguments(options)
 
-    const handle = await this.promisifyWithResponse<Uint8Array>(
+    const handle = await this.promisify<Uint8Array>(
       (cb, cbId) => this.nativeAskar.askar_session_fetch_key(sessionHandle, name, forUpdate, cb, cbId),
-      FFI_KEY_ENTRY_LIST_HANDLE
+      FFI_CALLBACK_ARC_HANDLE
     )
 
     return KeyEntryListHandle.fromHandle(handle)
@@ -969,9 +974,10 @@ export class NodeJSAskar implements Askar {
 
   public async sessionRemoveAll(options: SessionRemoveAllOptions): Promise<number> {
     const { sessionHandle, tagFilter, category } = serializeArguments(options)
-    const response = await this.promisifyWithResponse<number>(
+
+    const response = await this.promisify<number>(
       (cb, cbId) => this.nativeAskar.askar_session_remove_all(sessionHandle, category, tagFilter, cb, cbId),
-      FFI_INT64
+      FFI_CALLBACK_INT64
     )
 
     return handleInvalidNullResponse(response)
@@ -980,15 +986,18 @@ export class NodeJSAskar implements Askar {
   public async sessionRemoveKey(options: SessionRemoveKeyOptions): Promise<void> {
     const { sessionHandle, name } = serializeArguments(options)
 
-    return this.promisify((cb, cbId) => this.nativeAskar.askar_session_remove_key(sessionHandle, name, cb, cbId))
+    return this.promisify(
+      (cb, cbId) => this.nativeAskar.askar_session_remove_key(sessionHandle, name, cb, cbId),
+      FFI_CALLBACK_NO_RESULT
+    )
   }
 
   public async sessionStart(options: SessionStartOptions): Promise<SessionHandle> {
     const { storeHandle, profile, asTransaction } = serializeArguments(options)
 
-    const handle = await this.promisifyWithResponse<number, number>(
+    const handle = await this.promisify<number>(
       (cb, cbId) => this.nativeAskar.askar_session_start(storeHandle, profile, asTransaction, cb, cbId),
-      FFI_SESSION_HANDLE
+      FFI_CALLBACK_USIZE
     )
 
     return SessionHandle.fromHandle(handle)
@@ -1023,22 +1032,27 @@ export class NodeJSAskar implements Askar {
   public storeClose(options: StoreCloseOptions): Promise<void> {
     const { storeHandle } = serializeArguments(options)
 
-    return this.promisify((cb, cbId) => this.nativeAskar.askar_store_close(storeHandle, cb, cbId))
+    return this.promisify(
+      (cb, cbId) => this.nativeAskar.askar_store_close(storeHandle, cb, cbId),
+      FFI_CALLBACK_NO_RESULT
+    )
   }
 
+  // TODO: change when updating to 0.6.0
   public storeCopyTo(options: StoreCopyToOptions): Promise<void> {
     const { storeHandle, targetUri, passKey, keyMethod, recreate } = serializeArguments(options)
 
-    return this.promisify((cb, cbId) =>
-      this.nativeAskar.askar_store_copy(storeHandle, targetUri, keyMethod, passKey, recreate, cb, cbId)
+    return this.promisify(
+      (cb, cbId) => this.nativeAskar.askar_store_copy(storeHandle, targetUri, keyMethod, passKey, recreate, cb, cbId),
+      FFI_CALLBACK_USIZE
     )
   }
 
   public async storeCreateProfile(options: StoreCreateProfileOptions): Promise<string> {
     const { storeHandle, profile } = serializeArguments(options)
-    const response = await this.promisifyWithResponse<string>(
+    const response = await this.promisify<string>(
       (cb, cbId) => this.nativeAskar.askar_store_create_profile(storeHandle, profile, cb, cbId),
-      FFI_STRING
+      FFI_CALLBACK_STRING
     )
 
     return handleInvalidNullResponse(response)
@@ -1056,8 +1070,10 @@ export class NodeJSAskar implements Askar {
 
   public async storeGetDefaultProfile(options: StoreGetDefaultProfileOptions): Promise<string> {
     const { storeHandle } = serializeArguments(options)
-    const response = await this.promisifyWithResponse<string>((cb, cbId) =>
-      this.nativeAskar.askar_store_get_default_profile(storeHandle, cb, cbId)
+
+    const response = await this.promisify<string>(
+      (cb, cbId) => this.nativeAskar.askar_store_get_default_profile(storeHandle, cb, cbId),
+      FFI_CALLBACK_STRING
     )
 
     return handleInvalidNullResponse(response)
@@ -1065,8 +1081,10 @@ export class NodeJSAskar implements Askar {
 
   public async storeGetProfileName(options: StoreGetProfileNameOptions): Promise<string> {
     const { storeHandle } = serializeArguments(options)
-    const response = await this.promisifyWithResponse<string>((cb, cbId) =>
-      this.nativeAskar.askar_store_get_profile_name(storeHandle, cb, cbId)
+
+    const response = await this.promisify<string>(
+      (cb, cbId) => this.nativeAskar.askar_store_get_profile_name(storeHandle, cb, cbId),
+      FFI_CALLBACK_STRING
     )
 
     return handleInvalidNullResponse(response)
@@ -1076,12 +1094,15 @@ export class NodeJSAskar implements Askar {
     const { storeHandle } = serializeArguments(options)
     const listHandle = await this.promisifyWithResponse<Buffer>(
       (cb, cbId) => this.nativeAskar.askar_store_list_profiles(storeHandle, cb, cbId),
-      FFI_STRING_LIST_HANDLE
+      FFI_CALLBACK_STRING_LIST
     )
+
     if (listHandle === null) {
       throw AskarError.customError({ message: 'Invalid handle' })
     }
+
     const counti32 = allocateInt32Buffer()
+
     const errorCode = this.nativeAskar.askar_string_list_count(listHandle, counti32)
     this.handleError(errorCode)
     const count = counti32.deref() as number
@@ -1099,9 +1120,9 @@ export class NodeJSAskar implements Askar {
   public async storeOpen(options: StoreOpenOptions): Promise<StoreHandle> {
     const { profile, keyMethod, passKey, specUri } = serializeArguments(options)
 
-    const handle = await this.promisifyWithResponse<number>(
+    const handle = await this.promisify<number>(
       (cb, cbId) => this.nativeAskar.askar_store_open(specUri, keyMethod, passKey, profile, cb, cbId),
-      FFI_STORE_HANDLE
+      FFI_CALLBACK_USIZE
     )
 
     return StoreHandle.fromHandle(handle)
@@ -1110,9 +1131,9 @@ export class NodeJSAskar implements Askar {
   public async storeProvision(options: StoreProvisionOptions): Promise<StoreHandle> {
     const { profile, passKey, keyMethod, specUri, recreate } = serializeArguments(options)
 
-    const handle = await this.promisifyWithResponse<number, number>(
+    const handle = await this.promisify<number>(
       (cb, cbId) => this.nativeAskar.askar_store_provision(specUri, keyMethod, passKey, profile, recreate, cb, cbId),
-      FFI_STORE_HANDLE
+      FFI_CALLBACK_USIZE
     )
 
     return StoreHandle.fromHandle(handle)
@@ -1121,14 +1142,18 @@ export class NodeJSAskar implements Askar {
   public async storeRekey(options: StoreRekeyOptions): Promise<void> {
     const { passKey, keyMethod, storeHandle } = serializeArguments(options)
 
-    return this.promisify((cb, cbId) => this.nativeAskar.askar_store_rekey(storeHandle, keyMethod, passKey, cb, cbId))
+    return this.promisify(
+      (cb, cbId) => this.nativeAskar.askar_store_rekey(storeHandle, keyMethod, passKey, cb, cbId),
+      FFI_CALLBACK_NO_RESULT
+    )
   }
 
   public async storeRemove(options: StoreRemoveOptions): Promise<number> {
     const { specUri } = serializeArguments(options)
-    const response = await this.promisifyWithResponse<number>(
+
+    const response = await this.promisify<number>(
       (cb, cbId) => this.nativeAskar.askar_store_remove(specUri, cb, cbId),
-      FFI_INT8
+      FFI_CALLBACK_INT8
     )
 
     return handleInvalidNullResponse(response)
@@ -1137,9 +1162,9 @@ export class NodeJSAskar implements Askar {
   public async storeRemoveProfile(options: StoreRemoveProfileOptions): Promise<number> {
     const { storeHandle, profile } = serializeArguments(options)
 
-    const response = await this.promisifyWithResponse<number>(
+    const response = await this.promisify<number>(
       (cb, cbId) => this.nativeAskar.askar_store_remove_profile(storeHandle, profile, cb, cbId),
-      FFI_INT8
+      FFI_CALLBACK_INT8
     )
 
     return handleInvalidNullResponse(response)
@@ -1148,37 +1173,37 @@ export class NodeJSAskar implements Askar {
   public async storeSetDefaultProfile(options: StoreSetDefaultProfileOptions): Promise<void> {
     const { storeHandle, profile } = serializeArguments(options)
 
-    return this.promisify((cb, cbId) =>
-      this.nativeAskar.askar_store_set_default_profile(storeHandle, profile, cb, cbId)
+    return this.promisify(
+      (cb, cbId) => this.nativeAskar.askar_store_set_default_profile(storeHandle, profile, cb, cbId),
+      FFI_CALLBACK_NO_RESULT
     )
   }
 
   public async storeRenameProfile(options: StoreRenameProfileOptions): Promise<number> {
     const { storeHandle, fromProfile, toProfile } = serializeArguments(options)
 
-    const response = await this.promisifyWithResponse<number>(
+    const response = await this.promisify<number>(
       (cb, cbId) => this.nativeAskar.askar_store_rename_profile(storeHandle, fromProfile, toProfile, cb, cbId),
-      FFI_INT8
+      FFI_CALLBACK_INT8
     )
 
     return handleInvalidNullResponse(response)
   }
 
-  public async storeCopyProfile(options: StoreCopyProfileOptions): Promise<number> {
+  public async storeCopyProfile(options: StoreCopyProfileOptions): Promise<void> {
     const { fromHandle, toHandle, fromProfile, toProfile } = serializeArguments(options)
 
-    const response = await this.promisifyWithResponse<number>(
+    await this.promisify(
       (cb, cbId) => this.nativeAskar.askar_store_copy_profile(fromHandle, toHandle, fromProfile, toProfile, cb, cbId),
-      FFI_INT8
+      FFI_CALLBACK_NO_RESULT
     )
-
-    return handleInvalidNullResponse(response)
   }
 
   public async migrateIndySdk(options: MigrateIndySdkOptions): Promise<void> {
     const { specUri, kdfLevel, walletKey, walletName } = serializeArguments(options)
-    await this.promisify((cb, cbId) =>
-      this.nativeAskar.askar_migrate_indy_sdk(specUri, walletName, walletKey, kdfLevel, cb, cbId)
+    await this.promisify(
+      (cb, cbId) => this.nativeAskar.askar_migrate_indy_sdk(specUri, walletName, walletKey, kdfLevel, cb, cbId),
+      FFI_CALLBACK_NO_RESULT
     )
   }
 }

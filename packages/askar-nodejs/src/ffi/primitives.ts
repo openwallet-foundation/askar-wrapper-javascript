@@ -19,18 +19,15 @@ export const FFI_STRING_PTR = refType(FFI_STRING)
 export const FFI_INT32_PTR = refType(FFI_INT32)
 
 // Custom
-
 export const FFI_CALLBACK_ID = FFI_INT64
-export const FFI_CALLBACK_PTR = FFI_POINTER
 export const FFI_ERROR_CODE = FFI_INT64
 
 // Handles
-
-const FFI_ARC_HANDLE = FFI_POINTER
+export const FFI_ARC_HANDLE = koffi.pointer(FFI_VOID)
 export const FFI_ENTRY_LIST_HANDLE = FFI_ARC_HANDLE
 export const FFI_KEY_ENTRY_LIST_HANDLE = FFI_ARC_HANDLE
 export const FFI_LOCAL_KEY_HANDLE = FFI_ARC_HANDLE
+export const FFI_STRING_LIST_HANDLE = FFI_ARC_HANDLE
 export const FFI_SESSION_HANDLE = FFI_USIZE
 export const FFI_SCAN_HANDLE = FFI_USIZE
 export const FFI_STORE_HANDLE = FFI_USIZE
-export const FFI_STRING_LIST_HANDLE = FFI_ARC_HANDLE

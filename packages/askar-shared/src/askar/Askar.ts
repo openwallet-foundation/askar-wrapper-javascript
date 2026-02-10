@@ -462,7 +462,7 @@ export type Askar = {
   storeRekey(options: StoreRekeyOptions): Promise<void>
   storeRemove(options: StoreRemoveOptions): Promise<number>
   storeRenameProfile(options: StoreRenameProfileOptions): Promise<number>
-  storeCopyProfile(options: StoreCopyProfileOptions): Promise<number>
+  storeCopyProfile(options: StoreCopyProfileOptions): Promise<void>
   storeRemoveProfile(options: StoreRemoveProfileOptions): Promise<number>
   storeSetDefaultProfile(options: StoreSetDefaultProfileOptions): Promise<void>
 

@@ -12,7 +12,7 @@ export class EntryList {
 
   public constructor({ handle, length }: { handle: EntryListHandle; length?: number }) {
     this._handle = handle
-    this._length = length || NativeAskar.instance.entryListCount({ entryListHandle: handle })
+    this._length = length ?? NativeAskar.instance.entryListCount({ entryListHandle: handle })
   }
 
   public get handle() {

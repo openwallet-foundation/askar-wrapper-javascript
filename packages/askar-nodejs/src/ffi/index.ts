@@ -1,5 +1,5 @@
 export * from './alloc'
-export * from './callback'
+export * from './callbacks'
 export * from './conversion'
 export * from './structures'
 export * from './primitives'

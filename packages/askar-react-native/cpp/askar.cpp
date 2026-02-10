@@ -127,7 +127,7 @@ jsi::Value entryListGetName(jsi::Runtime &rt, jsi::Object options) {
   return createReturnValue(rt, code, &out);
 }
 
-jsi::Value storeCopyTo(jsi::Runtime &rt, jsi::Object options) {
+jsi::Value storeCopy(jsi::Runtime &rt, jsi::Object options) {
   auto storeHandle = jsiToValue<int64_t>(rt, options, "storeHandle");
   auto targetUri = jsiToValue<std::string>(rt, options, "targetUri");
   auto recreate = jsiToValue<int8_t>(rt, options, "recreate");

@@ -62,8 +62,8 @@ import type {
   SessionUpdateKeyOptions,
   SessionUpdateOptions,
   StoreCloseOptions,
-  StoreCopyProfileOptions,
   StoreCopyToOptions,
+  StoreCopyProfileOptions,
   StoreCreateProfileOptions,
   StoreGenerateRawKeyOptions,
   StoreGetDefaultProfileOptions,
@@ -642,9 +642,10 @@ export class ReactNativeAskar implements Askar {
     return this.promisify((cb) => this.handleError(this.askar.storeClose({ cb, ...serializedOptions })))
   }
 
+  // TODO: change when updating to 0.6.0
   public storeCopyTo(options: StoreCopyToOptions): Promise<void> {
     const serializedOptions = serializeArguments(options)
-    return this.promisify((cb) => this.handleError(this.askar.storeCopyTo({ cb, ...serializedOptions })))
+    return this.promisify((cb) => this.handleError(this.askar.storeCopy({ cb, ...serializedOptions })))
   }
 
   public async storeCreateProfile(options: StoreCreateProfileOptions): Promise<string> {
@@ -753,13 +754,11 @@ export class ReactNativeAskar implements Askar {
     return handleInvalidNullResponse(response)
   }
 
-  public async storeCopyProfile(options: StoreCopyProfileOptions): Promise<number> {
+  public async storeCopyProfile(options: StoreCopyProfileOptions): Promise<void> {
     const serializedOptions = serializeArguments(options)
-    const response = await this.promisifyWithResponse<number>((cb) =>
+    await this.promisifyWithResponse<void>((cb) =>
       this.handleError(this.askar.storeCopyProfile({ cb, ...serializedOptions }))
     )
-
-    return handleInvalidNullResponse(response)
   }
 
   public async storeSetDefaultProfile(options: StoreSetDefaultProfileOptions): Promise<void> {
