@@ -18,7 +18,7 @@ FunctionMap AskarTurboModuleHostObject::functionMapping(jsi::Runtime &rt) {
   fMap.insert(
       std::make_tuple("argon2DerivePassword", &askar::argon2DerivePassword));
 
-  fMap.insert(std::make_tuple("storeCopyTo", &askar::storeCopyTo));
+  fMap.insert(std::make_tuple("storeCopy", &askar::storeCopy));
   fMap.insert(std::make_tuple("storeOpen", &askar::storeOpen));
   fMap.insert(
       std::make_tuple("storeGenerateRawKey", &askar::storeGenerateRawKey));

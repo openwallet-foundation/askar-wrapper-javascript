@@ -90,7 +90,7 @@ jsi::Value sessionStart(jsi::Runtime &rt, jsi::Object options);
 jsi::Value sessionUpdate(jsi::Runtime &rt, jsi::Object options);
 jsi::Value sessionUpdateKey(jsi::Runtime &rt, jsi::Object options);
 
-jsi::Value storeCopyTo(jsi::Runtime &rt, jsi::Object options);
+jsi::Value storeCopy(jsi::Runtime &rt, jsi::Object options);
 jsi::Value storeOpen(jsi::Runtime &rt, jsi::Object options);
 jsi::Value storeClose(jsi::Runtime &rt, jsi::Object options);
 jsi::Value storeCreateProfile(jsi::Runtime &rt, jsi::Object options);

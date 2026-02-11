@@ -1,41 +1,43 @@
-import { default as ref, refType } from '@2060.io/ref-napi'
-import refArray from 'ref-array-di'
-import refStruct from 'ref-struct-di'
-import { FFI_INT32, FFI_INT64, FFI_UINT8 } from './primitives'
+import * as koffi from 'koffi'
+import { FFI_INT32, FFI_INT64, FFI_UINT8, FFI_USIZE } from './primitives'
 
-const CStruct = refStruct(ref)
-const CArray = refArray(ref)
-
-export const ByteBufferArray = CArray(FFI_UINT8)
-export const ByteBufferArrayPtr = refType(ByteBufferArray)
-
-export const ByteBufferStruct = CStruct({
+export const ByteBufferStruct = koffi.struct('ByteBuffer', {
   len: FFI_INT64,
-  data: ByteBufferArrayPtr,
+  data: koffi.pointer(FFI_UINT8),
 })
 
-const ByteBufferStructPtr = ref.refType(ByteBufferStruct)
+export type ByteBufferType = {
+  len: number
+  data: Uint8Array
+}
 
-export const SecretBufferStruct = ByteBufferStruct
+export const SecretBufferStruct = koffi.struct('SecretBuffer', {
+  len: FFI_INT64,
+  data: koffi.pointer(FFI_UINT8),
+})
+export type SecretBufferType = {
+  len: number
+  data: Uint8Array
+}
 
-export const SecretBufferStructPtr = ByteBufferStructPtr
-
-export const EncryptedBufferStruct = CStruct({
-  secretBuffer: SecretBufferStruct,
+export const EncryptedBufferStruct = koffi.struct('EncryptedBuffer', {
+  secretBuffer: ByteBufferStruct,
   tagPos: FFI_INT64,
   noncePos: FFI_INT64,
 })
 
-export const EncryptedBufferStructPtr = ref.refType(EncryptedBufferStruct)
+export type EncryptedBufferType = {
+  secretBuffer: SecretBufferType
+  tagPos: number
+  noncePos: number
+}
 
-export const AeadParamsStruct = CStruct({
+export const AeadParamsStruct = koffi.struct('AeadParams', {
   nonceLength: FFI_INT32,
   tagLength: FFI_INT32,
 })
 
-export const AeadParamsStructPtr = ref.refType(AeadParamsStruct)
-
-export const Argon2ConfigStruct = CStruct({
+export const Argon2ConfigStruct = koffi.struct('Argon2Config', {
   algorithm: FFI_INT32,
   version: FFI_INT32,
   parallelism: FFI_INT32,
@@ -43,15 +45,20 @@ export const Argon2ConfigStruct = CStruct({
   time_cost: FFI_INT32,
 })
 
-export const Argon2ConfigStructPtr = ref.refType(Argon2ConfigStruct)
-
-export type EncryptedBufferType = { secretBuffer: SecretBufferType; tagPos: number; noncePos: number }
-export type ByteBufferType = { data: Buffer; len: number }
-export type SecretBufferType = ByteBufferType
 export type Argon2ConfigType = {
   algorithm: number
   version: number
   parallelism: number
   mem_cost: number
   time_cost: number
+}
+
+export const FfiHandleListStruct = koffi.struct('FfiHandleList', {
+  len: FFI_INT32,
+  data: koffi.pointer(FFI_USIZE),
+})
+
+export type FfiHandleListType = {
+  len: number
+  data: number[]
 }

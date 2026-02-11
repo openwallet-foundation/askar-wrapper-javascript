@@ -7,9 +7,9 @@ export class KeyEntryList {
   private _handle: KeyEntryListHandle
   private _len = 0
 
-  public constructor({ handle }: { handle: KeyEntryListHandle }) {
+  public constructor({ handle, length }: { handle: KeyEntryListHandle; length?: number }) {
     this._handle = handle
-    this._len = NativeAskar.instance.keyEntryListCount({ keyEntryListHandle: handle })
+    this._len = length ?? NativeAskar.instance.keyEntryListCount({ keyEntryListHandle: handle })
   }
 
   public get handle() {

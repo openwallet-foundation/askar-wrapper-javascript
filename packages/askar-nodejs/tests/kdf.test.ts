@@ -1,11 +1,7 @@
-import assert, { ok } from 'node:assert'
-import test, { before, describe } from 'node:test'
 import { Argon2, Argon2Algorithm, Argon2Parameters, Argon2Version } from '@openwallet-foundation/askar-shared'
-import { setup } from './utils'
+import { describe, expect, test } from 'vitest'
 
 describe('Argon2', () => {
-  before(setup)
-
   test('derive password', () => {
     const password = 'my password'
     const salt = 'long enough salt'
@@ -15,9 +11,8 @@ describe('Argon2', () => {
 
     const derivedPassword = Argon2.derivePassword(Argon2Parameters.Interactive, passwordBytes, saltBytes)
 
-    ok(
-      Buffer.from(derivedPassword).toString('hex') ===
-        '9ef87bcf828c46c0136a0d1d9e391d713f75b327c6dc190455bd36c1bae33259'
+    expect(Buffer.from(derivedPassword).toString('hex')).toBe(
+      '9ef87bcf828c46c0136a0d1d9e391d713f75b327c6dc190455bd36c1bae33259'
     )
   })
 
@@ -40,8 +35,7 @@ describe('Argon2', () => {
       saltBytes
     )
 
-    assert.equal(
-      Buffer.from(derivedPassword).toString('hex'),
+    expect(Buffer.from(derivedPassword).toString('hex')).toBe(
       '1128133bb2b55a35c801f1dfc99a525cb8ff27a519bcd035f1a07f9a1cf6eae9'
     )
   })

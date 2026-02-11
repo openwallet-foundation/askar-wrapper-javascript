@@ -156,7 +156,7 @@ export interface NativeBindings {
 
   storeClose(options: unknown): ReturnObject<never>
 
-  storeCopyTo(options: unknown): ReturnObject<never>
+  storeCopy(options: unknown): ReturnObject<never>
 
   storeCreateProfile(options: unknown): ReturnObject<never>
 

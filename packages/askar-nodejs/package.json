@@ -24,16 +24,11 @@
     "install": "node scripts/install.js"
   },
   "dependencies": {
-    "@2060.io/ffi-napi": "^4.0.9",
-    "@2060.io/ref-napi": "^3.0.6",
     "@openwallet-foundation/askar-shared": "workspace:*",
-    "ref-array-di": "^1.2.2",
-    "ref-struct-di": "^1.1.1"
+    "koffi": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "@types/ref-array-di": "^1.2.3",
-    "@types/ref-struct-di": "^1.1.6",
     "typescript": "catalog:"
   },
   "binary": {

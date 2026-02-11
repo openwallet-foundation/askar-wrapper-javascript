@@ -449,7 +449,7 @@ export type Askar = {
   sessionUpdateKey(options: SessionUpdateKeyOptions): Promise<void>
 
   storeClose(options: StoreCloseOptions): Promise<void>
-  storeCopyTo(options: StoreCopyToOptions): Promise<void>
+  storeCopyTo(options: StoreCopyToOptions): Promise<StoreHandle>
   storeCreateProfile(options: StoreCreateProfileOptions): Promise<string>
   storeGenerateRawKey(options: StoreGenerateRawKeyOptions): string
   storeGetDefaultProfile(options: StoreGetDefaultProfileOptions): Promise<string>
@@ -462,7 +462,7 @@ export type Askar = {
   storeRekey(options: StoreRekeyOptions): Promise<void>
   storeRemove(options: StoreRemoveOptions): Promise<number>
   storeRenameProfile(options: StoreRenameProfileOptions): Promise<number>
-  storeCopyProfile(options: StoreCopyProfileOptions): Promise<number>
+  storeCopyProfile(options: StoreCopyProfileOptions): Promise<void>
   storeRemoveProfile(options: StoreRemoveProfileOptions): Promise<number>
   storeSetDefaultProfile(options: StoreSetDefaultProfileOptions): Promise<void>
 

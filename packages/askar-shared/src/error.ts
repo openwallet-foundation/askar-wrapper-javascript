@@ -18,7 +18,7 @@ export class AskarError extends Error {
 
 export function handleInvalidNullResponse<T extends null | unknown>(response: T): Exclude<T, null> {
   if (response === null) {
-    throw AskarError.customError({ message: 'Invalid response. Expected value but received null pointer' })
+    throw AskarError.customError({ message: 'Invalid response. Expected value but received null' })
   }
 
   return response as Exclude<T, null>
