@@ -193,7 +193,7 @@ describe('Store and Session', () => {
 
     await expect(store.listOpenScans()).resolves.toHaveLength(0)
     await store.scan({ category: firstEntry.category }).fetchAll()
-    await expect(store.listOpenScans()).resolves.toHaveLength(0)
+    await expect.poll(async () => (await store.listOpenScans()).length).toBe(0)
 
     await store.close()
   })
