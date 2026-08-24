@@ -1,17 +1,9 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 import java.nio.file.Paths
 
-buildscript {
-  repositories {
-    google()
-    mavenCentral()
-  }
-
-  dependencies {
-    classpath 'com.android.tools.build:gradle:4.2.2'
-    classpath 'de.undercouch:gradle-download-task:4.1.2'
-  }
-}
+// NOTE: no `buildscript` block here on purpose. The Android Gradle Plugin is taken from
+// the consuming app's root project (as with every other React Native library), so we do
+// not pin a version that conflicts with it. React Native 0.87 ships Gradle 9 / AGP 9.
 
 static def findNodeModules(baseDir) {
   def basePath = baseDir.toPath().normalize()
@@ -51,7 +43,6 @@ file("$nodeModules/react-native/ReactAndroid/gradle.properties").withInputStream
 def REACT_NATIVE_VERSION = reactProperties.getProperty("VERSION_NAME").split("\\.")[1].toInteger()
 
 apply plugin: 'com.android.library'
-apply plugin: 'de.undercouch.download'
 
 def getExt(name) {
   return rootProject.ext.get(name)
@@ -124,11 +115,6 @@ android {
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_1_8
     targetCompatibility JavaVersion.VERSION_1_8
-  }
-
-  configurations {
-    extractHeaders
-    extractJNI
   }
 
   sourceSets {
@@ -211,51 +197,4 @@ repositories {
 
 dependencies {
   implementation "com.facebook.react:react-android:"
-}
-
-def downloadsDir = new File("$buildDir/downloads")
-
-task createNativeDepsDirectories {
-  doLast {
-    downloadsDir.mkdirs()
-  }
-}
-
-
-task extractAARHeaders {
-  doLast {
-    configurations.extractHeaders.files.each {
-      def file = it.absoluteFile
-      copy {
-        from zipTree(file)
-        into "$buildDir/$file.name"
-        include "**/*.h"
-      }
-    }
-  }
-}
-
-extractAARHeaders.mustRunAfter createNativeDepsDirectories
-
-task extractJNIFiles {
-  doLast {
-    configurations.extractJNI.files.each {
-      def file = it.absoluteFile
-
-      copy {
-        from zipTree(file)
-        into "$buildDir/$file.name"
-        include "jni/**/*"
-      }
-    }
-  }
-}
-
-extractJNIFiles.mustRunAfter extractAARHeaders
-
-tasks.whenTaskAdded { task ->
-  if (!task.name.contains('Clean') && (task.name.contains('externalNative') || task.name.contains('CMake'))) {
-    task.dependsOn(extractAARHeaders)
-    task.dependsOn(extractJNIFiles)
-  }
 }
