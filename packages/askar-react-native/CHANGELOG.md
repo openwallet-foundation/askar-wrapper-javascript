@@ -1,5 +1,12 @@
 # @openwallet-foundation/askar-react-native
 
+## 0.6.1
+
+### Patch Changes
+
+- 815d768: fix(react-native): install JSI bindings under NewArch (bridgeless)
+  - @openwallet-foundation/askar-shared@0.6.1
+
 ## 0.6.0
 
 ### Minor Changes
