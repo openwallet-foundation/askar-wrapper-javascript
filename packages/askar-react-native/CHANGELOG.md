@@ -1,5 +1,15 @@
 # @openwallet-foundation/askar-react-native
 
+## 0.7.0
+
+### Minor Changes
+
+- ea8840a: Support React Native 0.87 on iOS, and require React Native >= 0.77.
+
+### Patch Changes
+
+- @openwallet-foundation/askar-shared@0.7.0
+
 ## 0.6.1
 
 ### Patch Changes
