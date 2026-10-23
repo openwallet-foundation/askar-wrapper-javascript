@@ -10,6 +10,15 @@
 
 using namespace facebook;
 
+// React Native 0.87 removed the legacy bridge, so `RCTCxxBridge` no longer exists and
+// cannot be named. Re-declare just the `runtime` accessor we need and probe for it at
+// runtime instead: only the legacy bridge responds to it, and on 0.87+
+// `+[RCTBridge currentBridge]` is hardcoded to return nil, so the branch is never taken.
+// (`jsCallInvoker` is already declared on RCTBridge by <ReactCommon/RCTTurboModule.h>.)
+@interface RCTBridge (AskarLegacyBridge)
+- (void *)runtime;
+@end
+
 @interface Askar () <RCTTurboModule, RCTTurboModuleWithJSIBindings>
 @end
 
@@ -46,9 +55,8 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
     // Old Architecture (legacy bridge present): install using the bridge
     // runtime so this keeps working for non-bridgeless apps.
     RCTBridge* bridge = [RCTBridge currentBridge];
-    RCTCxxBridge* cxxBridge = (RCTCxxBridge*)bridge;
-    if (cxxBridge != nil) {
-        jsi::Runtime* jsiRuntime = (jsi::Runtime*) cxxBridge.runtime;
+    if ([bridge respondsToSelector:@selector(runtime)]) {
+        jsi::Runtime* jsiRuntime = (jsi::Runtime*) [bridge runtime];
         if (jsiRuntime != nil) {
             askarTurboModuleUtility::registerTurboModule(*jsiRuntime, bridge.jsCallInvoker);
         }
