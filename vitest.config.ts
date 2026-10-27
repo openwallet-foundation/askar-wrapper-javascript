@@ -4,7 +4,7 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   resolve: {
     // Test the packages from source, like the paths in tsconfig.json
-    alias: [{ find: /^@openwallet-foundation\/(.*)$/, replacement: path.resolve(__dirname, 'packages/$1/src') }],
+    alias: [{ find: /^@openwallet-foundation\/([^/]+)$/, replacement: path.resolve(__dirname, 'packages/$1/src') }],
   },
   test: {
     watch: false,

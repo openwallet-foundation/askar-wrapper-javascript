@@ -10,6 +10,14 @@ describe('keys', () => {
     expect(backends.includes('software')).toBe(true)
   })
 
+  test('handle to JSON', () => {
+    const key = Key.generate(KeyAlgorithm.Ed25519)
+
+    expect(JSON.parse(JSON.stringify({ handle: key.handle }))).toEqual({ handle: key.handle.handle.toString() })
+
+    key.handle.free()
+  })
+
   test('aes cbc hmac', () => {
     const key = Key.generate(KeyAlgorithm.AesA128CbcHs256)
 

@@ -22,7 +22,9 @@ catalog:
 # pnpm only runs the install scripts of packages listed here, and fails the install for packages with scripts that
 # aren't listed
 allowBuilds:
-  koffi: true
+  # koffi's script only checks that the binary from its @koromix/koffi-<platform> package loads, and builds it from
+  # source when it doesn't
+  koffi: false
   esbuild: false
   # Dependencies of React Native Harness that ship prebuilt binaries
   '@parcel/watcher': false

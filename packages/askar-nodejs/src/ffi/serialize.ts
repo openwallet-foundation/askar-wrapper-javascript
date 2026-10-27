@@ -24,6 +24,7 @@ type Argument =
 type SerializedArgument =
   | string
   | number
+  | bigint
   | Callback
   | CallbackWithResponse
   | ByteBufferType
