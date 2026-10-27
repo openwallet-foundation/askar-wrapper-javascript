@@ -18,7 +18,7 @@ export interface NativeBindings {
       mem_cost: number
       time_cost: number
     }
-  }): ReturnObject<Uint8Array>
+  }): ReturnObject<ArrayBuffer>
 
   entryListCount(options: { entryListHandle: string }): ReturnObject<number>
   entryListFree(options: { entryListHandle: string }): ReturnObject<never>
@@ -107,6 +107,7 @@ export interface NativeBindings {
   keyGetJwkThumbprint(options: unknown): ReturnObject<string>
 
   keyGetPublicBytes(options: unknown): ReturnObject<ArrayBuffer>
+  keyGetSupportedBackends(options: Record<string, never>): ReturnObject<string>
 
   keyGetSecretBytes(options: unknown): ReturnObject<ArrayBuffer>
 
@@ -167,6 +168,8 @@ export interface NativeBindings {
   storeGetProfileName(options: unknown): ReturnObject<never>
 
   storeListProfiles(options: unknown): ReturnObject<never>
+  storeListScans(options: unknown): ReturnObject<never>
+  storeListSessions(options: unknown): ReturnObject<never>
 
   storeOpen(options: {
     specUri: string

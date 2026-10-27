@@ -1,7 +1,15 @@
-import { promises } from 'node:fs'
 import { AskarError, KdfMethod, Key, KeyAlgorithm, Store, StoreKeyMethod } from '@openwallet-foundation/askar-shared'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
-import { firstEntry, getRawKey, secondEntry, setupWallet, testStoreUri } from './utils'
+import {
+  createStoreUri,
+  createTemporaryDirectory,
+  firstEntry,
+  getRawKey,
+  poll,
+  removeDirectory,
+  secondEntry,
+  setupWallet,
+} from './utils'
 
 describe('Store and Session', () => {
   let store: Store
@@ -18,7 +26,7 @@ describe('Store and Session', () => {
     const argon2iModStore = await Store.provision({
       recreate: true,
       passKey: 'abc',
-      uri: testStoreUri,
+      uri: await createStoreUri(),
       keyMethod: new StoreKeyMethod(KdfMethod.Argon2IMod),
     })
 
@@ -33,7 +41,7 @@ describe('Store and Session', () => {
     const argon2iIntStore = await Store.provision({
       recreate: true,
       passKey: 'abc',
-      uri: testStoreUri,
+      uri: await createStoreUri(),
       keyMethod: new StoreKeyMethod(KdfMethod.Argon2IInt),
     })
 
@@ -47,12 +55,7 @@ describe('Store and Session', () => {
   test('Rekey', async () => {
     const initialKey = Store.generateRawKey()
 
-    const storagePath = './askar_tmp_db'
-    try {
-      await promises.access(storagePath)
-    } catch {
-      await promises.mkdir(storagePath)
-    }
+    const storagePath = await createTemporaryDirectory()
 
     let newStore = await Store.provision({
       recreate: true,
@@ -85,9 +88,8 @@ describe('Store and Session', () => {
       passKey: newKey,
     })
 
-    await promises.rm(storagePath, { recursive: true, force: true }).catch()
-
     await newStore.close(true)
+    await removeDirectory(storagePath)
   })
 
   test('Insert', async () => {
@@ -193,7 +195,8 @@ describe('Store and Session', () => {
 
     await expect(store.listOpenScans()).resolves.toHaveLength(0)
     await store.scan({ category: firstEntry.category }).fetchAll()
-    await expect.poll(async () => (await store.listOpenScans()).length).toBe(0)
+    // The scan is closed in the background after fetchAll
+    expect(await poll(async () => (await store.listOpenScans()).length, 0)).toBe(0)
 
     await store.close()
   })
@@ -287,11 +290,12 @@ describe('Store and Session', () => {
     await session2.close()
 
     if (!store.uri.includes(':memory:')) {
+      // The profile is still there after re-opening the store
       const key = getRawKey()
-      const store2 = await Store.open({ uri: testStoreUri, keyMethod: new StoreKeyMethod(KdfMethod.Raw), passKey: key })
-      const session3 = await store2.openSession()
+      const store2 = await Store.open({ uri: store.uri, keyMethod: new StoreKeyMethod(KdfMethod.Raw), passKey: key })
+      const session3 = await store2.session(profile).open()
 
-      expect(await session3.count(firstEntry)).toBe(0)
+      expect(await session3.count(firstEntry)).toBe(1)
 
       await session3.close()
       await store2.close()

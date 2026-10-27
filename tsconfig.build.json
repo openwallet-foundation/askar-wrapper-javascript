@@ -10,8 +10,7 @@
     "types": [],
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "forceConsistentCasingInFileNames": true,
-    "baseUrl": "."
+    "forceConsistentCasingInFileNames": true
   },
   "exclude": ["node_modules", "build", "tests"]
 }

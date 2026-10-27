@@ -236,6 +236,24 @@ jsi::Value createReturnValue(jsi::Runtime &rt, ErrorCode code,
 
 template <>
 jsi::Value createReturnValue(jsi::Runtime &rt, ErrorCode code,
+                             FfiHandleList const *value) {
+  auto object = jsi::Object(rt);
+
+  if (code == ErrorCode::Success) {
+    auto handles = jsi::Array(rt, value->len);
+    for (int32_t i = 0; i < value->len; i++) {
+      handles.setValueAtIndex(rt, i, jsi::Value(double(value->data[i])));
+    }
+    object.setProperty(rt, "value", handles);
+  }
+
+  object.setProperty(rt, "errorCode", int(code));
+
+  return object;
+}
+
+template <>
+jsi::Value createReturnValue(jsi::Runtime &rt, ErrorCode code,
                              EncryptedBuffer *value) {
   auto object = jsi::Object(rt);
 
@@ -273,7 +291,7 @@ jsi::Value createReturnValue(jsi::Runtime &rt, ErrorCode code,
       valueObject.setProperty(rt, "nonceLength", int(value->nonce_length));
       valueObject.setProperty(rt, "tagLength", int(value->tag_length));
 
-      object.setProperty(rt, "value", object);
+      object.setProperty(rt, "value", valueObject);
     }
   }
 
@@ -362,6 +380,22 @@ void callbackWithResponse(CallbackId result, ErrorCode code,
     jsi::Runtime *rt = reinterpret_cast<jsi::Runtime *>(state->rt);
 
     auto out = createReturnValue(*rt, code, &response);
+    cb->call(*rt, out);
+  });
+}
+
+template <>
+void callbackWithResponse(CallbackId result, ErrorCode code,
+                          FfiHandleList response) {
+  invoker->invokeAsync([result, code, response]() {
+    State *_state = reinterpret_cast<State *>(result);
+    State *state = static_cast<State *>(_state);
+    jsi::Function *cb = &state->cb;
+    jsi::Runtime *rt = reinterpret_cast<jsi::Runtime *>(state->rt);
+
+    // The handles are copied into a JS array, so the list can be freed here
+    auto out = createReturnValue(*rt, code, &response);
+    askar_handle_list_free(response);
     cb->call(*rt, out);
   });
 }

@@ -16,6 +16,10 @@
     "build": "pnpm -r build",
     "clean": "pnpm -r clean",
     "test": "vitest",
+    "test:android": "pnpm --filter askar-react-native-example test:android",
+    "test:ios": "pnpm --filter askar-react-native-example test:ios",
+    "test:android:device": "pnpm --filter askar-react-native-example test:android:device",
+    "test:ios:device": "pnpm --filter askar-react-native-example test:ios:device",
     "release": "pnpm build && pnpm changeset publish --no-git-tag",
     "changeset-version": "pnpm changeset version && pnpm style:fix"
   },
@@ -29,5 +33,5 @@
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^4.0.12"
   },
-  "packageManager": "pnpm@10.29.2"
+  "packageManager": "pnpm@12.15.0"
 }

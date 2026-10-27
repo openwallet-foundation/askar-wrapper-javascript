@@ -2,7 +2,7 @@
   "extends": "./tsconfig.build.json",
   "compilerOptions": {
     "paths": {
-      "@openwallet-foundation/*": ["packages/*/src"]
+      "@openwallet-foundation/*": ["./packages/*/src"]
     }
   }
 }

@@ -22,7 +22,9 @@ type Argument =
   | Key
   | Jwk
 
-type SerializedArgument = string | number | Callback | CallbackWithResponse | ArrayBuffer
+// ArcHandle is typed as Uint8Array | string for the Node.js bindings, and TypeScript 5.7 and later no longer accept a
+// Uint8Array as an ArrayBuffer
+type SerializedArgument = string | number | Callback | CallbackWithResponse | ArrayBufferLike | Uint8Array
 
 type SerializedArguments = Record<string, SerializedArgument>
 

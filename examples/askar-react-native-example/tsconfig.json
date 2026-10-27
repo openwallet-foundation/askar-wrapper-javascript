@@ -3,8 +3,11 @@
   "compilerOptions": {
     "noEmit": true,
     "skipLibCheck": true,
-    "types": ["react-native"],
-    "jsx": "react-native"
+    "types": ["react-native", "expo/types/metro-require"],
+    "jsx": "react-native",
+    // Metro bundles the app, and React Native only exposes its types through package.json exports
+    "module": "preserve",
+    "moduleResolution": "bundler"
   },
-  "include": ["src"]
+  "include": ["src", "harness", "tests"]
 }

@@ -1,0 +1,24 @@
+diff --git a/dist/getHarnessSerializer.js b/dist/getHarnessSerializer.js
+index 074ef1db698acb330a798bf66f1193101e7b2c1b..d0451dc6ac7fd915657c0eef8970729fa4fe8a0c 100644
+--- a/dist/getHarnessSerializer.js
++++ b/dist/getHarnessSerializer.js
+@@ -7,14 +7,17 @@ const serializerLogger = logger.child('metro-serializer');
+ // directly to `module.exports`. A plain `require()` therefore returns
+ // `{default: fn}`, not `fn` itself -- unwrap `.default` explicitly rather
+ // than calling the require() result as a function.
+-const baseJSBundle = require('metro/private/DeltaBundler/Serializers/baseJSBundle').default;
++const baseJSBundleModule = require('metro/private/DeltaBundler/Serializers/baseJSBundle');
++// Metro before 0.83.3 assigns the function to `module.exports`
++const baseJSBundle = baseJSBundleModule.default ?? baseJSBundleModule;
+ // Metro ships no .d.ts for this module. Its actual (synchronous) return shape
+ // is `{code, metadata}`, which doesn't line up with the `customSerializer`
+ // type's `{code, map}` -- but Metro's Server only reads `.code` off of
+ // whatever a custom serializer returns and computes `.map` itself when it's
+ // absent (see Server.js's `_serializeGraph`), so the mismatch is harmless in
+ // practice. `asSerializerResult` documents/contains that cast.
+-const bundleToString = require('metro/private/lib/bundleToString').default;
++const bundleToStringModule = require('metro/private/lib/bundleToString');
++const bundleToString = bundleToStringModule.default ?? bundleToStringModule;
+ const asSerializerResult = (result) => result;
+ // Same filter Metro's own `processModules` helper (used internally by
+ // baseJSBundle) applies before a module gets wrapped into a `__d()` call.
