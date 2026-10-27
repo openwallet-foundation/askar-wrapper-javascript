@@ -14,8 +14,8 @@ catalog:
   koffi: ^3.3.4
   react: 19.3.0
   react-native: 0.88.0
-  rimraf: ^6.1.3
-  # 0.23.2 generates the type declarations with TypeScript's classic API, which TypeScript 7 doesn't have
+  # 0.23.2 generates the type declarations with TypeScript's classic API, which TypeScript 7 doesn't have. Fixed in
+  # 0.23.3: https://github.com/rolldown/tsdown/issues/1106
   tsdown: 0.23.1
   tsx: ^4.23.15
   typescript: ~7.0.2

@@ -40,7 +40,6 @@
   "scripts": {
     "types:check": "tsc -p ./tsconfig.build.json --noEmit",
     "build": "tsdown",
-    "clean": "rimraf -rf ./build",
     "install": "node scripts/install.js"
   },
   "dependencies": {

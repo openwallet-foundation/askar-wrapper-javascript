@@ -30,7 +30,6 @@
   "scripts": {
     "types:check": "tsc -p ./tsconfig.build.json --noEmit",
     "build": "tsdown --platform node",
-    "clean": "rimraf -rf ./build",
     "install": "node scripts/install.js"
   },
   "dependencies": {
@@ -48,6 +47,6 @@
     "packageName": "library-{platform}-{arch}.tar.gz"
   },
   "engines": {
-    "node": ">= 22"
+    "node": ">= 22.12"
   }
 }

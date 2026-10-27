@@ -30,8 +30,7 @@
   ],
   "scripts": {
     "types:check": "tsc -p ./tsconfig.build.json --noEmit",
-    "build": "tsdown",
-    "clean": "rimraf -rf ./build"
+    "build": "tsdown"
   },
   "dependencies": {
     "buffer": "^6.0.3",
