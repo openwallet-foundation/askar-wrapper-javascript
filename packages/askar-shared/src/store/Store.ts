@@ -173,12 +173,14 @@ export class Store {
     passKey?: string
     recreate: boolean
   }) {
-    await NativeAskar.instance.storeCopyTo({
+    // Askar opens the copy, which this API doesn't return
+    const copy = await NativeAskar.instance.storeCopyTo({
       storeHandle: this.handle,
       targetUri: uri,
       keyMethod: keyMethod?.toUri(),
       passKey,
       recreate,
     })
+    await copy.close()
   }
 }

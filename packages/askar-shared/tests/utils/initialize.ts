@@ -1,6 +1,6 @@
 import { KdfMethod, Store, StoreKeyMethod } from '@openwallet-foundation/askar-shared'
 import { utf8 } from './encoding'
-import { createTemporaryDirectory } from './files'
+import { createTemporaryDirectory, removeDirectory } from './files'
 
 export const getRawKey = () => Store.generateRawKey(utf8('00000000000000000000000000000My1'))
 
@@ -16,6 +16,14 @@ export const createStoreUri = async () => {
 
   storeDirectory ??= createTemporaryDirectory()
   return `sqlite://${await storeDirectory}/${Date.now()}-${Math.random().toString(36).slice(2)}.db`
+}
+
+/**
+ * Removes the directory with the SQLite files of createStoreUri
+ */
+export const removeStoreDirectory = async () => {
+  if (storeDirectory) await removeDirectory(await storeDirectory)
+  storeDirectory = undefined
 }
 
 export const setupWallet = async () => {

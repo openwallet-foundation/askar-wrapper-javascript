@@ -4,6 +4,19 @@ import type { KeyAlgorithm } from '../enums'
 import { Jwk } from './Jwk'
 import { Key } from './Key'
 
+// Calls fn with the key, created from the Jwk if it is one. A key created here is freed once fn returns, the caller's own
+// keys are left alone
+const withKey = <T>(key: Key | Jwk, fn: (key: Key) => T): T => {
+  if (!(key instanceof Jwk)) return fn(key)
+
+  const created = Key.fromJwk({ jwk: key })
+  try {
+    return fn(created)
+  } finally {
+    created.handle.free()
+  }
+}
+
 export class EcdhEs {
   private algId: Uint8Array
   private apu: Uint8Array
@@ -54,12 +67,16 @@ export class EcdhEs {
     aad?: Uint8Array
     nonce?: Uint8Array
   }) {
-    const eKey = ephemeralKey instanceof Jwk ? Key.fromJwk({ jwk: ephemeralKey }) : ephemeralKey
-    const rKey = recipientKey instanceof Jwk ? Key.fromJwk({ jwk: recipientKey }) : recipientKey
-    const derived = this.deriveKey({ encryptionAlgorithm, ephemeralKey: eKey, recipientKey: rKey, receive: false })
-    const encryptedBuffer = derived.aeadEncrypt({ message, aad, nonce })
-    derived.handle.free()
-    return encryptedBuffer
+    return withKey(ephemeralKey, (eKey) =>
+      withKey(recipientKey, (rKey) => {
+        const derived = this.deriveKey({ encryptionAlgorithm, ephemeralKey: eKey, recipientKey: rKey, receive: false })
+        try {
+          return derived.aeadEncrypt({ message, aad, nonce })
+        } finally {
+          derived.handle.free()
+        }
+      })
+    )
   }
 
   public decryptDirect({
@@ -79,12 +96,16 @@ export class EcdhEs {
     tag: Uint8Array
     aad?: Uint8Array
   }) {
-    const eKey = ephemeralKey instanceof Jwk ? Key.fromJwk({ jwk: ephemeralKey }) : ephemeralKey
-    const rKey = recipientKey instanceof Jwk ? Key.fromJwk({ jwk: recipientKey }) : recipientKey
-    const derived = this.deriveKey({ encryptionAlgorithm, ephemeralKey: eKey, recipientKey: rKey, receive: true })
-    const encryptedBuffer = derived.aeadDecrypt({ tag, nonce, ciphertext, aad })
-    derived.handle.free()
-    return encryptedBuffer
+    return withKey(ephemeralKey, (eKey) =>
+      withKey(recipientKey, (rKey) => {
+        const derived = this.deriveKey({ encryptionAlgorithm, ephemeralKey: eKey, recipientKey: rKey, receive: true })
+        try {
+          return derived.aeadDecrypt({ tag, nonce, ciphertext, aad })
+        } finally {
+          derived.handle.free()
+        }
+      })
+    )
   }
 
   public senderWrapKey({
@@ -104,9 +125,11 @@ export class EcdhEs {
       recipientKey,
       receive: false,
     })
-    const encryptedBuffer = derived.wrapKey({ other: cek })
-    derived.handle.free()
-    return encryptedBuffer
+    try {
+      return derived.wrapKey({ other: cek })
+    } finally {
+      derived.handle.free()
+    }
   }
 
   public receiverUnwrapKey({
@@ -132,8 +155,10 @@ export class EcdhEs {
       recipientKey,
       receive: true,
     })
-    const encryptedBuffer = derived.unwrapKey({ tag, nonce, ciphertext, algorithm: encryptionAlgorithm })
-    derived.handle.free()
-    return encryptedBuffer
+    try {
+      return derived.unwrapKey({ tag, nonce, ciphertext, algorithm: encryptionAlgorithm })
+    } finally {
+      derived.handle.free()
+    }
   }
 }

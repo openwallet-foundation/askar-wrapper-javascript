@@ -11,7 +11,7 @@ catalog:
   '@biomejs/biome': 1.9.4
   '@changesets/cli': ^2.27.12
   '@types/node': ^20.12.11
-  koffi: ^2.15.1
+  koffi: ^2.16.3
   react: 19.3.0
   react-native: 0.88.0
   rimraf: ^5.0.5
@@ -34,6 +34,10 @@ allowBuilds:
 #   timeout to 120 seconds. Remove once a release includes https://github.com/callstackincubator/react-native-harness/pull/226
 # - bundler-metro: the serializer reads the `default` export of Metro modules that only have one since Metro 0.83.3, so
 #   bundling fails with the Metro of Expo SDK 53 (0.82). Falls back to the module itself. Not fixed upstream yet
+# - runtime: afterEach hooks run from the outer suite inwards, unlike Jest and Vitest. The shared tests check in an outer
+#   afterEach (packages/askar-shared/tests/setup.ts) that the inner ones closed everything. Runs them inside out. Not fixed
+#   upstream yet
 patchedDependencies:
   '@react-native-harness/bridge@1.6.0': patches/@react-native-harness__bridge@1.6.0.patch
   '@react-native-harness/bundler-metro@1.6.0': patches/@react-native-harness__bundler-metro@1.6.0.patch
+  '@react-native-harness/runtime@1.6.0': patches/@react-native-harness__runtime@1.6.0.patch

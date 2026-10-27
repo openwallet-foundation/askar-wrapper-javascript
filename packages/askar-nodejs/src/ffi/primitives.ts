@@ -9,6 +9,16 @@ export const FFI_INT64 = koffi.types.int64_t
 export const FFI_STRING = koffi.types.string
 export const FFI_VOID = koffi.types.void
 
+// Askar allocates the strings it returns: return values, out parameters and callback results. koffi converts these to a
+// JS string and then calls askar_string_free on the original pointer. Strings that JS passes to Askar use FFI_STRING
+let freeAskarString: ((pointer: unknown) => void) | undefined
+export const setFreeAskarString = (free: (pointer: unknown) => void) => {
+  freeAskarString = free
+}
+export const FFI_ASKAR_STRING = koffi.disposable('askar_string', FFI_STRING, (pointer: unknown) => {
+  if (pointer) freeAskarString?.(pointer)
+})
+
 export const FFI_CALLBACK_ID = FFI_INT64
 export const FFI_ERROR_CODE = FFI_INT64
 

@@ -67,9 +67,11 @@ export class Ecdh1PU {
       senderKey,
       receive: false,
     })
-    const encryptedBuffer = derived.aeadEncrypt({ message, aad, nonce })
-    derived.handle.free()
-    return encryptedBuffer
+    try {
+      return derived.aeadEncrypt({ message, aad, nonce })
+    } finally {
+      derived.handle.free()
+    }
   }
 
   public decryptDirect({
@@ -98,9 +100,11 @@ export class Ecdh1PU {
       senderKey,
       receive: true,
     })
-    const encryptedBuffer = derived.aeadDecrypt({ tag, nonce, ciphertext, aad })
-    derived.handle.free()
-    return encryptedBuffer
+    try {
+      return derived.aeadDecrypt({ tag, nonce, ciphertext, aad })
+    } finally {
+      derived.handle.free()
+    }
   }
 
   public senderWrapKey({
@@ -126,9 +130,11 @@ export class Ecdh1PU {
       receive: false,
       ccTag,
     })
-    const encryptedBuffer = derived.wrapKey({ other: cek })
-    derived.handle.free()
-    return encryptedBuffer
+    try {
+      return derived.wrapKey({ other: cek })
+    } finally {
+      derived.handle.free()
+    }
   }
 
   public receiverUnwrapKey({
@@ -160,8 +166,10 @@ export class Ecdh1PU {
       senderKey,
       ccTag,
     })
-    const encryptedBuffer = derived.unwrapKey({ tag, nonce, ciphertext, algorithm: encryptionAlgorithm })
-    derived.handle.free()
-    return encryptedBuffer
+    try {
+      return derived.unwrapKey({ tag, nonce, ciphertext, algorithm: encryptionAlgorithm })
+    } finally {
+      derived.handle.free()
+    }
   }
 }

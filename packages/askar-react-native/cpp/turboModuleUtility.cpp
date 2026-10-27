@@ -1,3 +1,4 @@
+#include <memory>
 #include <vector>
 
 #include "turboModuleUtility.h"
@@ -24,18 +25,26 @@ void assertValueIsObject(jsi::Runtime &rt, const jsi::Value *val) {
   val->asObject(rt);
 }
 
+jsi::Value askarStringToValue(jsi::Runtime &rt, const char *value) {
+  if (value == nullptr)
+    return jsi::Value::null();
+
+  // Askar allocates the strings it returns, and the JS string is a copy
+  auto string = jsi::String::createFromUtf8(rt, value);
+  askar_string_free(const_cast<char *>(value));
+  return string;
+}
+
 template <>
 jsi::Value createReturnValue(jsi::Runtime &rt, ErrorCode code,
-                             const char **value) {
+                             const char *const *value) {
   auto object = jsi::Object(rt);
 
-  if (code == ErrorCode::Success) {
-    auto isNullptr = value == nullptr || *value == nullptr;
-    auto valueWithoutNullptr = isNullptr
-                                   ? jsi::Value::null()
-                                   : jsi::String::createFromAscii(rt, *value);
-    object.setProperty(rt, "value", valueWithoutNullptr);
-  }
+  // Askar only sets the string when it returns Success
+  if (code == ErrorCode::Success)
+    object.setProperty(
+        rt, "value",
+        askarStringToValue(rt, value == nullptr ? nullptr : *value));
 
   object.setProperty(rt, "errorCode", int(code));
 
@@ -44,20 +53,8 @@ jsi::Value createReturnValue(jsi::Runtime &rt, ErrorCode code,
 
 template <>
 jsi::Value createReturnValue(jsi::Runtime &rt, ErrorCode code,
-                             const char *const *value) {
-  auto object = jsi::Object(rt);
-
-  if (code == ErrorCode::Success) {
-    auto isNullptr = value == nullptr || *value == nullptr;
-    auto valueWithoutNullptr = isNullptr
-                                   ? jsi::Value::null()
-                                   : jsi::String::createFromAscii(rt, *value);
-    object.setProperty(rt, "value", valueWithoutNullptr);
-  }
-
-  object.setProperty(rt, "errorCode", int(code));
-
-  return object;
+                             const char **value) {
+  return createReturnValue(rt, code, const_cast<const char *const *>(value));
 }
 
 template <>
@@ -302,8 +299,8 @@ jsi::Value createReturnValue(jsi::Runtime &rt, ErrorCode code,
 
 void callback(CallbackId result, ErrorCode code) {
   invoker->invokeAsync([result, code]() {
-    State *_state = reinterpret_cast<State *>(result);
-    State *state = static_cast<State *>(_state);
+    // Owns the state, so it's deleted once the callback ran, also when it throws
+    std::unique_ptr<State> state(reinterpret_cast<State *>(result));
     jsi::Function *cb = &state->cb;
     jsi::Runtime *rt = reinterpret_cast<jsi::Runtime *>(state->rt);
 
@@ -311,15 +308,14 @@ void callback(CallbackId result, ErrorCode code) {
     object.setProperty(*rt, "errorCode", int(code));
     cb->call(*rt, object);
   });
-  //  delete state;
 }
 
 // Session, Store and Scan Handle
 template <>
 void callbackWithResponse(CallbackId result, ErrorCode code, size_t response) {
   invoker->invokeAsync([result, code, response]() {
-    State *_state = reinterpret_cast<State *>(result);
-    State *state = static_cast<State *>(_state);
+    // Owns the state, so it's deleted once the callback ran, also when it throws
+    std::unique_ptr<State> state(reinterpret_cast<State *>(result));
     jsi::Function *cb = &state->cb;
     jsi::Runtime *rt = reinterpret_cast<jsi::Runtime *>(state->rt);
 
@@ -332,8 +328,8 @@ template <>
 void callbackWithResponse(CallbackId result, ErrorCode code,
                           const char *response) {
   invoker->invokeAsync([result, code, response]() {
-    State *_state = reinterpret_cast<State *>(result);
-    State *state = static_cast<State *>(_state);
+    // Owns the state, so it's deleted once the callback ran, also when it throws
+    std::unique_ptr<State> state(reinterpret_cast<State *>(result));
     jsi::Function *cb = &state->cb;
     jsi::Runtime *rt = reinterpret_cast<jsi::Runtime *>(state->rt);
 
@@ -346,8 +342,8 @@ template <>
 void callbackWithResponse(CallbackId result, ErrorCode code,
                           EntryListHandle response) {
   invoker->invokeAsync([result, code, response]() {
-    State *_state = reinterpret_cast<State *>(result);
-    State *state = static_cast<State *>(_state);
+    // Owns the state, so it's deleted once the callback ran, also when it throws
+    std::unique_ptr<State> state(reinterpret_cast<State *>(result));
     jsi::Function *cb = &state->cb;
     jsi::Runtime *rt = reinterpret_cast<jsi::Runtime *>(state->rt);
 
@@ -360,8 +356,8 @@ template <>
 void callbackWithResponse(CallbackId result, ErrorCode code,
                           KeyEntryListHandle response) {
   invoker->invokeAsync([result, code, response]() {
-    State *_state = reinterpret_cast<State *>(result);
-    State *state = static_cast<State *>(_state);
+    // Owns the state, so it's deleted once the callback ran, also when it throws
+    std::unique_ptr<State> state(reinterpret_cast<State *>(result));
     jsi::Function *cb = &state->cb;
     jsi::Runtime *rt = reinterpret_cast<jsi::Runtime *>(state->rt);
 
@@ -374,8 +370,8 @@ template <>
 void callbackWithResponse(CallbackId result, ErrorCode code,
                           StringListHandle response) {
   invoker->invokeAsync([result, code, response]() {
-    State *_state = reinterpret_cast<State *>(result);
-    State *state = static_cast<State *>(_state);
+    // Owns the state, so it's deleted once the callback ran, also when it throws
+    std::unique_ptr<State> state(reinterpret_cast<State *>(result));
     jsi::Function *cb = &state->cb;
     jsi::Runtime *rt = reinterpret_cast<jsi::Runtime *>(state->rt);
 
@@ -388,8 +384,8 @@ template <>
 void callbackWithResponse(CallbackId result, ErrorCode code,
                           FfiHandleList response) {
   invoker->invokeAsync([result, code, response]() {
-    State *_state = reinterpret_cast<State *>(result);
-    State *state = static_cast<State *>(_state);
+    // Owns the state, so it's deleted once the callback ran, also when it throws
+    std::unique_ptr<State> state(reinterpret_cast<State *>(result));
     jsi::Function *cb = &state->cb;
     jsi::Runtime *rt = reinterpret_cast<jsi::Runtime *>(state->rt);
 
@@ -403,8 +399,8 @@ void callbackWithResponse(CallbackId result, ErrorCode code,
 template <>
 void callbackWithResponse(CallbackId result, ErrorCode code, int8_t response) {
   invoker->invokeAsync([result, code, response]() {
-    State *_state = reinterpret_cast<State *>(result);
-    State *state = static_cast<State *>(_state);
+    // Owns the state, so it's deleted once the callback ran, also when it throws
+    std::unique_ptr<State> state(reinterpret_cast<State *>(result));
     jsi::Function *cb = &state->cb;
     jsi::Runtime *rt = reinterpret_cast<jsi::Runtime *>(state->rt);
 
@@ -416,8 +412,8 @@ void callbackWithResponse(CallbackId result, ErrorCode code, int8_t response) {
 template <>
 void callbackWithResponse(CallbackId result, ErrorCode code, int64_t response) {
   invoker->invokeAsync([result, code, response]() {
-    State *_state = reinterpret_cast<State *>(result);
-    State *state = static_cast<State *>(_state);
+    // Owns the state, so it's deleted once the callback ran, also when it throws
+    std::unique_ptr<State> state(reinterpret_cast<State *>(result));
     jsi::Function *cb = &state->cb;
     jsi::Runtime *rt = reinterpret_cast<jsi::Runtime *>(state->rt);
 

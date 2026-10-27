@@ -26,6 +26,7 @@ The shared tests can't use Node.js APIs:
 - For files, use the helpers in `tests/utils/files.ts`. Metro picks `files.native.ts` instead, which does the same with expo-file-system. Fixtures in `tests/fixtures` are loaded as Metro assets in the app; add new file extensions to `assetExts` in the example's `metro.config.js`.
 - `setupWallet` provisions a SQLite file in a temporary directory. Set `URI` to run the Node.js tests against another store, e.g. Postgres.
 - Harness's `expect` has no `expect.poll`: use `poll` from `tests/utils`.
+- Free everything a test creates: keys with `key.handle.free()`, sessions and stores with `close()`. `tests/setup.ts` checks after every test, on Node.js and in the app, that no key, entry list, session, scan or store is left open.
 
 From the repo root:
 

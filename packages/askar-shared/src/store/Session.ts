@@ -48,12 +48,11 @@ export class Session {
     const handle = await NativeAskar.instance.sessionFetch({ forUpdate, name, category, sessionHandle: this.handle })
     if (!handle) return null
 
-    const entry = new Entry({ list: handle, position: 0 })
-    const entryObject = entry.toJson(isJson)
-
-    handle.free()
-
-    return entryObject
+    try {
+      return new Entry({ list: handle, position: 0 }).toJson(isJson)
+    } finally {
+      handle.free()
+    }
   }
 
   public async fetchAll({
@@ -87,12 +86,11 @@ export class Session {
 
     if (!handle) return []
 
-    const entryList = new EntryList({ handle })
-    const entryObjects = entryList.toArray(isJson)
-
-    entryList.handle.free()
-
-    return entryObjects
+    try {
+      return new EntryList({ handle }).toArray(isJson)
+    } finally {
+      handle.free()
+    }
   }
 
   public async insert({
@@ -201,11 +199,11 @@ export class Session {
     const handle = await NativeAskar.instance.sessionFetchKey({ forUpdate, name, sessionHandle: this.handle })
     if (!handle) return null
 
-    const keyEntryList = new KeyEntryList({ handle })
-    const keyEntryObject = keyEntryList.getEntryByIndex(0).toJson()
-    keyEntryList.handle.free()
-
-    return keyEntryObject
+    try {
+      return new KeyEntryList({ handle }).getEntryByIndex(0).toJson()
+    } finally {
+      handle.free()
+    }
   }
 
   public async fetchAllKeys({
@@ -232,11 +230,11 @@ export class Session {
     })
     if (!handle) return []
 
-    const keyEntryList = new KeyEntryList({ handle })
-    const keyEntryObjects = keyEntryList.toArray()
-    keyEntryList.handle.free()
-
-    return keyEntryObjects
+    try {
+      return new KeyEntryList({ handle }).toArray()
+    } finally {
+      handle.free()
+    }
   }
 
   public async updateKey({

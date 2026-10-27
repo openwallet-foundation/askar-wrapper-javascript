@@ -5,6 +5,6 @@ export default defineConfig({
   plugins: [viteTsConfigPaths()],
   test: {
     watch: false,
-    setupFiles: ['packages/askar-nodejs/tests/setup.ts'],
+    setupFiles: ['packages/askar-nodejs/tests/setup.ts', 'packages/askar-shared/tests/setup.ts'],
   },
 })

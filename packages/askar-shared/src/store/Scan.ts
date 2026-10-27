@@ -1,5 +1,5 @@
 import { NativeAskar } from '../askar'
-import type { EntryListHandle, ScanHandle } from '../crypto'
+import type { ScanHandle } from '../crypto'
 import type { Entry, EntryObject } from './Entry'
 import type { Store } from './Store'
 
@@ -10,7 +10,6 @@ import { EntryList } from './EntryList'
 
 export class Scan {
   private _handle?: ScanHandle
-  private _listHandle?: EntryListHandle
   private store: Store
   private profile?: string
   private category: string
@@ -79,17 +78,22 @@ export class Scan {
         const listHandle = await NativeAskar.instance.scanNext({ scanHandle: this._handle })
         if (!listHandle) break
 
-        this._listHandle = listHandle
-        const list = new EntryList({ handle: this._listHandle })
+        try {
+          const list = new EntryList({ handle: listHandle })
 
-        recordCount = recordCount + list.length
-        for (let index = 0; index < list.length; index++) {
-          const entry = list.getEntryByIndex(index)
-          cb(entry)
+          recordCount = recordCount + list.length
+          for (let index = 0; index < list.length; index++) {
+            const entry = list.getEntryByIndex(index)
+            cb(entry)
+          }
+        } finally {
+          listHandle.free()
         }
       }
     } finally {
-      NativeAskar.instance.scanFree({ scanHandle: this._handle })
+      const scanHandle = this._handle
+      this._handle = undefined
+      NativeAskar.instance.scanFree({ scanHandle })
     }
   }
 
