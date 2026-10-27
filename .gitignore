@@ -1,7 +1,6 @@
 .DS_Store
 *.tgz
 *.so
-askar_tmp_db
 node_modules
 
 build
@@ -17,3 +16,4 @@ packages/askar-react-native/android/.cxx
 examples/askar-react-native-example/android
 examples/askar-react-native-example/ios
 examples/askar-react-native-example/.expo
+examples/askar-react-native-example/.harness

@@ -19,6 +19,7 @@ FunctionMap AskarTurboModuleHostObject::functionMapping(jsi::Runtime &rt) {
       std::make_tuple("argon2DerivePassword", &askar::argon2DerivePassword));
 
   fMap.insert(std::make_tuple("storeCopy", &askar::storeCopy));
+  fMap.insert(std::make_tuple("storeCopyProfile", &askar::storeCopyProfile));
   fMap.insert(std::make_tuple("storeOpen", &askar::storeOpen));
   fMap.insert(
       std::make_tuple("storeGenerateRawKey", &askar::storeGenerateRawKey));
@@ -34,11 +35,16 @@ FunctionMap AskarTurboModuleHostObject::functionMapping(jsi::Runtime &rt) {
   fMap.insert(
       std::make_tuple("storeGetDefaultProfile",
                       &askar::storeGetDefaultProfile));
+  fMap.insert(std::make_tuple("storeListProfiles", &askar::storeListProfiles));
+  fMap.insert(std::make_tuple("storeListScans", &askar::storeListScans));
+  fMap.insert(std::make_tuple("storeListSessions", &askar::storeListSessions));
   fMap.insert(std::make_tuple("storeProvision", &askar::storeProvision));
   fMap.insert(std::make_tuple("storeRekey", &askar::storeRekey));
   fMap.insert(std::make_tuple("storeRemove", &askar::storeRemove));
   fMap.insert(
       std::make_tuple("storeRemoveProfile", &askar::storeRemoveProfile));
+  fMap.insert(
+      std::make_tuple("storeRenameProfile", &askar::storeRenameProfile));
   fMap.insert(
       std::make_tuple("storeSetDefaultProfile",
                       &askar::storeSetDefaultProfile));
@@ -93,6 +99,8 @@ FunctionMap AskarTurboModuleHostObject::functionMapping(jsi::Runtime &rt) {
       std::make_tuple("keyGetJwkThumbprint", &askar::keyGetJwkThumbprint));
   fMap.insert(
       std::make_tuple("keyGetPublicBytes", &askar::keyGetPublicBytes));
+  fMap.insert(std::make_tuple("keyGetSupportedBackends",
+                              &askar::keyGetSupportedBackends));
   fMap.insert(
       std::make_tuple("keyGetSecretBytes", &askar::keyGetSecretBytes));
   fMap.insert(std::make_tuple("keySignMessage", &askar::keySignMessage));
@@ -143,6 +151,10 @@ FunctionMap AskarTurboModuleHostObject::functionMapping(jsi::Runtime &rt) {
                               &askar::keyEntryListLoadLocal));
 
   fMap.insert(std::make_tuple("migrateIndySdk", &askar::migrateIndySdk));
+
+  fMap.insert(std::make_tuple("stringListCount", &askar::stringListCount));
+  fMap.insert(std::make_tuple("stringListFree", &askar::stringListFree));
+  fMap.insert(std::make_tuple("stringListGetItem", &askar::stringListGetItem));
 
   return fMap;
 }

@@ -2,18 +2,38 @@ packages:
   - packages/*
   - examples/*
 
+# The React Native packages are linked from a hoisted node_modules, as React Native's native build tooling expects
+nodeLinker: hoisted
+
+# The React Native package (devDependencies) and the example app use the same react / react-native, so Metro bundles a
+# single copy of each
 catalog:
   '@biomejs/biome': 1.9.4
   '@changesets/cli': ^2.27.12
   '@types/node': ^20.12.11
   koffi: ^2.15.1
+  react: 19.3.0
+  react-native: 0.88.0
   rimraf: ^5.0.5
   tsx: ^4.19.2
   typescript: ~5.4.5
 
-ignoredBuiltDependencies:
-  - esbuild
+# pnpm only runs the install scripts of packages listed here, and fails the install for packages with scripts that
+# aren't listed
+allowBuilds:
+  '@biomejs/biome': true
+  koffi: true
+  esbuild: false
+  # Dependencies of React Native Harness that ship prebuilt binaries
+  '@parcel/watcher': false
+  unrs-resolver: false
 
-onlyBuiltDependencies:
-  - '@biomejs/biome'
-  - koffi
+# Patches for React Native Harness 1.6.0, until a release fixes them:
+# - bridge: Harness fails the run when the app's JS thread doesn't answer its heartbeat within 20 seconds, and the
+#   synchronous askar calls and the test bundle evaluation block it longer than that on CI's iOS simulators. Raises the
+#   timeout to 120 seconds. Remove once a release includes https://github.com/callstackincubator/react-native-harness/pull/226
+# - bundler-metro: the serializer reads the `default` export of Metro modules that only have one since Metro 0.83.3, so
+#   bundling fails with the Metro of Expo SDK 53 (0.82). Falls back to the module itself. Not fixed upstream yet
+patchedDependencies:
+  '@react-native-harness/bridge@1.6.0': patches/@react-native-harness__bridge@1.6.0.patch
+  '@react-native-harness/bundler-metro@1.6.0': patches/@react-native-harness__bundler-metro@1.6.0.patch

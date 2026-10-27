@@ -1,6 +1,13 @@
-import { AskarError, KeyAlgorithm, NativeAskar } from '@openwallet-foundation/askar-shared'
+import {
+  AskarError,
+  type KdfMethod,
+  KeyAlgorithm,
+  NativeAskar,
+  Store,
+  StoreKeyMethod,
+} from '@openwallet-foundation/askar-shared'
 import { describe, expect, test } from 'vitest'
-import { setupWallet } from './utils'
+import { createStoreUri, getRawKey, setupWallet } from './utils'
 
 describe('Error', () => {
   test('set error code to 0 after correct call', () => {
@@ -25,11 +32,15 @@ describe('Error', () => {
   })
 
   test('set error code to non 0 incorrect async call where the error is outside the callback', async () => {
-    const store = await setupWallet()
-    await store.close()
-
-    // @ts-expect-error: testing invalid call
-    await expect(store.removeProfile()).rejects.toMatchObject({ code: 5, message: 'Profile name not provided' })
+    // Askar checks the key method before it starts the async work
+    await expect(
+      Store.provision({
+        uri: await createStoreUri(),
+        keyMethod: new StoreKeyMethod('invalid' as KdfMethod),
+        passKey: getRawKey(),
+        recreate: true,
+      })
+    ).rejects.toMatchObject({ code: 8, message: 'Invalid store key method' })
   })
 
   test('set error code to non 0 incorrect async call where the error is inside the callback', async () => {

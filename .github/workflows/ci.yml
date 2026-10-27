@@ -75,3 +75,76 @@ jobs:
 
       - name: Run tests
         run: pnpm test
+
+  # Runs the tests in packages/askar-shared/tests inside the example app with React Native Harness, on an emulator and a
+  # simulator. The example app is built with each Expo SDK in the matrix, and with it a React Native version: 53 (React
+  # Native 0.79, the oldest SDK with React Native >= 0.77), 55 (0.83) and 58 (0.88, the version in the lockfile).
+  test-react-native:
+    if: github.event_name != 'pull_request_review' ||  github.event.pull_request.head.ref == 'changeset-release/main'
+    runs-on: ${{ matrix.platform == 'ios' && 'macos-26' || 'ubuntu-24.04' }}
+    name: Tests React Native (${{ matrix.platform }}, Expo SDK ${{ matrix.expo-sdk }})
+    timeout-minutes: 60
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [android, ios]
+        expo-sdk: [53, 55, 58]
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+      - name: Setup NodeJS
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: "pnpm"
+
+      - name: Setup Java
+        if: matrix.platform == 'android'
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 17
+
+      # Caches Gradle's dependencies and build cache. Saved from main only, pull requests restore it
+      - name: Setup Gradle
+        if: matrix.platform == 'android'
+        uses: gradle/actions/setup-gradle@v6
+
+      # The pods and the prebuilt React Native and Hermes binaries that pod install downloads
+      - name: Cache CocoaPods downloads
+        if: matrix.platform == 'ios'
+        uses: actions/cache@v6
+        with:
+          path: ~/Library/Caches/CocoaPods
+          key: cocoapods-${{ matrix.expo-sdk }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: cocoapods-${{ matrix.expo-sdk }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # React Native 0.79 ships fmt 11.0.2, which doesn't compile with Xcode 26.6 (the image default). Xcode 26.2 works
+      - name: Use Xcode 26.2
+        if: matrix.platform == 'ios' && matrix.expo-sdk == 53
+        run: sudo xcode-select --switch /Applications/Xcode_26.2.app
+
+      - name: Use Expo SDK ${{ matrix.expo-sdk }}
+        if: matrix.expo-sdk != 58
+        working-directory: examples/askar-react-native-example
+        run: node harness/use-expo-sdk.mjs ${{ matrix.expo-sdk }}
+
+      - name: Build the example app
+        working-directory: examples/askar-react-native-example
+        run: node harness/run.mjs ${{ matrix.platform }} --build-only
+
+      # Harness boots the emulator or simulator from rn-harness.config.mjs and installs the app
+      - name: Run tests
+        uses: callstackincubator/react-native-harness@v1.6.0
+        with:
+          runner: ${{ matrix.platform }}
+          app: ${{ matrix.platform == 'ios' && 'ios/build/Build/Products/Debug-iphonesimulator/askarreactnativeexample.app' || 'android/app/build/outputs/apk/debug/app-debug.apk' }}
+          projectRoot: examples/askar-react-native-example
+          packageManager: pnpm

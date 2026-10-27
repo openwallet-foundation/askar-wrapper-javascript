@@ -252,6 +252,32 @@ jsi::Value storeGetDefaultProfile(jsi::Runtime &rt, jsi::Object options) {
   return createReturnValue(rt, code, nullptr);
 }
 
+jsi::Value storeListScans(jsi::Runtime &rt, jsi::Object options) {
+  auto storeHandle = jsiToValue<int64_t>(rt, options, "storeHandle");
+
+  jsi::Function cb = options.getPropertyAsFunction(rt, "cb");
+  State *state = new State(&cb);
+  state->rt = &rt;
+
+  ErrorCode code = askar_store_list_scans(storeHandle, callbackWithResponse,
+                                          CallbackId(state));
+
+  return createReturnValue(rt, code, nullptr);
+}
+
+jsi::Value storeListSessions(jsi::Runtime &rt, jsi::Object options) {
+  auto storeHandle = jsiToValue<int64_t>(rt, options, "storeHandle");
+
+  jsi::Function cb = options.getPropertyAsFunction(rt, "cb");
+  State *state = new State(&cb);
+  state->rt = &rt;
+
+  ErrorCode code = askar_store_list_sessions(
+      storeHandle, callbackWithResponse, CallbackId(state));
+
+  return createReturnValue(rt, code, nullptr);
+}
+
 jsi::Value storeListProfiles(jsi::Runtime &rt, jsi::Object options) {
   auto storeHandle = jsiToValue<int64_t>(rt, options, "storeHandle");
 
@@ -776,6 +802,14 @@ jsi::Value keyGetJwkThumbprint(jsi::Runtime &rt, jsi::Object options) {
       askar_key_get_jwk_thumbprint(localKeyHandle, algorithm.c_str(), &out);
 
   return createReturnValue(rt, code, &out);
+}
+
+jsi::Value keyGetSupportedBackends(jsi::Runtime &rt, jsi::Object options) {
+  StringListHandle out;
+
+  ErrorCode code = askar_key_get_supported_backends(&out);
+
+  return createReturnValue(rt, code, const_cast<StringListHandle const *>(&out));
 }
 
 jsi::Value keyGetPublicBytes(jsi::Runtime &rt, jsi::Object options) {

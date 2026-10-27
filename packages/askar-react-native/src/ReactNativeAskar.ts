@@ -189,10 +189,12 @@ export class ReactNativeAskar implements Askar {
   }
 
   public argon2DerivePassword(options: Argon2DerivePasswordOptions): Uint8Array {
-    const serializedOptions = serializeArguments(options)
-    return handleInvalidNullResponse(
-      this.handleError(this.askar.argon2DerivePassword({ ...serializedOptions, config: options.config }))
+    const { config, ...rest } = options
+    // The config is passed as an object, and only when set: the C++ reads it when the property exists
+    const buf = handleInvalidNullResponse(
+      this.handleError(this.askar.argon2DerivePassword({ ...serializeArguments(rest), ...(config && { config }) }))
     )
+    return new Uint8Array(buf)
   }
 
   public entryListCount(options: EntryListCountOptions): number {
@@ -431,6 +433,11 @@ export class ReactNativeAskar implements Askar {
     return new Uint8Array(buf)
   }
 
+  public keyGetSupportedBackends(): string[] {
+    const stringListHandle = handleInvalidNullResponse(this.handleError(this.askar.keyGetSupportedBackends({})))
+    return this.stringListToArray(stringListHandle)
+  }
+
   public keyGetSecretBytes(options: KeyGetSecretBytesOptions): Uint8Array {
     const serializedOptions = serializeArguments(options)
     const buf = handleInvalidNullResponse(this.handleError(this.askar.keyGetSecretBytes(serializedOptions)))
@@ -633,7 +640,8 @@ export class ReactNativeAskar implements Askar {
   }
 
   public sessionUpdateKey(options: SessionUpdateKeyOptions): Promise<void> {
-    const serializedOptions = serializeArguments(options)
+    // -1 for no expiry, as the C++ reads a missing expiryMs as 0, which expires the key right away
+    const serializedOptions = serializeArguments({ ...options, expiryMs: options.expiryMs ?? -1 })
     return this.promisify((cb) => this.handleError(this.askar.sessionUpdateKey({ cb, ...serializedOptions })))
   }
 
@@ -692,21 +700,36 @@ export class ReactNativeAskar implements Askar {
         this.handleError(this.askar.storeListProfiles({ cb, ...serializedOptions }))
       )
     )
-    const ret = []
+    return this.stringListToArray(stringListHandle)
+  }
+
+  public async storeListScans(options: StoreListScansOptions): Promise<ScanHandle[]> {
+    const serializedOptions = serializeArguments(options)
+    const handles = await this.promisifyWithResponse<number[]>((cb) =>
+      this.handleError(this.askar.storeListScans({ cb, ...serializedOptions }))
+    )
+
+    return handleInvalidNullResponse(handles).map((handle) => ScanHandle.fromHandle(handle))
+  }
+
+  public async storeListSessions(options: StoreListSessionsOptions): Promise<SessionHandle[]> {
+    const serializedOptions = serializeArguments(options)
+    const handles = await this.promisifyWithResponse<number[]>((cb) =>
+      this.handleError(this.askar.storeListSessions({ cb, ...serializedOptions }))
+    )
+
+    return handleInvalidNullResponse(handles).map((handle) => SessionHandle.fromHandle(handle))
+  }
+
+  // Reads the items of a string list from the native library and frees it
+  private stringListToArray(stringListHandle: string): string[] {
+    const items = []
     const count = this.handleError(this.askar.stringListCount({ stringListHandle }))
     for (let index = 0; index < count; index++) {
-      ret.push(this.handleError(this.askar.stringListGetItem({ stringListHandle, index })))
+      items.push(this.handleError(this.askar.stringListGetItem({ stringListHandle, index })))
     }
     this.handleError(this.askar.stringListFree({ stringListHandle }))
-    return ret
-  }
-
-  public async storeListScans(_options: StoreListScansOptions): Promise<ScanHandle[]> {
-    throw new Error('Method askar_store_list_scans is not implemented in React Native')
-  }
-
-  public async storeListSessions(_options: StoreListSessionsOptions): Promise<SessionHandle[]> {
-    throw new Error('Method askar_store_list_sessions is not implemented in React Native')
+    return items
   }
 
   public async storeOpen(options: StoreOpenOptions): Promise<StoreHandle> {
@@ -761,18 +784,12 @@ export class ReactNativeAskar implements Askar {
 
   public async storeCopyProfile(options: StoreCopyProfileOptions): Promise<void> {
     const serializedOptions = serializeArguments(options)
-    await this.promisifyWithResponse<void>((cb) =>
-      this.handleError(this.askar.storeCopyProfile({ cb, ...serializedOptions }))
-    )
+    return this.promisify((cb) => this.handleError(this.askar.storeCopyProfile({ cb, ...serializedOptions })))
   }
 
   public async storeSetDefaultProfile(options: StoreSetDefaultProfileOptions): Promise<void> {
     const serializedOptions = serializeArguments(options)
-    const response = await this.promisifyWithResponse((cb) =>
-      this.handleError(this.askar.storeSetDefaultProfile({ cb, ...serializedOptions }))
-    )
-
-    handleInvalidNullResponse(response)
+    return this.promisify((cb) => this.handleError(this.askar.storeSetDefaultProfile({ cb, ...serializedOptions })))
   }
 
   public async migrateIndySdk(options: MigrateIndySdkOptions): Promise<void> {

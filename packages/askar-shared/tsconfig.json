@@ -1,3 +1,7 @@
 {
-  "extends": "../../tsconfig.json"
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    // For the tests, which run on Node.js with Vitest
+    "types": ["node"]
+  }
 }

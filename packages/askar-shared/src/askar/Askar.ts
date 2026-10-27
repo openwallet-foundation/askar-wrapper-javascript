@@ -425,6 +425,7 @@ export type Askar = {
   keyGetJwkSecret(options: KeyGetJwkSecretOptions): Uint8Array
   keyGetJwkThumbprint(options: KeyGetJwkThumbprintOptions): string
   keyGetPublicBytes(options: KeyGetPublicBytesOptions): Uint8Array
+  keyGetSupportedBackends(): string[]
   keyGetSecretBytes(options: KeyGetSecretBytesOptions): Uint8Array
   keySignMessage(options: KeySignMessageOptions): Uint8Array
   keyUnwrapKey(options: KeyUnwrapKeyOptions): LocalKeyHandle

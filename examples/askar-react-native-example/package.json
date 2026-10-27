@@ -7,19 +7,30 @@
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "prebuild": "expo prebuild"
+    "prebuild": "expo prebuild",
+    "types:check": "tsc --noEmit",
+    "test:android": "node harness/run.mjs android",
+    "test:ios": "node harness/run.mjs ios",
+    "test:android:device": "node harness/run.mjs android-device",
+    "test:ios:device": "node harness/run.mjs ios-device"
   },
   "dependencies": {
+    "@expo/dom-webview": "~58.0.2",
     "@openwallet-foundation/askar-react-native": "workspace:*",
-    "expo": "~52.0.27",
-    "expo-status-bar": "~2.0.1",
-    "react": "18.3.1",
-    "react-native": "~0.76.6"
+    "@openwallet-foundation/askar-shared": "workspace:*",
+    "expo": "~58.0.19",
+    "expo-asset": "~58.0.18",
+    "expo-file-system": "~58.0.11",
+    "react": "catalog:",
+    "react-native": "catalog:"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0",
-    "@babel/runtime": "^7.22.15",
-    "@types/react": "~18.3.18",
-    "typescript": "catalog:"
+    "@babel/core": "^7.29.7",
+    "@babel/runtime": "^7.29.10",
+    "@react-native-harness/platform-android": "^1.6.0",
+    "@react-native-harness/platform-apple": "^1.6.0",
+    "@types/react": "~19.3.0",
+    "react-native-harness": "^1.6.0",
+    "typescript": "~6.0.3"
   }
 }

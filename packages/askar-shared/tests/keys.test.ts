@@ -1,10 +1,10 @@
-import { Jwk, Key, KeyAlgorithm } from '@openwallet-foundation/askar-shared'
+import { Jwk, Key, KeyAlgorithm, NativeAskar } from '@openwallet-foundation/askar-shared'
 import { describe, expect, test } from 'vitest'
-import { askarNodeJS } from '../src'
+import { utf8 } from './utils'
 
 describe('keys', () => {
   test('supported backends', () => {
-    const backends = askarNodeJS.keyGetSupportedBackends()
+    const backends = NativeAskar.instance.keyGetSupportedBackends()
 
     expect(backends.length).toBe(1)
     expect(backends.includes('software')).toBe(true)
@@ -16,7 +16,7 @@ describe('keys', () => {
     expect(key.algorithm).toBe(KeyAlgorithm.AesA128CbcHs256)
 
     const messageString = 'test message'
-    const message = Uint8Array.from(Buffer.from(messageString))
+    const message = utf8(messageString)
     const aeadNonce = key.aeadRandomNonce
     const params = key.aeadParams
 
@@ -30,7 +30,7 @@ describe('keys', () => {
   })
 
   test('Bls G2 Keygen', () => {
-    const seed = Uint8Array.from(Buffer.from('testseed000000000000000000000001'))
+    const seed = utf8('testseed000000000000000000000001')
     const key = Key.fromSeed({ algorithm: KeyAlgorithm.Bls12381G2, seed })
 
     expect(key.jwkPublic).toEqual(
@@ -44,7 +44,7 @@ describe('keys', () => {
   })
 
   test('Bls G1 Keygen', () => {
-    const seed = Uint8Array.from(Buffer.from('testseed000000000000000000000001'))
+    const seed = utf8('testseed000000000000000000000001')
     const key = Key.fromSeed({ algorithm: KeyAlgorithm.Bls12381G1, seed })
 
     expect(key.jwkPublic).toEqual(
@@ -62,16 +62,16 @@ describe('keys', () => {
 
     expect(key.algorithm).toBe(KeyAlgorithm.Ed25519)
 
-    const message = Uint8Array.from(Buffer.from('test message'))
-    const messageBuffer = Buffer.from('test message')
+    const message = utf8('test message')
+    const messageBuffer = utf8('test message')
     const signature = key.signMessage({ message })
 
     expect(key.verifySignature({ message, signature })).toBe(true)
     expect(key.verifySignature({ message: messageBuffer, signature })).toBe(true)
-    expect(key.verifySignature({ message: Buffer.from('other message'), signature })).toBe(false)
+    expect(key.verifySignature({ message: utf8('other message'), signature })).toBe(false)
     expect(
       key.verifySignature({
-        message: Uint8Array.from(Buffer.from('other message')),
+        message: utf8('other message'),
         signature,
       })
     ).toBe(false)
@@ -84,7 +84,7 @@ describe('keys', () => {
     expect(
       key.verifySignature({
         message,
-        signature: Buffer.from('random signature'),
+        signature: utf8('random signature'),
       })
     ).toBe(false)
 
@@ -110,7 +110,7 @@ describe('keys', () => {
 
     expect(key.algorithm).toBe(KeyAlgorithm.EcSecp384r1)
 
-    const message = Uint8Array.from(Buffer.from('test message'))
+    const message = utf8('test message')
     const signature = key.signMessage({ message })
 
     expect(key.verifySignature({ message, signature })).toBe(true)
