@@ -34,7 +34,8 @@ describe('Store and Session', () => {
 
     expect(await session.fetch({ name: 'unknownKey', category: 'unknownCategory' })).toBe(null)
 
-    await argon2iModStore.close()
+    await session.close()
+    await argon2iModStore.close(true)
   })
 
   test('argon2i int', async () => {
@@ -49,7 +50,8 @@ describe('Store and Session', () => {
 
     expect(await session.fetch({ name: 'unknownKey', category: 'unknownCategory' })).toBe(null)
 
-    await argon2iIntStore.close()
+    await session.close()
+    await argon2iIntStore.close(true)
   })
 
   test('Rekey', async () => {
@@ -365,6 +367,38 @@ describe('Store and Session', () => {
     expect(await session9.count(firstEntry)).toBe(1)
 
     await session9.close()
+    await destinationStore.close()
+  })
+
+  test('Non-ASCII strings', async () => {
+    const entry = {
+      category: 'catégorie',
+      name: 'naïve 名前',
+      value: 'välue 🔑',
+      tags: { '~plaintag': 'ä', enctag: '名' },
+    }
+
+    const session = await store.openSession()
+    await session.insert(entry)
+    expect(await session.fetch(entry)).toEqual(entry)
+    expect(await session.fetchAll({ category: entry.category, tagFilter: { '~plaintag': 'ä' } })).toEqual([entry])
+    await session.close()
+
+    const profile = await store.createProfile('profiel ü')
+    expect(await store.listProfiles()).toContain(profile)
+  })
+
+  test('Fetch frees the entries when reading them fails', async () => {
+    const session = await store.openSession()
+    await session.insert(firstEntry)
+
+    // The value of firstEntry isn't JSON
+    await expect(
+      session.fetch({ category: firstEntry.category, name: firstEntry.name, isJson: true })
+    ).rejects.toThrow()
+    await expect(session.fetchAll({ category: firstEntry.category, isJson: true })).rejects.toThrow()
+
+    await session.close()
   })
 
   test('Copy', async () => {

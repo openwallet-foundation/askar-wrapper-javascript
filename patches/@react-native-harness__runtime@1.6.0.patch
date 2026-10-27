@@ -1,0 +1,14 @@
+diff --git a/dist/runner/hooks.js b/dist/runner/hooks.js
+index 44f98c90be711c0bfe468081603457a14b0b3529..295f058234b7d9176c4093f1f09ced810f1b566c 100644
+--- a/dist/runner/hooks.js
++++ b/dist/runner/hooks.js
+@@ -49,6 +49,9 @@ export const runHooks = async (suite, hookType, context, options = {}) => {
+         return;
+     }
+     const hooks = collectInheritedHooks(suite, hookType);
++    // Like Jest and Vitest: beforeEach hooks run from the outer suite inwards, afterEach hooks from the inner suite outwards
++    if (hookType === 'afterEach')
++        hooks.reverse();
+     for (const hook of hooks) {
+         const runHook = async () => {
+             const result = hook(context);

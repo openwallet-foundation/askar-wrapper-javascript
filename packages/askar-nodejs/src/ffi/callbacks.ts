@@ -1,6 +1,7 @@
 import * as koffi from 'koffi'
 import {
   FFI_ARC_HANDLE,
+  FFI_ASKAR_STRING,
   FFI_CALLBACK_ID,
   FFI_ERROR_CODE,
   FFI_INT8,
@@ -21,7 +22,11 @@ export const FFI_CALLBACK_HANDLE_LIST = koffi.proto('cb_handle_list', FFI_VOID, 
 
 export const FFI_CALLBACK_INT64 = koffi.proto('cb_int64', FFI_VOID, [FFI_CALLBACK_ID, FFI_ERROR_CODE, FFI_INT64])
 export const FFI_CALLBACK_INT8 = koffi.proto('cb_int8', FFI_VOID, [FFI_CALLBACK_ID, FFI_ERROR_CODE, FFI_INT8])
-export const FFI_CALLBACK_STRING = koffi.proto('cb_string', FFI_VOID, [FFI_CALLBACK_ID, FFI_ERROR_CODE, FFI_STRING])
+export const FFI_CALLBACK_STRING = koffi.proto('cb_string', FFI_VOID, [
+  FFI_CALLBACK_ID,
+  FFI_ERROR_CODE,
+  FFI_ASKAR_STRING,
+])
 export const FFI_CALLBACK_LOG = koffi.proto('cb_log', FFI_VOID, [
   koffi.pointer(FFI_VOID),
   FFI_INT32,

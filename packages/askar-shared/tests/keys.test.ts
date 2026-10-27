@@ -27,6 +27,8 @@ describe('keys', () => {
     const dec = key.aeadDecrypt(enc.parts)
 
     expect(dec).toEqual(message)
+
+    key.handle.free()
   })
 
   test('Bls G2 Keygen', () => {
@@ -41,6 +43,8 @@ describe('keys', () => {
         y: 'CA1TwLRnETa8qPKPktW4XHSkD_9Qmuxb7syIiOMAjWKsIaptbF2USMVp40NqyV7XD8qQ_kM4QNme49eGyn_aQSsVdQKy7zSeBlRubTIc4Gl3vL-SHk8NlQJ41-NlTpBU',
       })
     )
+
+    key.handle.free()
   })
 
   test('Bls G1 Keygen', () => {
@@ -55,6 +59,8 @@ describe('keys', () => {
         y: 'BmNdJxcuusPBTqggIS-D-ItsxILnKz4q2G95at5K1d1-vFOtMJO0Aoh9OfGuQlvi',
       })
     )
+
+    key.handle.free()
   })
 
   test('ed25519', () => {
@@ -103,6 +109,8 @@ describe('keys', () => {
 
     expect(key.jwkSecret.kty).toBe('OKP')
     expect(key.jwkSecret.crv).toBe('Ed25519')
+
+    for (const k of [key, x25519Key, x25519Key2, kex]) k.handle.free()
   })
 
   test('p384', () => {
@@ -120,5 +128,7 @@ describe('keys', () => {
 
     expect(key.jwkSecret.kty).toBe('EC')
     expect(key.jwkSecret.crv).toBe('P-384')
+
+    key.handle.free()
   })
 })

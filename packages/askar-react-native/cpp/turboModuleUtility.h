@@ -7,6 +7,9 @@
 // TODO(rename): when lib has changed
 #include "include/libaries_askar.h"
 
+// Frees the strings that Askar returns. Askar exports it, but libaries_askar.h doesn't declare it
+extern "C" void askar_string_free(char *s);
+
 using namespace facebook;
 
 namespace askarTurboModuleUtility {
@@ -58,5 +61,24 @@ jsi::Value createReturnValue(jsi::Runtime &rt, ErrorCode code, T out);
 
 jsi::ArrayBuffer byteBufferToArrayBuffer(jsi::Runtime &rt, ByteBuffer bb);
 jsi::ArrayBuffer secretBufferToArrayBuffer(jsi::Runtime &rt, SecretBuffer sb);
+
+// Converts a string that Askar returns to a JS string, or null, and frees it
+jsi::Value askarStringToValue(jsi::Runtime &rt, const char *value);
+
+// Calls an async Askar function with the callback in `options.cb`. `call` gets
+// the callback id to pass on and returns the error code. Askar only calls the
+// callback when it returns Success, so otherwise the state is deleted here
+template <typename Call>
+jsi::Value callAsync(jsi::Runtime &rt, jsi::Object &options, Call call) {
+  jsi::Function cb = options.getPropertyAsFunction(rt, "cb");
+  State *state = new State(&cb);
+  state->rt = &rt;
+
+  ErrorCode code = call(CallbackId(state));
+  if (code != ErrorCode::Success)
+    delete state;
+
+  return createReturnValue(rt, code, nullptr);
+}
 
 } // namespace askarTurboModuleUtility

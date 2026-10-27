@@ -4,6 +4,7 @@ import {
   Argon2ConfigStruct,
   ByteBufferStruct,
   EncryptedBufferStruct,
+  FFI_ASKAR_STRING,
   FFI_CALLBACK_ENTRY_LIST_HANDLE,
   FFI_CALLBACK_HANDLE_LIST,
   FFI_CALLBACK_ID,
@@ -37,13 +38,14 @@ import {
 export const nativeBindings: Record<string, [koffi.TypeSpec, Array<koffi.TypeSpec>]> = {
   // Version and termination
   askar_terminate: [FFI_VOID, []],
-  askar_version: [koffi.pointer(FFI_STRING), []],
+  askar_version: [FFI_ASKAR_STRING, []],
 
   // Error handling
-  askar_get_current_error: [FFI_ERROR_CODE, [koffi.out(koffi.pointer(FFI_STRING))]],
+  askar_get_current_error: [FFI_ERROR_CODE, [koffi.out(koffi.pointer(FFI_ASKAR_STRING))]],
 
   // Buffer management
   askar_buffer_free: [FFI_VOID, [SecretBufferStruct]],
+  askar_string_free: [FFI_VOID, [koffi.pointer(FFI_VOID)]],
 
   // Logger functions
   askar_clear_custom_logger: [FFI_VOID, []],
@@ -77,10 +79,16 @@ export const nativeBindings: Record<string, [koffi.TypeSpec, Array<koffi.TypeSpe
   askar_entry_list_free: [FFI_VOID, [FFI_ENTRY_LIST_HANDLE]],
   askar_entry_list_get_category: [
     FFI_ERROR_CODE,
-    [FFI_ENTRY_LIST_HANDLE, FFI_INT32, koffi.out(koffi.pointer(FFI_STRING))],
+    [FFI_ENTRY_LIST_HANDLE, FFI_INT32, koffi.out(koffi.pointer(FFI_ASKAR_STRING))],
   ],
-  askar_entry_list_get_name: [FFI_ERROR_CODE, [FFI_ENTRY_LIST_HANDLE, FFI_INT32, koffi.out(koffi.pointer(FFI_STRING))]],
-  askar_entry_list_get_tags: [FFI_ERROR_CODE, [FFI_ENTRY_LIST_HANDLE, FFI_INT32, koffi.out(koffi.pointer(FFI_STRING))]],
+  askar_entry_list_get_name: [
+    FFI_ERROR_CODE,
+    [FFI_ENTRY_LIST_HANDLE, FFI_INT32, koffi.out(koffi.pointer(FFI_ASKAR_STRING))],
+  ],
+  askar_entry_list_get_tags: [
+    FFI_ERROR_CODE,
+    [FFI_ENTRY_LIST_HANDLE, FFI_INT32, koffi.out(koffi.pointer(FFI_ASKAR_STRING))],
+  ],
   askar_entry_list_get_value: [
     FFI_ERROR_CODE,
     [FFI_ENTRY_LIST_HANDLE, FFI_INT32, koffi.out(koffi.pointer(SecretBufferStruct))],
@@ -94,7 +102,7 @@ export const nativeBindings: Record<string, [koffi.TypeSpec, Array<koffi.TypeSpe
   askar_string_list_free: [FFI_VOID, [FFI_STRING_LIST_HANDLE]],
   askar_string_list_get_item: [
     FFI_ERROR_CODE,
-    [FFI_STRING_LIST_HANDLE, FFI_INT32, koffi.out(koffi.pointer(FFI_STRING))],
+    [FFI_STRING_LIST_HANDLE, FFI_INT32, koffi.out(koffi.pointer(FFI_ASKAR_STRING))],
   ],
 
   // Key AEAD functions
@@ -191,19 +199,19 @@ export const nativeBindings: Record<string, [koffi.TypeSpec, Array<koffi.TypeSpe
   askar_key_entry_list_free: [FFI_VOID, [FFI_KEY_ENTRY_LIST_HANDLE]],
   askar_key_entry_list_get_algorithm: [
     FFI_ERROR_CODE,
-    [FFI_KEY_ENTRY_LIST_HANDLE, FFI_INT32, koffi.out(koffi.pointer(FFI_STRING))],
+    [FFI_KEY_ENTRY_LIST_HANDLE, FFI_INT32, koffi.out(koffi.pointer(FFI_ASKAR_STRING))],
   ],
   askar_key_entry_list_get_metadata: [
     FFI_ERROR_CODE,
-    [FFI_KEY_ENTRY_LIST_HANDLE, FFI_INT32, koffi.out(koffi.pointer(FFI_STRING))],
+    [FFI_KEY_ENTRY_LIST_HANDLE, FFI_INT32, koffi.out(koffi.pointer(FFI_ASKAR_STRING))],
   ],
   askar_key_entry_list_get_name: [
     FFI_ERROR_CODE,
-    [FFI_KEY_ENTRY_LIST_HANDLE, FFI_INT32, koffi.out(koffi.pointer(FFI_STRING))],
+    [FFI_KEY_ENTRY_LIST_HANDLE, FFI_INT32, koffi.out(koffi.pointer(FFI_ASKAR_STRING))],
   ],
   askar_key_entry_list_get_tags: [
     FFI_ERROR_CODE,
-    [FFI_KEY_ENTRY_LIST_HANDLE, FFI_INT32, koffi.out(koffi.pointer(FFI_STRING))],
+    [FFI_KEY_ENTRY_LIST_HANDLE, FFI_INT32, koffi.out(koffi.pointer(FFI_ASKAR_STRING))],
   ],
   askar_key_entry_list_load_local: [
     FFI_ERROR_CODE,
@@ -233,13 +241,16 @@ export const nativeBindings: Record<string, [koffi.TypeSpec, Array<koffi.TypeSpe
     FFI_ERROR_CODE,
     [FFI_STRING, FFI_STRING, FFI_INT8, koffi.out(koffi.pointer(FFI_LOCAL_KEY_HANDLE))],
   ],
-  askar_key_get_algorithm: [FFI_ERROR_CODE, [FFI_LOCAL_KEY_HANDLE, koffi.out(koffi.pointer(FFI_STRING))]],
+  askar_key_get_algorithm: [FFI_ERROR_CODE, [FFI_LOCAL_KEY_HANDLE, koffi.out(koffi.pointer(FFI_ASKAR_STRING))]],
   askar_key_get_ephemeral: [FFI_ERROR_CODE, [FFI_LOCAL_KEY_HANDLE, koffi.out(koffi.pointer(FFI_INT8))]],
-  askar_key_get_jwk_public: [FFI_ERROR_CODE, [FFI_LOCAL_KEY_HANDLE, FFI_STRING, koffi.out(koffi.pointer(FFI_STRING))]],
+  askar_key_get_jwk_public: [
+    FFI_ERROR_CODE,
+    [FFI_LOCAL_KEY_HANDLE, FFI_STRING, koffi.out(koffi.pointer(FFI_ASKAR_STRING))],
+  ],
   askar_key_get_jwk_secret: [FFI_ERROR_CODE, [FFI_LOCAL_KEY_HANDLE, koffi.out(koffi.pointer(SecretBufferStruct))]],
   askar_key_get_jwk_thumbprint: [
     FFI_ERROR_CODE,
-    [FFI_LOCAL_KEY_HANDLE, FFI_STRING, koffi.out(koffi.pointer(FFI_STRING))],
+    [FFI_LOCAL_KEY_HANDLE, FFI_STRING, koffi.out(koffi.pointer(FFI_ASKAR_STRING))],
   ],
   askar_key_get_public_bytes: [FFI_ERROR_CODE, [FFI_LOCAL_KEY_HANDLE, koffi.out(koffi.pointer(SecretBufferStruct))]],
   askar_key_get_secret_bytes: [FFI_ERROR_CODE, [FFI_LOCAL_KEY_HANDLE, koffi.out(koffi.pointer(SecretBufferStruct))]],
@@ -419,7 +430,7 @@ export const nativeBindings: Record<string, [koffi.TypeSpec, Array<koffi.TypeSpe
     FFI_ERROR_CODE,
     [FFI_STORE_HANDLE, FFI_STRING, koffi.pointer(FFI_CALLBACK_STRING), FFI_CALLBACK_ID],
   ],
-  askar_store_generate_raw_key: [FFI_ERROR_CODE, [ByteBufferStruct, koffi.out(koffi.pointer(FFI_STRING))]],
+  askar_store_generate_raw_key: [FFI_ERROR_CODE, [ByteBufferStruct, koffi.out(koffi.pointer(FFI_ASKAR_STRING))]],
   askar_store_get_default_profile: [
     FFI_ERROR_CODE,
     [FFI_STORE_HANDLE, koffi.pointer(FFI_CALLBACK_STRING), FFI_CALLBACK_ID],

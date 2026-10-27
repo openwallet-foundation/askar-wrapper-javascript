@@ -58,6 +58,34 @@ describe('jose ecdh', () => {
     bobKey.handle.free()
   })
 
+  test('ecdh es direct frees its keys when decrypting fails', () => {
+    const bobKey = Key.generate(KeyAlgorithm.EcSecp256r1)
+    const ephemeralKey = Key.generate(KeyAlgorithm.EcSecp256r1)
+    const ecdh = new EcdhEs({ algId: utf8('A256GCM'), apu: utf8('Alice'), apv: utf8('Bob') })
+
+    const { ciphertext, nonce } = ecdh.encryptDirect({
+      encryptionAlgorithm: KeyAlgorithm.AesA256Gcm,
+      ephemeralKey,
+      recipientKey: bobKey.jwkPublic,
+      message: utf8('Hello there'),
+    }).parts
+
+    // The key created from the Jwk and the derived key are freed, also when decrypting with a wrong tag throws
+    expect(() =>
+      ecdh.decryptDirect({
+        encryptionAlgorithm: KeyAlgorithm.AesA256Gcm,
+        ephemeralKey: ephemeralKey.jwkPublic,
+        recipientKey: bobKey,
+        ciphertext,
+        nonce,
+        tag: new Uint8Array(16),
+      })
+    ).toThrow()
+
+    ephemeralKey.handle.free()
+    bobKey.handle.free()
+  })
+
   test('ecdh es wrapped', () => {
     const bobKey = Key.generate(KeyAlgorithm.X25519)
     const bobJwk = bobKey.jwkPublic
@@ -84,6 +112,7 @@ describe('jose ecdh', () => {
 
     const encryptedMessage = cek.aeadEncrypt({ message, aad: protectedB64Bytes })
     const { tag, nonce, ciphertext } = encryptedMessage.parts
+    const bobPublicKey = Key.fromJwk({ jwk: bobJwk })
     const encryptedKey = new EcdhEs({
       algId: utf8(alg),
       apu: utf8(apu),
@@ -91,10 +120,11 @@ describe('jose ecdh', () => {
     }).senderWrapKey({
       keyWrappingAlgorithm: KeyAlgorithm.AesA128Kw,
       ephemeralKey,
-      recipientKey: Key.fromJwk({ jwk: bobJwk }),
+      recipientKey: bobPublicKey,
       cek,
     }).ciphertext
 
+    const ephemeralPublicKey = Key.fromJwk({ jwk: ephemeralJwk })
     const cekReceiver = new EcdhEs({
       algId: utf8(alg),
       apu: utf8(apu),
@@ -102,7 +132,7 @@ describe('jose ecdh', () => {
     }).receiverUnwrapKey({
       keyWrappingAlgorithm: KeyAlgorithm.AesA128Kw,
       encryptionAlgorithm: KeyAlgorithm.AesA256Gcm,
-      ephemeralKey: Key.fromJwk({ jwk: ephemeralJwk }),
+      ephemeralKey: ephemeralPublicKey,
       recipientKey: bobKey,
       ciphertext: encryptedKey,
     })
@@ -111,10 +141,7 @@ describe('jose ecdh', () => {
 
     expect(messageReceived).toEqual(message)
 
-    ephemeralKey.handle.free()
-    bobKey.handle.free()
-    cek.handle.free()
-    cekReceiver.handle.free()
+    for (const key of [ephemeralKey, ephemeralPublicKey, bobKey, bobPublicKey, cek, cekReceiver]) key.handle.free()
   })
 
   test('ecdh 1pu direct', () => {
@@ -140,6 +167,7 @@ describe('jose ecdh', () => {
     const protectedB64 = base64url(protectedString)
     const protectedB64Bytes = utf8(protectedB64)
 
+    const bobPublicKey = Key.fromJwk({ jwk: bobJwk })
     const encrypedMessage = new Ecdh1PU({
       algId: utf8(enc),
       apu: utf8(apu),
@@ -149,12 +177,13 @@ describe('jose ecdh', () => {
       ephemeralKey,
       message,
       senderKey: aliceKey,
-      recipientKey: Key.fromJwk({ jwk: bobJwk }),
+      recipientKey: bobPublicKey,
       aad: protectedB64Bytes,
     })
 
     const { nonce, tag, ciphertext } = encrypedMessage.parts
 
+    const alicePublicKey = Key.fromJwk({ jwk: aliceJwk })
     const messageReceived = new Ecdh1PU({
       algId: utf8(enc),
       apu: utf8(apu),
@@ -162,7 +191,7 @@ describe('jose ecdh', () => {
     }).decryptDirect({
       encryptionAlgorithm: KeyAlgorithm.AesA256Gcm,
       ephemeralKey,
-      senderKey: Key.fromJwk({ jwk: aliceJwk }),
+      senderKey: alicePublicKey,
       recipientKey: bobKey,
       ciphertext,
       nonce,
@@ -172,9 +201,7 @@ describe('jose ecdh', () => {
 
     expect(messageReceived).toEqual(message)
 
-    aliceKey.handle.free()
-    bobKey.handle.free()
-    ephemeralKey.handle.free()
+    for (const key of [aliceKey, alicePublicKey, bobKey, bobPublicKey, ephemeralKey]) key.handle.free()
   })
 
   /**
@@ -327,9 +354,7 @@ describe('jose ecdh', () => {
 
     expect(cekReceiver2.jwkSecret).toEqual(cek.jwkSecret)
 
-    cek.handle.free()
-    cekReceiver.handle.free()
-    cekReceiver2.handle.free()
-    derived.handle.free()
+    for (const key of [ephemeral, alice, bob, cek, cekReceiver, cekReceiver2, derived, derivedReceiver])
+      key.handle.free()
   })
 })

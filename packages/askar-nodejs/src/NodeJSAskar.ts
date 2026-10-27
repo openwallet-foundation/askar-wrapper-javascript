@@ -143,6 +143,7 @@ function handleReturnPointer<Return>(returnValue: [unknown] | unknown): Return {
 
 export class NodeJSAskar implements Askar {
   private callbackId = 1
+  private customLogger?: koffi.IKoffiRegisteredCallback
 
   private promisify = async <R>(
     method: (_: unknown, id: number) => number,
@@ -226,12 +227,25 @@ export class NodeJSAskar implements Askar {
 
   public clearCustomLogger(): void {
     this.nativeAskar.askar_clear_custom_logger()
+    this.unregisterCustomLogger()
   }
 
   public setCustomLogger({ logLevel, flush = false, enabled = false, logger }: SetCustomLoggerOptions): void {
     const registeredCallback = koffi.register(logger, FFI_CALLBACK_LOG)
     const errorCode = this.nativeAskar.askar_set_custom_logger(0, registeredCallback, +enabled, +flush, logLevel)
-    this.handleError(errorCode)
+    if (errorCode !== 0) {
+      koffi.unregister(registeredCallback)
+      this.handleError(errorCode)
+    }
+
+    // Askar calls the new logger from now on
+    this.unregisterCustomLogger()
+    this.customLogger = registeredCallback
+  }
+
+  private unregisterCustomLogger() {
+    if (this.customLogger) koffi.unregister(this.customLogger)
+    this.customLogger = undefined
   }
 
   public setDefaultLogger(): void {
