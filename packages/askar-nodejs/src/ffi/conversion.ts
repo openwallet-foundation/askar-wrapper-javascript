@@ -27,10 +27,14 @@ const decodeCounted = <Type>(struct: koffi.TypeObject, countedStruct: koffi.Type
   return koffi.decode(buffer, countedStruct).data
 }
 
+// decodeCounted reads the bytes of a struct as its counted struct, so each counted struct must have the same layout as
+// its source struct in structures.ts: the same member types, in the same order
 const CountedByteBufferStruct = koffi.struct({ len: FFI_INT64, data: koffi.pointer(null, FFI_UINT8, 'len') })
 const CountedHandleListStruct = koffi.struct({ len: FFI_INT32, data: koffi.pointer(null, FFI_USIZE, 'len') })
 
 export const decodeHandleList = (handleList: FfiHandleListType): number[] => {
+  if (handleList.len === 0) return []
+
   // koffi decodes size_t values as BigInts. The handles are sequence numbers, as for the store, session and scan
   // handles that Askar returns directly
   return Array.from(decodeCounted<BigUint64Array>(FfiHandleListStruct, CountedHandleListStruct, handleList), Number)
@@ -44,6 +48,8 @@ export const byteBufferToUint8Array = (byteBuffer: ByteBufferType): Uint8Array =
   if (data instanceof Uint8Array) {
     return data.slice(0, len)
   }
+
+  if (len === 0) return new Uint8Array(0)
 
   // If data is a koffi pointer, decode it as uint8 array
   return decodeCounted<Uint8Array>(ByteBufferStruct, CountedByteBufferStruct, byteBuffer)

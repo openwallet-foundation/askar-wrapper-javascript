@@ -22,4 +22,12 @@ describe('conversion', () => {
 
     koffi.free(pointer)
   })
+
+  test('decodes an empty native buffer with a null pointer', () => {
+    expect(byteBufferToUint8Array({ data: null, len: 0 })).toEqual(new Uint8Array(0))
+  })
+
+  test('decodes an empty native list of handles with a null pointer', () => {
+    expect(decodeHandleList({ data: null, len: 0 })).toEqual([])
+  })
 })
