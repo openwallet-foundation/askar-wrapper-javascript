@@ -31,7 +31,7 @@ export class Jwk {
     return new Jwk(JSON.parse(str) as JwkProps)
   }
 
-  public toUint8Array() {
+  public toUint8Array(): Uint8Array {
     return Uint8Array.from(Buffer.from(JSON.stringify(this)))
   }
 }

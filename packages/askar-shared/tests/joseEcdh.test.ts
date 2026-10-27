@@ -20,7 +20,7 @@ describe('jose ecdh', () => {
       enc: encryptionAlgorithm,
       apu: base64url(apu),
       apv: base64url(apv),
-      epk: ephemeralKey,
+      epk: ephemeralJwk,
     }
     const protectedB64 = base64url(JSON.stringify(protectedJson))
 

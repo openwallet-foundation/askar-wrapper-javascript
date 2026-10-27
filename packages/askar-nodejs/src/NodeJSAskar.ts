@@ -87,17 +87,27 @@ import {
   AeadParams,
   AskarError,
   EntryListHandle,
+  handleInvalidNullResponse,
   KeyEntryListHandle,
   LocalKeyHandle,
   ScanHandle,
   SessionHandle,
   StoreHandle,
-  handleInvalidNullResponse,
 } from '@openwallet-foundation/askar-shared'
 import * as koffi from 'koffi'
 import {
+  allocateAeadParams,
+  allocateEncryptedBuffer,
+  allocateInt8Buffer,
+  allocateInt32Buffer,
+  allocatePointer,
+  allocateSecretBuffer,
+  allocateStringBuffer,
+  allocateStringListHandle,
   type ByteBufferType,
+  decodeHandleList,
   type EncryptedBufferType,
+  encryptedBufferStructToClass,
   FFI_CALLBACK_ENTRY_LIST_HANDLE,
   FFI_CALLBACK_HANDLE_LIST,
   FFI_CALLBACK_INT8,
@@ -111,18 +121,9 @@ import {
   FFI_CALLBACK_STRING,
   FFI_CALLBACK_STRING_LIST_HANDLE,
   type FfiHandleListType,
-  allocateAeadParams,
-  allocateEncryptedBuffer,
-  allocateInt8Buffer,
-  allocateInt32Buffer,
-  allocatePointer,
-  allocateSecretBuffer,
-  allocateStringBuffer,
-  allocateStringListHandle,
-  decodeHandleList,
-  encryptedBufferStructToClass,
   secretBufferToUint8Array,
   serializeArguments,
+  type TypeSpec,
 } from './ffi'
 import { getNativeAskar } from './library'
 
@@ -146,7 +147,7 @@ export class NodeJSAskar implements Askar {
 
   private promisify = async <R>(
     method: (_: unknown, id: number) => number,
-    callbackType: koffi.TypeSpec
+    callbackType: TypeSpec
   ): Promise<R | null> => {
     return new Promise((resolve, reject) => {
       let keepAlive: NodeJS.Immediate | undefined
@@ -253,7 +254,7 @@ export class NodeJSAskar implements Askar {
     this.handleError(errorCode)
   }
 
-  public argon2DerivePassword(options: Argon2DerivePasswordOptions) {
+  public argon2DerivePassword(options: Argon2DerivePasswordOptions): Uint8Array {
     const { parameters, password, salt } = serializeArguments(options)
 
     const ret = allocateSecretBuffer()

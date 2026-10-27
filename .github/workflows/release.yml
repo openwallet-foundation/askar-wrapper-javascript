@@ -26,11 +26,8 @@ jobs:
       - name: Setup NodeJS
         uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 24
           cache: "pnpm"
-
-      - name: Update npm
-        run: npm install -g npm@^11
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
@@ -39,12 +36,14 @@ jobs:
         id: changesets
         uses: changesets/action@v2
         with:
-          title: "chore(release): new version"
-          commit: "chore(release): new version"
-          publish: pnpm release
-          version: pnpm changeset-version
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          pr-title: "chore(release): new version"
+          commit-message: "chore(release): new version"
+          publish-script: pnpm release
+          version-script: pnpm changeset-version
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # The next step creates one GitHub release for the version instead of one per package
+          create-github-releases: false
+          push-git-tags: false
 
       - name: Get current package version
         id: get_version
@@ -69,11 +68,8 @@ jobs:
       - name: Setup NodeJS
         uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 24
           cache: "pnpm"
-
-      - name: Update npm
-        run: npm install -g npm@^11
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile

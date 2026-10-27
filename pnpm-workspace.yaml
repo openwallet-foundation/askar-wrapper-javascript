@@ -8,20 +8,20 @@ nodeLinker: hoisted
 # The React Native package (devDependencies) and the example app use the same react / react-native, so Metro bundles a
 # single copy of each
 catalog:
-  '@biomejs/biome': 1.9.4
-  '@changesets/cli': ^2.27.12
-  '@types/node': ^20.12.11
-  koffi: ^2.16.3
+  '@biomejs/biome': 2.6.3
+  '@changesets/cli': ^3.0.3
+  '@types/node': ^22.20.5
+  koffi: ^3.3.4
   react: 19.3.0
   react-native: 0.88.0
-  rimraf: ^5.0.5
-  tsx: ^4.19.2
-  typescript: ~5.4.5
+  rimraf: ^6.1.3
+  tsx: ^4.23.15
+  typescript: ~7.0.2
+  vitest: ^5.0.5
 
 # pnpm only runs the install scripts of packages listed here, and fails the install for packages with scripts that
 # aren't listed
 allowBuilds:
-  '@biomejs/biome': true
   koffi: true
   esbuild: false
   # Dependencies of React Native Harness that ship prebuilt binaries

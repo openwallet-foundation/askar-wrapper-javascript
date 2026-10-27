@@ -33,9 +33,10 @@ import {
   FFI_VOID,
   FfiHandleListStruct,
   SecretBufferStruct,
+  type TypeSpec,
 } from '../ffi'
 
-export const nativeBindings: Record<string, [koffi.TypeSpec, Array<koffi.TypeSpec>]> = {
+export const nativeBindings: Record<string, [TypeSpec, Array<TypeSpec>]> = {
   // Version and termination
   askar_terminate: [FFI_VOID, []],
   askar_version: [FFI_ASKAR_STRING, []],

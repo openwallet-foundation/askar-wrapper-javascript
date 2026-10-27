@@ -15,7 +15,10 @@
   "publishConfig": {
     "access": "public"
   },
-  "files": ["build", "scripts"],
+  "files": [
+    "build",
+    "scripts"
+  ],
   "scripts": {
     "types:check": "pnpm compile --noEmit",
     "build": "pnpm clean && pnpm compile",
@@ -37,6 +40,6 @@
     "packageName": "library-{platform}-{arch}.tar.gz"
   },
   "engines": {
-    "node": ">= 18"
+    "node": ">= 22"
   }
 }

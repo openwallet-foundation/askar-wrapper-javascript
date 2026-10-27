@@ -77,7 +77,7 @@ export class EntryListHandle extends ArcHandle {
     return NativeAskar.instance.entryListGetName({ index, entryListHandle: this })
   }
 
-  public getValue(index: number) {
+  public getValue(index: number): Uint8Array {
     return NativeAskar.instance.entryListGetValue({ index, entryListHandle: this })
   }
 

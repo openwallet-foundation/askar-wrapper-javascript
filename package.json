@@ -7,7 +7,7 @@
     "url": "https://github.com/openwallet-foundation/askar-wrapper-javascript"
   },
   "engines": {
-    "node": ">= 18"
+    "node": ">= 22"
   },
   "scripts": {
     "style:check": "biome check --unsafe .",
@@ -30,8 +30,7 @@
     "rimraf": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:",
-    "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^4.0.12"
+    "vitest": "catalog:"
   },
   "packageManager": "pnpm@12.15.0"
 }

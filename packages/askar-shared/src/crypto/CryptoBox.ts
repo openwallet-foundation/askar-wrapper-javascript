@@ -2,7 +2,7 @@ import { NativeAskar } from '../askar'
 import type { Key } from './Key'
 
 export class CryptoBox {
-  public static randomNonce() {
+  public static randomNonce(): Uint8Array {
     return NativeAskar.instance.keyCryptoBoxRandomNonce()
   }
 
@@ -16,7 +16,7 @@ export class CryptoBox {
     senderKey: Key
     message: Uint8Array
     nonce: Uint8Array
-  }) {
+  }): Uint8Array {
     return NativeAskar.instance.keyCryptoBox({ nonce, message, senderKey, recipientKey })
   }
 
@@ -30,15 +30,15 @@ export class CryptoBox {
     senderKey: Key
     message: Uint8Array
     nonce: Uint8Array
-  }) {
+  }): Uint8Array {
     return NativeAskar.instance.keyCryptoBoxOpen({ nonce, message, senderKey, recipientKey })
   }
 
-  public static seal({ recipientKey, message }: { recipientKey: Key; message: Uint8Array }) {
+  public static seal({ recipientKey, message }: { recipientKey: Key; message: Uint8Array }): Uint8Array {
     return NativeAskar.instance.keyCryptoBoxSeal({ message, localKeyHandle: recipientKey.handle })
   }
 
-  public static sealOpen({ recipientKey, ciphertext }: { recipientKey: Key; ciphertext: Uint8Array }) {
+  public static sealOpen({ recipientKey, ciphertext }: { recipientKey: Key; ciphertext: Uint8Array }): Uint8Array {
     return NativeAskar.instance.keyCryptoBoxSealOpen({ ciphertext, localKeyHandle: recipientKey.handle })
   }
 }

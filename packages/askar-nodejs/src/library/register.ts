@@ -3,8 +3,8 @@ import os from 'node:os'
 import path from 'node:path'
 import * as koffi from 'koffi'
 import { setFreeAskarString } from '../ffi'
-import type { NativeMethods } from './NativeBindingInterface'
 import { nativeBindings } from './bindings'
+import type { NativeMethods } from './NativeBindingInterface'
 
 // TODO(rename): when lib is changed
 const LIBNAME = 'aries_askar'

@@ -68,11 +68,11 @@ export class Key {
     return Boolean(NativeAskar.instance.keyGetEphemeral({ localKeyHandle: this.handle }))
   }
 
-  public get publicBytes() {
+  public get publicBytes(): Uint8Array {
     return NativeAskar.instance.keyGetPublicBytes({ localKeyHandle: this.handle })
   }
 
-  public get secretBytes() {
+  public get secretBytes(): Uint8Array {
     return NativeAskar.instance.keyGetSecretBytes({ localKeyHandle: this.handle })
   }
 
@@ -103,7 +103,7 @@ export class Key {
     return NativeAskar.instance.keyAeadGetParams({ localKeyHandle: this.handle })
   }
 
-  public get aeadRandomNonce() {
+  public get aeadRandomNonce(): Uint8Array {
     return NativeAskar.instance.keyAeadRandomNonce({ localKeyHandle: this.handle })
   }
 
@@ -114,14 +114,19 @@ export class Key {
     })
   }
 
-  public aeadDecrypt(options: { ciphertext: Uint8Array; nonce: Uint8Array; tag?: Uint8Array; aad?: Uint8Array }) {
+  public aeadDecrypt(options: {
+    ciphertext: Uint8Array
+    nonce: Uint8Array
+    tag?: Uint8Array
+    aad?: Uint8Array
+  }): Uint8Array {
     return NativeAskar.instance.keyAeadDecrypt({
       localKeyHandle: this.handle,
       ...options,
     })
   }
 
-  public signMessage(options: { message: Uint8Array; sigType?: SignatureAlgorithm }) {
+  public signMessage(options: { message: Uint8Array; sigType?: SignatureAlgorithm }): Uint8Array {
     return NativeAskar.instance.keySignMessage({
       localKeyHandle: this.handle,
       ...options,
