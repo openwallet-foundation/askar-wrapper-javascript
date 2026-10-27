@@ -30,7 +30,7 @@
   ],
   "scripts": {
     "types:check": "tsc -p ./tsconfig.build.json --noEmit",
-    "build": "tsdown src/index.ts --format esm --platform neutral --dts --sourcemap --out-dir build --tsconfig tsconfig.build.json",
+    "build": "tsdown",
     "clean": "rimraf -rf ./build"
   },
   "dependencies": {

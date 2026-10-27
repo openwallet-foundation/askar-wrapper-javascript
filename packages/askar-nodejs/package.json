@@ -29,7 +29,7 @@
   ],
   "scripts": {
     "types:check": "tsc -p ./tsconfig.build.json --noEmit",
-    "build": "tsdown src/index.ts --format esm --platform node --dts --sourcemap --out-dir build --tsconfig tsconfig.build.json",
+    "build": "tsdown --platform node",
     "clean": "rimraf -rf ./build",
     "install": "node scripts/install.js"
   },
