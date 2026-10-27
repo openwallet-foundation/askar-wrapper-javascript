@@ -143,7 +143,6 @@ function handleReturnPointer<Return>(returnValue: [unknown] | unknown): Return {
 
 export class NodeJSAskar implements Askar {
   private callbackId = 1
-  private customLogger?: koffi.IKoffiRegisteredCallback
 
   private promisify = async <R>(
     method: (_: unknown, id: number) => number,
@@ -227,25 +226,19 @@ export class NodeJSAskar implements Askar {
 
   public clearCustomLogger(): void {
     this.nativeAskar.askar_clear_custom_logger()
-    this.unregisterCustomLogger()
   }
 
-  public setCustomLogger({ logLevel, flush = false, enabled = false, logger }: SetCustomLoggerOptions): void {
-    const registeredCallback = koffi.register(logger, FFI_CALLBACK_LOG)
-    const errorCode = this.nativeAskar.askar_set_custom_logger(0, registeredCallback, +enabled, +flush, logLevel)
+  public setCustomLogger({ logLevel, logger }: SetCustomLoggerOptions): void {
+    const registeredCallback = koffi.register(logger, koffi.pointer(FFI_CALLBACK_LOG))
+    // No enabled and flush callbacks: Askar then filters by the log level only
+    const errorCode = this.nativeAskar.askar_set_custom_logger(null, registeredCallback, null, null, logLevel)
+    // Askar sets a custom logger once per process and keeps calling it after clearCustomLogger (a log call on another
+    // thread can pass the check just before the logger is disabled), so the callback is only unregistered when Askar
+    // didn't take it
     if (errorCode !== 0) {
       koffi.unregister(registeredCallback)
       this.handleError(errorCode)
     }
-
-    // Askar calls the new logger from now on
-    this.unregisterCustomLogger()
-    this.customLogger = registeredCallback
-  }
-
-  private unregisterCustomLogger() {
-    if (this.customLogger) koffi.unregister(this.customLogger)
-    this.customLogger = undefined
   }
 
   public setDefaultLogger(): void {

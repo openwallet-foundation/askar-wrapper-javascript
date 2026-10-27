@@ -91,8 +91,9 @@ export class Scan {
         }
       }
     } finally {
-      NativeAskar.instance.scanFree({ scanHandle: this._handle })
+      const scanHandle = this._handle
       this._handle = undefined
+      NativeAskar.instance.scanFree({ scanHandle })
     }
   }
 

@@ -35,6 +35,9 @@ jobs:
       - name: Compile
         run: pnpm build
 
+      - name: Check Types
+        run: pnpm types:check
+
   tests:
     runs-on: ubuntu-24.04
     name: Tests

@@ -27,7 +27,14 @@ export type NativeLogCallback = (
 
 export type SetCustomLoggerOptions = {
   logLevel: LogLevel
+  /**
+   * @deprecated has no effect. Askar takes an optional flush callback here, not a boolean
+   */
   flush?: boolean
+  /**
+   * @deprecated has no effect. Askar takes an optional enabled callback here, not a boolean. Use `logLevel` to
+   * filter the logs
+   */
   enabled?: boolean
   logger: NativeLogCallback
 }
