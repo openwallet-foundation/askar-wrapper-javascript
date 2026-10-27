@@ -1,7 +1,13 @@
 import { EncryptedBuffer } from '@openwallet-foundation/askar-shared'
 import * as koffi from 'koffi'
-import { FFI_UINT8, FFI_USIZE } from './primitives'
-import type { ByteBufferType, EncryptedBufferType, FfiHandleListType } from './structures'
+import { FFI_INT32, FFI_INT64, FFI_UINT8, FFI_USIZE } from './primitives'
+import {
+  ByteBufferStruct,
+  type ByteBufferType,
+  type EncryptedBufferType,
+  FfiHandleListStruct,
+  type FfiHandleListType,
+} from './structures'
 
 export const uint8ArrayToByteBufferStruct = (buffer: Uint8Array = new Uint8Array(0)): ByteBufferType => {
   return { data: buffer, len: buffer.length }
@@ -12,13 +18,22 @@ export type NodeJsHandleList = {
   data: unknown
 }
 
-export const decodeHandleList = (handleList: FfiHandleListType): number[] => {
-  // With koffi, pointer data needs to be decoded
-  const { data, len } = handleList
+// koffi.decode(pointer, type, len) leaks about 20 bytes on every call: it formats the name of a new array type each
+// time. koffi does decode a pointer member whose length is in another member of the struct without a new type, so the
+// struct is copied to a buffer and decoded as a struct with such a member
+const decodeCounted = <Type>(struct: koffi.TypeObject, countedStruct: koffi.TypeObject, value: object): Type => {
+  const buffer = new Uint8Array(koffi.sizeof(struct))
+  koffi.encode(buffer, struct, value)
+  return koffi.decode(buffer, countedStruct).data
+}
 
+const CountedByteBufferStruct = koffi.struct({ len: FFI_INT64, data: koffi.pointer(null, FFI_UINT8, 'len') })
+const CountedHandleListStruct = koffi.struct({ len: FFI_INT32, data: koffi.pointer(null, FFI_USIZE, 'len') })
+
+export const decodeHandleList = (handleList: FfiHandleListType): number[] => {
   // koffi decodes size_t values as BigInts. The handles are sequence numbers, as for the store, session and scan
   // handles that Askar returns directly
-  return Array.from(koffi.decode(data, FFI_USIZE, len) as ArrayLike<bigint>, Number)
+  return Array.from(decodeCounted<BigUint64Array>(FfiHandleListStruct, CountedHandleListStruct, handleList), Number)
 }
 
 export const byteBufferToUint8Array = (byteBuffer: ByteBufferType): Uint8Array => {
@@ -30,9 +45,8 @@ export const byteBufferToUint8Array = (byteBuffer: ByteBufferType): Uint8Array =
     return data.slice(0, len)
   }
 
-  // If data is a koffi external pointer, decode it as uint8 array
-  const decoded = koffi.decode(data, FFI_UINT8, len)
-  return decoded
+  // If data is a koffi pointer, decode it as uint8 array
+  return decodeCounted<Uint8Array>(ByteBufferStruct, CountedByteBufferStruct, byteBuffer)
 }
 
 export const secretBufferToUint8Array = byteBufferToUint8Array
