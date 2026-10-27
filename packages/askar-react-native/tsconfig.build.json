@@ -4,11 +4,7 @@
     "outDir": "./build",
     "rootDir": "./src",
     "skipLibCheck": true,
-    "types": ["react-native"],
-    // React Native only exposes its types through package.json exports, which "node" (CommonJS) resolution ignores.
-    // node16 emits the same CommonJS
-    "module": "node16",
-    "moduleResolution": "node16"
+    "types": ["react-native"]
   },
   "include": ["src"]
 }

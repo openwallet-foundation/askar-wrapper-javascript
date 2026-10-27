@@ -20,18 +20,4 @@ import "@openwallet-foundation/askar-nodejs";
 import "@openwallet-foundation/askar-react-native";
 ```
 
-An alterative approach is to first try to require the Node.JS package, and otherwise require the React Native package:
-
-```typescript
-try {
-  require("@openwallet-foundation/askar-nodejs");
-} catch (error) {
-  try {
-    require("@openwallet-foundation/askar-react-native");
-  } catch (error) {
-    throw new Error("Could not load Askar bindings");
-  }
-}
-```
-
 How you approach it is up to you, as long as the native binding are called before any actions are performed on the Askar library.

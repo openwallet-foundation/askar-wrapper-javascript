@@ -1,4 +1,5 @@
 import fs from 'node:fs'
+import { createRequire } from 'node:module'
 import os from 'node:os'
 import path from 'node:path'
 import * as koffi from 'koffi'
@@ -44,7 +45,11 @@ const getLibrary = () => {
 
   // Look for the file in the native directory of the package.
   // node-pre-gyp will download the binaries to this directory after installing the package
-  platformPaths.unshift(path.join(__dirname, '../../native'))
+  // The package root, from both the bundle in build and the sources (Vitest)
+  const packageRoot = path.dirname(
+    createRequire(import.meta.url).resolve('@openwallet-foundation/askar-nodejs/package.json')
+  )
+  platformPaths.unshift(path.join(packageRoot, 'native'))
 
   // Check if the path from the environment variable is supplied and add it
   // We use unshift here so that when we want to get a valid library path this will be the first to resolve
