@@ -3,7 +3,15 @@
   "version": "0.6.1",
   "license": "Apache-2.0",
   "description": "Nodejs wrapper for Askar",
-  "main": "build/index",
+  "main": "./build/index.mjs",
+  "types": "./build/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.mts",
+      "default": "./build/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
   "source": "src/index",
   "homepage": "https://github.com/openwallet-foundation/askar-wrapper-javascript",
   "author": "Openwallet Foundation (https://github.com/openwallet-foundation)",
@@ -20,10 +28,8 @@
     "scripts"
   ],
   "scripts": {
-    "types:check": "pnpm compile --noEmit",
-    "build": "pnpm clean && pnpm compile",
-    "clean": "rimraf -rf ./build",
-    "compile": "tsc -p ./tsconfig.build.json",
+    "types:check": "tsc -p ./tsconfig.build.json --noEmit",
+    "build": "tsdown --platform node",
     "install": "node scripts/install.js"
   },
   "dependencies": {
@@ -32,6 +38,7 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
+    "tsdown": "catalog:",
     "typescript": "catalog:"
   },
   "binary": {
@@ -40,6 +47,6 @@
     "packageName": "library-{platform}-{arch}.tar.gz"
   },
   "engines": {
-    "node": ">= 22"
+    "node": ">= 22.12"
   }
 }

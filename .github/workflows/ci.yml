@@ -65,6 +65,13 @@ jobs:
       - name: Run tests
         run: pnpm test
 
+      - name: Compile
+        run: pnpm build
+
+      # The tests load the packages from src. This loads the build with require() and import()
+      - name: Load the built Node.js package
+        run: node packages/askar-nodejs/tests/built-package.cjs
+
   # Runs the tests in packages/askar-shared/tests inside the example app with React Native Harness, on an emulator and a
   # simulator. The example app is built with each Expo SDK in the matrix, and with it a React Native version: 53 (React
   # Native 0.79, the oldest SDK with React Native >= 0.77), 55 (0.83) and 58 (0.88, the version in the lockfile).

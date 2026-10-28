@@ -3,9 +3,17 @@
   "version": "0.6.1",
   "license": "Apache-2.0",
   "description": "Shared library for using Askar with NodeJS and React Native",
-  "main": "build/index",
+  "main": "./build/index.mjs",
+  "types": "./build/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.mts",
+      "default": "./build/index.mjs"
+    },
+    "./installBinary": "./installBinary.js",
+    "./package.json": "./package.json"
+  },
   "source": "src/index",
-  "types": "build/index",
   "homepage": "https://github.com/openwallet-foundation/askar-wrapper-javascript",
   "author": "Openwallet Foundation (https://github.com/openwallet-foundation)",
   "repository": {
@@ -21,16 +29,15 @@
     "installBinary.js"
   ],
   "scripts": {
-    "types:check": "pnpm compile --noEmit",
-    "build": "pnpm clean && pnpm compile",
-    "clean": "rimraf -rf ./build",
-    "compile": "tsc -p ./tsconfig.build.json"
+    "types:check": "tsc -p ./tsconfig.build.json --noEmit",
+    "build": "tsdown"
   },
   "dependencies": {
     "buffer": "^6.0.3",
     "tar": "^7.5.22"
   },
   "devDependencies": {
+    "tsdown": "catalog:",
     "typescript": "catalog:"
   }
 }
