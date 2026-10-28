@@ -16,9 +16,9 @@ export const decodeHandleList = (handleList: FfiHandleListType): number[] => {
   // With koffi, pointer data needs to be decoded
   const { data, len } = handleList
 
-  // If data is a koffi external pointer, decode it as uint8 array
-  const decoded = koffi.decode(data, FFI_USIZE, len)
-  return decoded
+  // koffi decodes size_t values as BigInts. The handles are sequence numbers, as for the store, session and scan
+  // handles that Askar returns directly
+  return Array.from(koffi.decode(data, FFI_USIZE, len) as ArrayLike<bigint>, Number)
 }
 
 export const byteBufferToUint8Array = (byteBuffer: ByteBufferType): Uint8Array => {

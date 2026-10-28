@@ -1,5 +1,8 @@
 import * as koffi from 'koffi'
 
+// koffi doesn't export the type of a type specifier
+export type TypeSpec = Parameters<typeof koffi.out>[0]
+
 export const FFI_UINT8 = koffi.types.uint8_t
 export const FFI_UINT64 = koffi.types.uint64_t
 export const FFI_USIZE = koffi.types.size_t

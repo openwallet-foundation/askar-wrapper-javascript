@@ -92,7 +92,7 @@ export class Ecdh1PU {
     nonce: Uint8Array
     tag: Uint8Array
     aad?: Uint8Array
-  }) {
+  }): Uint8Array {
     const derived = this.deriveKey({
       encryptionAlgorithm: encryptionAlgorithm,
       ephemeralKey,

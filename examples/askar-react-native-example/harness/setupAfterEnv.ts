@@ -1,4 +1,5 @@
 import { afterEach } from 'react-native-harness'
+
 // Checks that every test frees what it creates, as on Node.js. A require, so the type check of the example doesn't
 // include the shared tests, which are checked for Node.js
 require('../../../packages/askar-shared/tests/setup')

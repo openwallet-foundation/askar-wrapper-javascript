@@ -1,18 +1,19 @@
 import { NativeAskar } from '../askar'
 import { AskarError } from '../error'
 
-type ArcHandleType = Uint8Array | string | null
+// A pointer: a BigInt on Node.js, a string on React Native
+type ArcHandleType = Uint8Array | string | bigint | null
 
 export class ArcHandle {
-  public handle: Uint8Array | string
+  public handle: Uint8Array | string | bigint
 
-  public constructor(handle: Uint8Array | string) {
-    if (handle === '0') {
-      throw AskarError.customError({
-        message: 'Invalid handle. This means that the function call succeeded but none was found.',
-      })
-    }
+  public constructor(handle: Uint8Array | string | bigint) {
     this.handle = handle
+  }
+
+  // JSON.stringify throws on BigInts
+  public toJSON() {
+    return this.handle.toString()
   }
 
   public static fromHandle(handle: ArcHandleType) {
@@ -77,7 +78,7 @@ export class EntryListHandle extends ArcHandle {
     return NativeAskar.instance.entryListGetName({ index, entryListHandle: this })
   }
 
-  public getValue(index: number) {
+  public getValue(index: number): Uint8Array {
     return NativeAskar.instance.entryListGetValue({ index, entryListHandle: this })
   }
 

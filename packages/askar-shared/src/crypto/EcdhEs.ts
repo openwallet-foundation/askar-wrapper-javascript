@@ -95,7 +95,7 @@ export class EcdhEs {
     nonce: Uint8Array
     tag: Uint8Array
     aad?: Uint8Array
-  }) {
+  }): Uint8Array {
     return withKey(ephemeralKey, (eKey) =>
       withKey(recipientKey, (rKey) => {
         const derived = this.deriveKey({ encryptionAlgorithm, ephemeralKey: eKey, recipientKey: rKey, receive: true })
