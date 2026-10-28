@@ -24,8 +24,8 @@ Pod::Spec.new do |s|
   s.ios.vendored_frameworks = "native/mobile/ios/aries_askar.xcframework"
 
   s.source_files = "ios/**/*.{h,m,mm}", "cpp/**/*.{h,cpp}"
-  
-  s.dependency "React-Core"
-  s.dependency "React-callinvoker"
-  s.dependency "React"
+
+  # Adds the React Native dependencies, including the generated codegen spec, and defines
+  # RCT_NEW_ARCH_ENABLED when the app uses the New Architecture
+  install_modules_dependencies(s)
 end

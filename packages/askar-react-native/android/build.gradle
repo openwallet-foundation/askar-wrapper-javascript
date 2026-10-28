@@ -41,6 +41,11 @@ def REACT_NATIVE_VERSION = reactProperties.getProperty("VERSION_NAME").split("\\
 
 apply plugin: 'com.android.library'
 
+// Generates the Java spec of the TurboModule from the codegen config in package.json
+if (isNewArchitectureEnabled()) {
+  apply plugin: 'com.facebook.react'
+}
+
 def getExt(name) {
   return rootProject.ext.get(name)
 }
@@ -66,11 +71,13 @@ android {
 
   buildFeatures {
     prefab true
+    buildConfig true
   }
   
   defaultConfig {
     minSdkVersion getExtWithFallback('minSdkVersion', 21) 
     targetSdkVersion getExt('targetSdkVersion')
+    buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
     
     externalNativeBuild {
         cmake {
@@ -117,6 +124,12 @@ android {
   sourceSets {
     main {
       jniLibs.srcDirs = ['../native/mobile/android']
+      if (isNewArchitectureEnabled()) {
+        java.srcDirs += ["${project.buildDir}/generated/source/codegen/java"]
+      } else {
+        // A copy of the generated spec, as codegen only runs on the New Architecture
+        java.srcDirs += ['src/oldarch/java']
+      }
     }
   }
 }
