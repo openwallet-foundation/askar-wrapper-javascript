@@ -1,14 +1,14 @@
-#import <React/RCTBridge+Private.h>
 #import <jsi/jsi.h>
-#import <React/RCTUtils.h>
 #import <ReactCommon/RCTTurboModule.h>
-#import <ReactCommon/RCTInteropTurboModule.h>
 #import <ReactCommon/RCTTurboModuleWithJSIBindings.h>
 #import <askar/turboModuleUtility.h>
 
 #import "Askar.h"
 
 using namespace facebook;
+
+#ifndef RCT_NEW_ARCH_ENABLED
+#import <React/RCTBridge+Private.h>
 
 // React Native 0.87 removed the legacy bridge, so `RCTCxxBridge` no longer exists and
 // cannot be named. Re-declare just the `runtime` accessor we need and probe for it at
@@ -18,50 +18,52 @@ using namespace facebook;
 @interface RCTBridge (AskarLegacyBridge)
 - (void *)runtime;
 @end
+#endif
 
-@interface Askar () <RCTTurboModule, RCTTurboModuleWithJSIBindings>
+@interface Askar () <RCTTurboModuleWithJSIBindings>
 @end
 
-@implementation Askar 
+@implementation Askar
 
 RCT_EXPORT_MODULE()
 
-// Expose this module as a TurboModule so React Native invokes
-// installJSIBindingsWithRuntime:callInvoker: below when the module is created.
-// This is the only supported way to install JSI bindings under the New
-// Architecture / bridgeless mode, where [RCTBridge currentBridge] is nil and
-// the legacy bridge is compiled out (RCT_REMOVE_LEGACY_ARCH=1).
-//
-// ObjCInteropTurboModule keeps the existing RCT_EXPORT methods (e.g. `install`)
-// dispatchable without requiring a codegen spec, so this remains a drop-in
-// change that also works on the old architecture.
-- (std::shared_ptr<react::TurboModule>)getTurboModule:(const react::ObjCTurboModule::InitParams &)params
-{
-    return std::make_shared<react::ObjCInteropTurboModule>(params);
-}
-
+// React Native calls this when it creates the TurboModule, with a valid runtime and call
+// invoker also in bridgeless mode, where [RCTBridge currentBridge] is nil
 - (void)installJSIBindingsWithRuntime:(jsi::Runtime &)runtime
                           callInvoker:(const std::shared_ptr<react::CallInvoker> &)callInvoker
 {
     askarTurboModuleUtility::registerTurboModule(runtime, callInvoker);
 }
 
+#ifdef RCT_NEW_ARCH_ENABLED
+
+- (std::shared_ptr<react::TurboModule>)getTurboModule:(const react::ObjCTurboModule::InitParams &)params
+{
+    return std::make_shared<react::NativeAskarSpecJSI>(params);
+}
+
+// The bindings are already installed by installJSIBindingsWithRuntime:callInvoker:
+- (NSNumber *)install
+{
+    return @YES;
+}
+
+#else
+
+// Old Architecture: install using the runtime of the legacy bridge
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
 {
-    // New Architecture: the JSI bindings are installed via
-    // installJSIBindingsWithRuntime:callInvoker: when this TurboModule is
-    // created, so there is nothing to do here.
-    //
-    // Old Architecture (legacy bridge present): install using the bridge
-    // runtime so this keeps working for non-bridgeless apps.
     RCTBridge* bridge = [RCTBridge currentBridge];
     if ([bridge respondsToSelector:@selector(runtime)]) {
         jsi::Runtime* jsiRuntime = (jsi::Runtime*) [bridge runtime];
         if (jsiRuntime != nil) {
             askarTurboModuleUtility::registerTurboModule(*jsiRuntime, bridge.jsCallInvoker);
+            return @true;
         }
     }
-    return @true;
+    return @false;
 }
+
+#endif
 
 @end

@@ -25,6 +25,7 @@
   },
   "files": [
     "build",
+    "src/specs",
     "android/src",
     "android/build.gradle",
     "android/CMakeLists.txt",
@@ -37,6 +38,19 @@
     "askar.podspec",
     "scripts"
   ],
+  "codegenConfig": {
+    "name": "RNAskarSpec",
+    "type": "modules",
+    "jsSrcsDir": "src/specs",
+    "android": {
+      "javaPackageName": "foundation.openwallet.askar"
+    },
+    "ios": {
+      "modulesProvider": {
+        "Askar": "Askar"
+      }
+    }
+  },
   "scripts": {
     "types:check": "tsc -p ./tsconfig.build.json --noEmit",
     "build": "tsdown",
