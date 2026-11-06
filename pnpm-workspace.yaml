@@ -32,7 +32,8 @@ allowBuilds:
   '@parcel/watcher': false
   unrs-resolver: false
 
-# Patches for React Native Harness 1.6.0, until a release fixes them:
+# Patches for React Native Harness 1.6.0, until a release fixes them. The example pins Harness to exactly 1.6.0:
+# harness/use-expo-sdk.mjs installs without the lockfile, and pnpm fails when a newer version leaves a patch unused
 # - bridge: Harness fails the run when the app's JS thread doesn't answer its heartbeat within 20 seconds, and the
 #   synchronous askar calls and the test bundle evaluation block it longer than that on CI's iOS simulators. Raises the
 #   timeout to 120 seconds. Remove once a release includes https://github.com/callstackincubator/react-native-harness/pull/226
