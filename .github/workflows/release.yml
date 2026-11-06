@@ -32,6 +32,12 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
+      # .changeset/commit.js reads the git user for the sign-off when changeset version runs
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v2
@@ -44,6 +50,8 @@ jobs:
           # The next step creates one GitHub release for the version instead of one per package
           create-github-releases: false
           push-git-tags: false
+          # Pushes the commit that changeset version creates, so it keeps the sign-off from .changeset/commit.js
+          push-with-git-cli: true
 
       - name: Get current package version
         id: get_version
@@ -74,6 +82,11 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
       - name: Create unstable release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -93,7 +106,5 @@ jobs:
           pnpm changeset publish --tag alpha
 
           CURRENT_PACKAGE_VERSION=$(node -p "require('./packages/askar-shared/package.json').version")
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git tag v$CURRENT_PACKAGE_VERSION
           git push origin v$CURRENT_PACKAGE_VERSION --no-verify
