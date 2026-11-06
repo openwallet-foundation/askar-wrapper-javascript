@@ -1,0 +1,4 @@
+{
+  "cmake.sourceDirectory": "/Users/genaris/dev/askar-wrapper-javascript/packages/askar-react-native/android",
+  "java.compile.nullAnalysis.mode": "automatic"
+}

@@ -11,7 +11,7 @@ catalog:
   '@biomejs/biome': 2.6.3
   '@changesets/cli': ^3.0.3
   '@types/node': ^22.20.5
-  koffi: ^3.3.4
+  koffi: ^3.3.6
   react: 19.3.0
   react-native: 0.88.0
   # 0.23.2 generates the type declarations with TypeScript's classic API, which TypeScript 7 doesn't have. Fixed in
