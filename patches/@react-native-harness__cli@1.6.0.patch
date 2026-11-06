@@ -1,0 +1,44 @@
+diff --git a/dist/ci/plan-metro-save.js b/dist/ci/plan-metro-save.js
+index 55a6fedaf370e4212cc8a4fa91a7fee5838a0260..a7cc72f02f432d5d9f416c2be265f5073abc5734 100644
+--- a/dist/ci/plan-metro-save.js
++++ b/dist/ci/plan-metro-save.js
+@@ -1,3 +1,4 @@
++import fs from 'node:fs';
+ import { createHarnessCache, } from '@react-native-harness/cache';
+ import { getConfig } from '@react-native-harness/config';
+ import { getFs } from '@react-native-harness/tools/harness-context';
+@@ -9,7 +10,8 @@ const parseSnapshot = (raw) => {
+         return {};
+     }
+     try {
+-        return JSON.parse(raw);
++        // snapshot-metro outputs the path of the file it wrote the snapshot to
++        return JSON.parse(raw.startsWith('{') ? raw : fs.readFileSync(raw, 'utf8'));
+     }
+     catch (error) {
+         console.warn('Failed to parse the metroSnapshot input. Treating the pre-run cache state as empty.', error);
+diff --git a/dist/ci/snapshot-metro.js b/dist/ci/snapshot-metro.js
+index 24965c31f41b167234f1c5ae6b6968adc13a1fe0..70421b94a8c975948dba2ae8657eff929c16d8fc 100644
+--- a/dist/ci/snapshot-metro.js
++++ b/dist/ci/snapshot-metro.js
+@@ -1,3 +1,5 @@
++import fs from 'node:fs';
++import path from 'node:path';
+ import { createHarnessCache } from '@react-native-harness/cache';
+ import { getConfig } from '@react-native-harness/config';
+ import { getFs } from '@react-native-harness/tools/harness-context';
+@@ -36,7 +38,13 @@ export const runSnapshotMetro = async () => {
+         else {
+             console.info('Metro cache: no existing cache entry matched — starting cold.');
+         }
+-        const output = `metroSnapshot=${JSON.stringify(snapshotAfterRestore)}\n`;
++        // The action passes this output to plan-metro-save in an environment variable, and Linux limits one to
++        // 128 KiB, so the snapshot of a restored cache doesn't fit. Writes it to a file next to keys.json, outside
++        // the cached directories, and outputs only its path.
++        const snapshotPath = path.join(resolvedProjectRoot, '.harness', 'cache', 'metro-snapshot.json');
++        fs.mkdirSync(path.dirname(snapshotPath), { recursive: true });
++        fs.writeFileSync(snapshotPath, JSON.stringify(snapshotAfterRestore));
++        const output = `metroSnapshot=${snapshotPath}\n`;
+         getFs().appendFileSync(githubOutput, output);
+     }
+     catch (error) {

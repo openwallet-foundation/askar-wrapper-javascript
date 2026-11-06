@@ -41,7 +41,12 @@ allowBuilds:
 # - runtime: afterEach hooks run from the outer suite inwards, unlike Jest and Vitest. The shared tests check in an outer
 #   afterEach (packages/askar-shared/tests/setup.ts) that the inner ones closed everything. Runs them inside out. Not fixed
 #   upstream yet
+# - cli: the GitHub Action passes the Metro cache snapshot from `ci snapshot-metro` to `ci plan-metro-save` in an
+#   environment variable, which is over Linux's 128 KiB limit once a cache is restored, so the Android jobs fail with
+#   "Argument list too long". Passes the path of a file with the snapshot instead. Remove once a release fixes
+#   https://github.com/callstackincubator/react-native-harness/issues/299
 patchedDependencies:
   '@react-native-harness/bridge@1.6.0': patches/@react-native-harness__bridge@1.6.0.patch
   '@react-native-harness/bundler-metro@1.6.0': patches/@react-native-harness__bundler-metro@1.6.0.patch
+  '@react-native-harness/cli@1.6.0': patches/@react-native-harness__cli@1.6.0.patch
   '@react-native-harness/runtime@1.6.0': patches/@react-native-harness__runtime@1.6.0.patch

@@ -198,6 +198,7 @@ catalogs:
 patchedDependencies:
   '@react-native-harness/bridge@1.6.0': 85bf4637397cd3e6871ad58cbb1412683608ba8c2fd3f5721e3d307ee555eb95
   '@react-native-harness/bundler-metro@1.6.0': 4b4e8881b138cb8012e229c82190f02d6212807ae73a42ca92a435cb38ae75ef
+  '@react-native-harness/cli@1.6.0': 9edd665ee4b1ed22bd43bc2a5dae3ad5dc18dcdf74e53f98817ceb282f382f78
   '@react-native-harness/runtime@1.6.0': c637ebef092b9d3fcf18d144ea7c3c1421b7724cde2579538bcfa2541efb7c5c
 
 importers:
@@ -7013,7 +7014,7 @@ snapshots:
     transitivePeerDependencies:
       - react-native
 
-  '@react-native-harness/cli@1.6.0(@types/node@22.20.5)(react-native@0.88.0(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(supports-color@8.1.1)':
+  '@react-native-harness/cli@1.6.0(patch_hash=9edd665ee4b1ed22bd43bc2a5dae3ad5dc18dcdf74e53f98817ceb282f382f78)(@types/node@22.20.5)(react-native@0.88.0(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(supports-color@8.1.1)':
     dependencies:
       '@react-native-harness/bridge': 1.6.0(patch_hash=85bf4637397cd3e6871ad58cbb1412683608ba8c2fd3f5721e3d307ee555eb95)(react-native@0.88.0(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))
       '@react-native-harness/cache': 1.6.0(react-native@0.88.0(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))
@@ -9570,7 +9571,7 @@ snapshots:
   react-native-harness@1.6.0(@babel/core@7.29.7(supports-color@8.1.1))(@babel/plugin-transform-react-jsx@7.28.6(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/node@22.20.5)(@types/react@19.3.0)(metro-cache@0.87.1(supports-color@8.1.1))(metro-config@0.87.1(supports-color@8.1.1))(metro-resolver@0.87.1)(metro@0.87.1(supports-color@8.1.1))(react-native@0.88.0(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)(supports-color@8.1.1):
     dependencies:
       '@react-native-harness/babel-preset': 1.6.0(@babel/core@7.29.7(supports-color@8.1.1))(@babel/plugin-transform-react-jsx@7.28.6(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(supports-color@8.1.1)
-      '@react-native-harness/cli': 1.6.0(@types/node@22.20.5)(react-native@0.88.0(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(supports-color@8.1.1)
+      '@react-native-harness/cli': 1.6.0(patch_hash=9edd665ee4b1ed22bd43bc2a5dae3ad5dc18dcdf74e53f98817ceb282f382f78)(@types/node@22.20.5)(react-native@0.88.0(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(supports-color@8.1.1)
       '@react-native-harness/jest': 1.6.0(@babel/core@7.29.7(supports-color@8.1.1))(@babel/plugin-transform-react-jsx@7.28.6(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(metro-cache@0.87.1(supports-color@8.1.1))(metro-config@0.87.1(supports-color@8.1.1))(metro-resolver@0.87.1)(metro@0.87.1(supports-color@8.1.1))(react-native@0.88.0(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)(supports-color@8.1.1)
       '@react-native-harness/metro': 1.6.0(metro@0.87.1(supports-color@8.1.1))
       '@react-native-harness/runtime': 1.6.0(patch_hash=c637ebef092b9d3fcf18d144ea7c3c1421b7724cde2579538bcfa2541efb7c5c)(@types/react@19.3.0)(react-native@0.88.0(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
