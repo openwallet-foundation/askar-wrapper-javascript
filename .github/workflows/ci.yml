@@ -138,7 +138,7 @@ jobs:
 
       # Harness boots the emulator or simulator from rn-harness.config.mjs and installs the app
       - name: Run tests
-        uses: callstackincubator/react-native-harness@v1.6.0
+        uses: callstackincubator/react-native-harness@v1.7.0
         with:
           runner: ${{ matrix.platform }}
           app: ${{ matrix.platform == 'ios' && 'ios/build/Build/Products/Debug-iphonesimulator/askarreactnativeexample.app' || 'android/app/build/outputs/apk/debug/app-debug.apk' }}
