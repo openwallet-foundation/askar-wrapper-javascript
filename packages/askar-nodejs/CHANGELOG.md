@@ -1,5 +1,25 @@
 # @openwallet-foundation/askar-nodejs
 
+## 0.7.0
+
+### Minor Changes
+
+- 97808ff: feat: drop the CommonJS build. The packages are now published as ESM only, built with tsdown. This removes the dual package hazard, where a CommonJS and an ESM copy of a package are loaded side by side and `instanceof` checks fail. CommonJS code can still `require()` the packages, which now need Node.js 22.12 or newer
+- 94172a7: feat(nodejs): require Node.js 22 or newer and update koffi to v3. Node.js 20 is end of life. koffi 3 installs its native binary from a package for your platform (`@koromix/koffi-<platform>`) instead of shipping the binaries for all platforms. It also fixes a crash of Node.js 24.14 and newer when exiting after an async Askar call or a custom logger. The native handles of keys and entry lists (`handle.handle`) are now BigInts. `JSON.stringify` writes a handle as a string
+
+### Patch Changes
+
+- 740cdd2: fix: free native memory that leaked. Node.js and React Native now free the strings that Askar returns. React Native frees the state of every async call, and Node.js unregisters the custom logger callback when Askar rejects it. `Store.scan` frees the entry lists it reads, and the `Session` fetch methods free their list when reading it fails. `EcdhEs` and `Ecdh1PU` free the keys they create, also when encrypting or decrypting fails. `Store.copyTo` closes the copy that Askar opens. `askarNodeJS.version()` now returns the version instead of a pointer, and calling `fetchAll` on a `Scan` a second time starts a new scan instead of using the freed one
+- 2417b04: fix(nodejs): update koffi to 3.3.6, which fixes the memory leak when decoding arrays with a length, and remove the workaround for it.
+- 8643f17: fix: stop leaking about 20 bytes of native memory each time Node.js reads bytes from Askar, such as a signature, a public key, a ciphertext or an entry value. koffi leaked them on every `koffi.decode` call with a length
+- 740cdd2: fix(nodejs): `setCustomLogger` threw a koffi type error and never set the logger, and with `enabled` or `flush` set to `true` it would have crashed the process. Askar expects callbacks for these, not booleans. Both options are now deprecated and have no effect: use `logLevel` to filter the logs
+- Updated dependencies [97808ff]
+- Updated dependencies [740cdd2]
+- Updated dependencies [94172a7]
+- Updated dependencies [740cdd2]
+- Updated dependencies [d9b8fe6]
+  - @openwallet-foundation/askar-shared@0.7.0
+
 ## 0.6.1
 
 ### Patch Changes
