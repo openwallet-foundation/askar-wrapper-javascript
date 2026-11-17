@@ -1,5 +1,14 @@
 # @openwallet-foundation/askar-react-native
 
+## 0.7.1
+
+### Patch Changes
+
+- a774212: fix(react-native): free key entry lists. `keyEntryListFree` counted the list instead of freeing it, so every `Session.fetchKey` and `Session.fetchAllKeys` leaked its list
+- a774212: fix(react-native): free string lists and byte buffers when reading them fails. An async call that is still running when the app reloads no longer calls back into the new JavaScript runtime with the state of the old one
+- Updated dependencies [a774212]
+  - @openwallet-foundation/askar-shared@0.7.1
+
 ## 0.7.0
 
 ### Minor Changes
