@@ -298,7 +298,7 @@ jsi::Value createReturnValue(jsi::Runtime &rt, ErrorCode code,
 }
 
 void callback(CallbackId result, ErrorCode code) {
-  invoker->invokeAsync([result, code]() {
+  reinterpret_cast<State *>(result)->invoker->invokeAsync([result, code]() {
     // Owns the state, so it's deleted once the callback ran, also when it throws
     std::unique_ptr<State> state(reinterpret_cast<State *>(result));
     jsi::Function *cb = &state->cb;
@@ -313,7 +313,7 @@ void callback(CallbackId result, ErrorCode code) {
 // Session, Store and Scan Handle
 template <>
 void callbackWithResponse(CallbackId result, ErrorCode code, size_t response) {
-  invoker->invokeAsync([result, code, response]() {
+  reinterpret_cast<State *>(result)->invoker->invokeAsync([result, code, response]() {
     // Owns the state, so it's deleted once the callback ran, also when it throws
     std::unique_ptr<State> state(reinterpret_cast<State *>(result));
     jsi::Function *cb = &state->cb;
@@ -327,7 +327,7 @@ void callbackWithResponse(CallbackId result, ErrorCode code, size_t response) {
 template <>
 void callbackWithResponse(CallbackId result, ErrorCode code,
                           const char *response) {
-  invoker->invokeAsync([result, code, response]() {
+  reinterpret_cast<State *>(result)->invoker->invokeAsync([result, code, response]() {
     // Owns the state, so it's deleted once the callback ran, also when it throws
     std::unique_ptr<State> state(reinterpret_cast<State *>(result));
     jsi::Function *cb = &state->cb;
@@ -341,7 +341,7 @@ void callbackWithResponse(CallbackId result, ErrorCode code,
 template <>
 void callbackWithResponse(CallbackId result, ErrorCode code,
                           EntryListHandle response) {
-  invoker->invokeAsync([result, code, response]() {
+  reinterpret_cast<State *>(result)->invoker->invokeAsync([result, code, response]() {
     // Owns the state, so it's deleted once the callback ran, also when it throws
     std::unique_ptr<State> state(reinterpret_cast<State *>(result));
     jsi::Function *cb = &state->cb;
@@ -355,7 +355,7 @@ void callbackWithResponse(CallbackId result, ErrorCode code,
 template <>
 void callbackWithResponse(CallbackId result, ErrorCode code,
                           KeyEntryListHandle response) {
-  invoker->invokeAsync([result, code, response]() {
+  reinterpret_cast<State *>(result)->invoker->invokeAsync([result, code, response]() {
     // Owns the state, so it's deleted once the callback ran, also when it throws
     std::unique_ptr<State> state(reinterpret_cast<State *>(result));
     jsi::Function *cb = &state->cb;
@@ -369,7 +369,7 @@ void callbackWithResponse(CallbackId result, ErrorCode code,
 template <>
 void callbackWithResponse(CallbackId result, ErrorCode code,
                           StringListHandle response) {
-  invoker->invokeAsync([result, code, response]() {
+  reinterpret_cast<State *>(result)->invoker->invokeAsync([result, code, response]() {
     // Owns the state, so it's deleted once the callback ran, also when it throws
     std::unique_ptr<State> state(reinterpret_cast<State *>(result));
     jsi::Function *cb = &state->cb;
@@ -383,7 +383,7 @@ void callbackWithResponse(CallbackId result, ErrorCode code,
 template <>
 void callbackWithResponse(CallbackId result, ErrorCode code,
                           FfiHandleList response) {
-  invoker->invokeAsync([result, code, response]() {
+  reinterpret_cast<State *>(result)->invoker->invokeAsync([result, code, response]() {
     // Owns the state, so it's deleted once the callback ran, also when it throws
     std::unique_ptr<State> state(reinterpret_cast<State *>(result));
     jsi::Function *cb = &state->cb;
@@ -398,7 +398,7 @@ void callbackWithResponse(CallbackId result, ErrorCode code,
 
 template <>
 void callbackWithResponse(CallbackId result, ErrorCode code, int8_t response) {
-  invoker->invokeAsync([result, code, response]() {
+  reinterpret_cast<State *>(result)->invoker->invokeAsync([result, code, response]() {
     // Owns the state, so it's deleted once the callback ran, also when it throws
     std::unique_ptr<State> state(reinterpret_cast<State *>(result));
     jsi::Function *cb = &state->cb;
@@ -411,7 +411,7 @@ void callbackWithResponse(CallbackId result, ErrorCode code, int8_t response) {
 
 template <>
 void callbackWithResponse(CallbackId result, ErrorCode code, int64_t response) {
-  invoker->invokeAsync([result, code, response]() {
+  reinterpret_cast<State *>(result)->invoker->invokeAsync([result, code, response]() {
     // Owns the state, so it's deleted once the callback ran, also when it throws
     std::unique_ptr<State> state(reinterpret_cast<State *>(result));
     jsi::Function *cb = &state->cb;

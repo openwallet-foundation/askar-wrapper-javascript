@@ -21,9 +21,28 @@ static const std::string errorInfix = "` is not of type ";
 struct State {
   jsi::Function cb;
   jsi::Runtime *rt;
+  // The invoker of `rt`. After a reload the global invoker runs on a new
+  // runtime, and this one drops the callback, so the state is never used
+  // without its runtime (it leaks then, as `cb` can't be destroyed without it)
+  std::shared_ptr<react::CallInvoker> invoker;
 
   State(jsi::Function *cb_) : cb(std::move(*cb_)) {}
 };
+
+// Frees a buffer that Askar wrote when the scope ends, so also when copying it
+// to a JS value throws
+struct FreeBufferOnExit {
+  ErrorCode &code;
+  SecretBuffer &buffer;
+
+  ~FreeBufferOnExit() {
+    if (code == ErrorCode::Success)
+      askar_buffer_free(buffer);
+  }
+};
+
+// The invoker of the runtime that installed the module last
+extern std::shared_ptr<react::CallInvoker> invoker;
 
 // Install the Turbomodule
 void registerTurboModule(jsi::Runtime &rt,
@@ -73,6 +92,7 @@ jsi::Value callAsync(jsi::Runtime &rt, jsi::Object &options, Call call) {
   jsi::Function cb = options.getPropertyAsFunction(rt, "cb");
   State *state = new State(&cb);
   state->rt = &rt;
+  state->invoker = invoker;
 
   ErrorCode code = call(CallbackId(state));
   if (code != ErrorCode::Success)

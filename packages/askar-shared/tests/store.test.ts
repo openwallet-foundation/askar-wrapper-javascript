@@ -1,4 +1,13 @@
-import { AskarError, KdfMethod, Key, KeyAlgorithm, Store, StoreKeyMethod } from '@openwallet-foundation/askar-shared'
+import {
+  type Askar,
+  AskarError,
+  KdfMethod,
+  Key,
+  KeyAlgorithm,
+  NativeAskar,
+  Store,
+  StoreKeyMethod,
+} from '@openwallet-foundation/askar-shared'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import {
   createStoreUri,
@@ -399,6 +408,34 @@ describe('Store and Session', () => {
     await expect(session.fetchAll({ category: firstEntry.category, isJson: true })).rejects.toThrow()
 
     await session.close()
+  })
+
+  test('Fetch all keys frees the keys it read when reading an entry fails', async () => {
+    const session = await store.openSession()
+    const keys = [Key.generate(KeyAlgorithm.Ed25519), Key.generate(KeyAlgorithm.Ed25519)]
+    for (const [index, key] of keys.entries()) await session.insertKey({ name: `key-${index}`, key })
+
+    // Reading the second entry fails after the key of the first entry was loaded
+    const native = NativeAskar.instance
+    NativeAskar.register(
+      new Proxy(native, {
+        get: (target, property: keyof Askar) =>
+          property === 'keyEntryListGetName'
+            ? (options: Parameters<Askar['keyEntryListGetName']>[0]) => {
+                if (options.index === 1) throw AskarError.customError({ message: 'Unreadable entry' })
+                return target.keyEntryListGetName(options)
+              }
+            : target[property],
+      })
+    )
+    try {
+      await expect(session.fetchAllKeys({})).rejects.toThrow('Unreadable entry')
+    } finally {
+      NativeAskar.register(native)
+    }
+
+    await session.close()
+    for (const key of keys) key.handle.free()
   })
 
   test('Copy', async () => {
