@@ -32,7 +32,13 @@ export class KeyEntryList {
 
   public toArray(): KeyEntryObject[] {
     const list: KeyEntryObject[] = []
-    this.forEachKeyEntry((key) => list.push(key.toJson()))
+    try {
+      this.forEachKeyEntry((key) => list.push(key.toJson()))
+    } catch (error) {
+      // The caller frees the keys it gets back. When reading fails it gets none, so they're freed here
+      for (const entry of list) entry.key.handle.free()
+      throw error
+    }
     return list
   }
 }

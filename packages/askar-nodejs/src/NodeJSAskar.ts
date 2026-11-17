@@ -205,6 +205,46 @@ export class NodeJSAskar implements Askar {
     throw this.getAskarError(errorCode)
   }
 
+  // Safety net for a key or list that is never freed: frees it when its handle is garbage collected. The free methods
+  // unregister the handle, so nothing is freed twice. Sessions and scans are not covered: a pending call only holds their
+  // number, so they could be closed under it
+  private finalizer = new FinalizationRegistry<() => void>((free) => free())
+
+  private freeWhenCollected<Handle extends object | null>(handle: Handle, free: () => void): Handle {
+    if (handle) this.finalizer.register(handle, free, handle)
+    return handle
+  }
+
+  private localKeyHandle(ret: [unknown]): LocalKeyHandle {
+    const pointer = handleReturnPointer<bigint>(ret)
+    return this.freeWhenCollected(new LocalKeyHandle(pointer), () => this.nativeAskar.askar_key_free(pointer))
+  }
+
+  private entryListHandle(handle: Uint8Array | null): EntryListHandle | null {
+    return this.freeWhenCollected(EntryListHandle.fromHandle(handle), () =>
+      this.nativeAskar.askar_entry_list_free(handle)
+    )
+  }
+
+  private keyEntryListHandle(handle: Uint8Array | null): KeyEntryListHandle | null {
+    return this.freeWhenCollected(KeyEntryListHandle.fromHandle(handle), () =>
+      this.nativeAskar.askar_key_entry_list_free(handle)
+    )
+  }
+
+  private readStringList(stringListHandle: unknown): string[] {
+    const count = allocateInt32Buffer()
+    this.handleError(this.nativeAskar.askar_string_list_count(stringListHandle, count))
+
+    const strings: string[] = []
+    for (let index = 0; index < count[0]; index++) {
+      const item = allocateStringBuffer()
+      this.handleError(this.nativeAskar.askar_string_list_get_item(stringListHandle, index, item))
+      strings.push(item[0] as string)
+    }
+    return strings
+  }
+
   private handleListFree(options: { handleList: FfiHandleListType }): void {
     this.nativeAskar.askar_handle_list_free(options.handleList)
   }
@@ -289,6 +329,7 @@ export class NodeJSAskar implements Askar {
   public entryListFree(options: EntryListFreeOptions): void {
     const { entryListHandle } = serializeArguments(options)
 
+    this.finalizer.unregister(options.entryListHandle)
     this.nativeAskar.askar_entry_list_free(entryListHandle)
   }
 
@@ -413,8 +454,7 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_convert(localKeyHandle, algorithm, ret)
     this.handleError(errorCode)
 
-    const handle = handleReturnPointer<Uint8Array>(ret)
-    return new LocalKeyHandle(handle)
+    return this.localKeyHandle(ret)
   }
 
   public keyCryptoBox(options: KeyCryptoBoxOptions): Uint8Array {
@@ -510,8 +550,7 @@ export class NodeJSAskar implements Askar {
     )
     this.handleError(errorCode)
 
-    const handle = handleReturnPointer<Uint8Array>(ret)
-    return new LocalKeyHandle(handle)
+    return this.localKeyHandle(ret)
   }
 
   public keyDeriveEcdhEs(options: KeyDeriveEcdhEsOptions): LocalKeyHandle {
@@ -530,8 +569,7 @@ export class NodeJSAskar implements Askar {
     )
     this.handleError(errorCode)
 
-    const handle = handleReturnPointer<Uint8Array>(ret)
-    return new LocalKeyHandle(handle)
+    return this.localKeyHandle(ret)
   }
 
   public keyEntryListCount(options: KeyEntryListCountOptions): number {
@@ -547,6 +585,7 @@ export class NodeJSAskar implements Askar {
   public keyEntryListFree(options: KeyEntryListFreeOptions): void {
     const { keyEntryListHandle } = serializeArguments(options)
 
+    this.finalizer.unregister(options.keyEntryListHandle)
     this.nativeAskar.askar_key_entry_list_free(keyEntryListHandle)
   }
 
@@ -597,13 +636,13 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_entry_list_load_local(keyEntryListHandle, index, ret)
     this.handleError(errorCode)
 
-    const handle = handleReturnPointer<Uint8Array>(ret)
-    return new LocalKeyHandle(handle)
+    return this.localKeyHandle(ret)
   }
 
   public keyFree(options: KeyFreeOptions): void {
     const { localKeyHandle } = serializeArguments(options)
 
+    this.finalizer.unregister(options.localKeyHandle)
     this.nativeAskar.askar_key_free(localKeyHandle)
   }
 
@@ -614,8 +653,7 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_from_jwk(jwk, ret)
     this.handleError(errorCode)
 
-    const handle = handleReturnPointer<Uint8Array>(ret)
-    return new LocalKeyHandle(handle)
+    return this.localKeyHandle(ret)
   }
 
   public keyFromKeyExchange(options: KeyFromKeyExchangeOptions): LocalKeyHandle {
@@ -625,8 +663,7 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_from_key_exchange(algorithm, skHandle, pkHandle, ret)
     this.handleError(errorCode)
 
-    const handle = handleReturnPointer<Uint8Array>(ret)
-    return new LocalKeyHandle(handle)
+    return this.localKeyHandle(ret)
   }
 
   public keyFromPublicBytes(options: KeyFromPublicBytesOptions): LocalKeyHandle {
@@ -636,8 +673,7 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_from_public_bytes(algorithm, publicKey, ret)
     this.handleError(errorCode)
 
-    const handle = handleReturnPointer<Uint8Array>(ret)
-    return new LocalKeyHandle(handle)
+    return this.localKeyHandle(ret)
   }
 
   public keyFromSecretBytes(options: KeyFromSecretBytesOptions): LocalKeyHandle {
@@ -647,8 +683,7 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_from_secret_bytes(algorithm, secretKey, ret)
     this.handleError(errorCode)
 
-    const handle = handleReturnPointer<Uint8Array>(ret)
-    return new LocalKeyHandle(handle)
+    return this.localKeyHandle(ret)
   }
 
   public keyFromSeed(options: KeyFromSeedOptions): LocalKeyHandle {
@@ -658,8 +693,7 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_from_seed(algorithm, seed, method, ret)
     this.handleError(errorCode)
 
-    const handle = handleReturnPointer<Uint8Array>(ret)
-    return new LocalKeyHandle(handle)
+    return this.localKeyHandle(ret)
   }
 
   public keyGenerate(options: KeyGenerateOptions): LocalKeyHandle {
@@ -669,8 +703,7 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_generate(algorithm, keyBackend, ephemeral, ret)
     this.handleError(errorCode)
 
-    const handle = handleReturnPointer<Uint8Array>(ret)
-    return new LocalKeyHandle(handle)
+    return this.localKeyHandle(ret)
   }
 
   public keyGetAlgorithm(options: KeyGetAlgorithmOptions): string {
@@ -778,8 +811,7 @@ export class NodeJSAskar implements Askar {
     const errorCode = this.nativeAskar.askar_key_unwrap_key(localKeyHandle, algorithm, ciphertext, nonce, tag, ret)
     this.handleError(errorCode)
 
-    const handle = handleReturnPointer<Uint8Array>(ret)
-    return new LocalKeyHandle(handle)
+    return this.localKeyHandle(ret)
   }
 
   public keyVerifySignature(options: KeyVerifySignatureOptions): boolean {
@@ -815,22 +847,11 @@ export class NodeJSAskar implements Askar {
     this.handleError(keyGetSupportedBackendsErrorCode)
     const stringListHandle = stringListHandlePtr[0]
 
-    const listCountPtr = allocateInt32Buffer()
-    const stringListCountErrorCode = this.nativeAskar.askar_string_list_count(stringListHandle, listCountPtr)
-    this.handleError(stringListCountErrorCode)
-    const count = listCountPtr[0]
-
-    const supportedBackends = []
-
-    for (let i = 0; i < count; i++) {
-      const strPtr = allocateStringBuffer()
-      const errorCode = this.nativeAskar.askar_string_list_get_item(stringListHandle, i, strPtr)
-      this.handleError(errorCode)
-      supportedBackends.push(strPtr[0] as string)
+    try {
+      return this.readStringList(stringListHandle)
+    } finally {
+      this.nativeAskar.askar_string_list_free(stringListHandle)
     }
-    this.nativeAskar.askar_string_list_free(stringListHandle)
-
-    return supportedBackends
   }
 
   public scanFree(options: ScanFreeOptions): void {
@@ -848,7 +869,7 @@ export class NodeJSAskar implements Askar {
       FFI_CALLBACK_ENTRY_LIST_HANDLE
     )
 
-    return EntryListHandle.fromHandle(handle)
+    return this.entryListHandle(handle)
   }
 
   public async scanStart(options: ScanStartOptions): Promise<ScanHandle> {
@@ -905,7 +926,7 @@ export class NodeJSAskar implements Askar {
       FFI_CALLBACK_ENTRY_LIST_HANDLE
     )
 
-    return EntryListHandle.fromHandle(handle)
+    return this.entryListHandle(handle)
   }
 
   public async sessionFetchAll(options: SessionFetchAllOptions): Promise<EntryListHandle | null> {
@@ -931,7 +952,7 @@ export class NodeJSAskar implements Askar {
       FFI_CALLBACK_ENTRY_LIST_HANDLE
     )
 
-    return EntryListHandle.fromHandle(handle)
+    return this.entryListHandle(handle)
   }
 
   public async sessionFetchAllKeys(options: SessionFetchAllKeysOptions): Promise<KeyEntryListHandle | null> {
@@ -955,7 +976,7 @@ export class NodeJSAskar implements Askar {
       FFI_CALLBACK_KEY_ENTRY_LIST_HANDLE
     )
 
-    return KeyEntryListHandle.fromHandle(handle)
+    return this.keyEntryListHandle(handle)
   }
 
   public async sessionFetchKey(options: SessionFetchKeyOptions): Promise<KeyEntryListHandle | null> {
@@ -966,7 +987,7 @@ export class NodeJSAskar implements Askar {
       FFI_CALLBACK_KEY_ENTRY_LIST_HANDLE
     )
 
-    return KeyEntryListHandle.fromHandle(handle)
+    return this.keyEntryListHandle(handle)
   }
 
   public async sessionInsertKey(options: SessionInsertKeyOptions): Promise<void> {
@@ -1137,19 +1158,11 @@ export class NodeJSAskar implements Askar {
       throw AskarError.customError({ message: 'Invalid handle' })
     }
 
-    const counti32 = allocateInt32Buffer()
-    const errorCode = this.nativeAskar.askar_string_list_count(listHandle, counti32)
-    this.handleError(errorCode)
-    const count = counti32[0]
-    const ret = []
-    const strval = allocateStringBuffer()
-    for (let i = 0; i < count; i++) {
-      const errorCode = this.nativeAskar.askar_string_list_get_item(listHandle, i, strval)
-      this.handleError(errorCode)
-      ret.push(strval[0] as string)
+    try {
+      return this.readStringList(listHandle)
+    } finally {
+      this.nativeAskar.askar_string_list_free(listHandle)
     }
-    this.nativeAskar.askar_string_list_free(listHandle)
-    return ret
   }
 
   public async storeListScans(options: StoreListScansOptions): Promise<ScanHandle[]> {

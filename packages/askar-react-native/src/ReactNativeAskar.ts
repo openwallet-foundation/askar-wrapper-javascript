@@ -723,13 +723,16 @@ export class ReactNativeAskar implements Askar {
 
   // Reads the items of a string list from the native library and frees it
   private stringListToArray(stringListHandle: string): string[] {
-    const items = []
-    const count = this.handleError(this.askar.stringListCount({ stringListHandle }))
-    for (let index = 0; index < count; index++) {
-      items.push(this.handleError(this.askar.stringListGetItem({ stringListHandle, index })))
+    try {
+      const items = []
+      const count = this.handleError(this.askar.stringListCount({ stringListHandle }))
+      for (let index = 0; index < count; index++) {
+        items.push(this.handleError(this.askar.stringListGetItem({ stringListHandle, index })))
+      }
+      return items
+    } finally {
+      this.handleError(this.askar.stringListFree({ stringListHandle }))
     }
-    this.handleError(this.askar.stringListFree({ stringListHandle }))
-    return items
   }
 
   public async storeOpen(options: StoreOpenOptions): Promise<StoreHandle> {
