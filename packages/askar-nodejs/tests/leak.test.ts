@@ -1,7 +1,7 @@
 import { setFlagsFromString } from 'node:v8'
 import { runInNewContext } from 'node:vm'
 import { Key, KeyAlgorithm, SignatureAlgorithm, type Store } from '@openwallet-foundation/askar-shared'
-import { afterEach, beforeEach, describe, expect, test } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { setupWallet } from '../../askar-shared/tests/utils'
 import { askarNodeJS } from '../src/index.js'
 
@@ -9,7 +9,7 @@ setFlagsFromString('--expose-gc')
 const collectGarbage = runInNewContext('gc') as () => void
 
 const ITERATIONS = 1000
-const ROUNDS = 4
+const ROUNDS = 5
 
 const memoryAfterGarbageCollection = async () => {
   // Finalizers and koffi's deferred frees run on the event loop, after the collection
@@ -22,29 +22,24 @@ const memoryAfterGarbageCollection = async () => {
 }
 
 /**
- * Bytes that each call of `iteration` leaves behind, after a warm-up. A leak grows in every round and the noise of the
- * allocator does not, so the round that grew least counts
+ * Bytes that each call of `iteration` leaves behind, after a warm-up. A leak grows in every round. The median round
+ * ignores a single round where the allocator grows an arena or returns memory to the OS
  */
-const growthPerIteration = async (iteration: (index: number) => Promise<void> | void, iterations = ITERATIONS) => {
+const growthPerIteration = async (iteration: (index: number) => Promise<void>) => {
   let index = 0
   const round = async () => {
-    for (let i = 0; i < iterations; i++) await iteration(index++)
+    for (let i = 0; i < ITERATIONS; i++) await iteration(index++)
     return await memoryAfterGarbageCollection()
   }
 
-  let before = await round()
-  const growth = {
-    rss: Number.POSITIVE_INFINITY,
-    external: Number.POSITIVE_INFINITY,
-    arrayBuffers: Number.POSITIVE_INFINITY,
-  }
-  for (let i = 0; i < ROUNDS; i++) {
-    const after = await round()
-    for (const kind of ['rss', 'external', 'arrayBuffers'] as const) {
-      growth[kind] = Math.min(growth[kind], (after[kind] - before[kind]) / iterations)
-    }
-    before = after
-  }
+  const measurements = [await round()]
+  for (let i = 0; i < ROUNDS; i++) measurements.push(await round())
+  const median = (kind: 'rss' | 'external' | 'arrayBuffers') =>
+    measurements
+      .slice(1)
+      .map((after, i) => (after[kind] - measurements[i][kind]) / ITERATIONS)
+      .sort((a, b) => a - b)[Math.floor(ROUNDS / 2)]
+  const growth = { rss: median('rss'), external: median('external'), arrayBuffers: median('arrayBuffers') }
 
   console.log(
     `${expect.getState().currentTestName}: ${Object.entries(growth)
@@ -112,13 +107,16 @@ describe('native memory', { timeout: 120_000 }, () => {
     expect(growth.arrayBuffers).toBeLessThan(64)
   })
 
-  // A key that is never freed is about 160 bytes, so this grew by about 16 kB per iteration without the safety net
   test('frees keys that are garbage collected without being freed', async () => {
-    // Not through NativeAskar.instance: the tests check that every key created through it is freed
-    const growth = await growthPerIteration(() => {
+    const keyFree = vi.spyOn(askarNodeJS.nativeAskar, 'askar_key_free')
+    try {
+      // Not through NativeAskar.instance: the tests check that every key created through it is freed
       for (let i = 0; i < 100; i++) askarNodeJS.keyGenerate({ algorithm: KeyAlgorithm.EcSecp256r1, ephemeral: false })
-    }, 100)
+      await memoryAfterGarbageCollection()
 
-    expect(growth.rss).toBeLessThan(2048)
+      expect(keyFree).toHaveBeenCalledTimes(100)
+    } finally {
+      keyFree.mockRestore()
+    }
   })
 })
