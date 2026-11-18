@@ -1,5 +1,11 @@
 # @openwallet-foundation/askar-shared
 
+## 0.7.1
+
+### Patch Changes
+
+- a774212: fix(shared): `Session.fetchAllKeys` frees the keys it already read when reading an entry fails
+
 ## 0.7.0
 
 ### Minor Changes
