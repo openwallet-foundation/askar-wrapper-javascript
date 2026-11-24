@@ -1,5 +1,18 @@
 # @openwallet-foundation/askar-react-native
 
+## 0.8.0
+
+### Minor Changes
+
+- 67bea3a: feat: update to Askar 0.6.0-dev.1. This adds ML-DSA support, updates sqlx to 0.9, rejects small-order public keys in crypto box, and supports cancelling pending store requests.
+
+### Patch Changes
+
+- 67bea3a: feat: support ML-DSA-44, ML-DSA-65, and ML-DSA-87 keys and signatures. `Jwk.crv` and `Jwk.x` are now optional.
+- Updated dependencies [67bea3a]
+- Updated dependencies [67bea3a]
+  - @openwallet-foundation/askar-shared@0.8.0
+
 ## 0.7.1
 
 ### Patch Changes
