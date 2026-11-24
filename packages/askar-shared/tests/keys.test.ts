@@ -146,39 +146,39 @@ describe('keys', () => {
     [KeyAlgorithm.MlDsa87, SignatureAlgorithm.MlDsa87, 'ML-DSA-87'],
   ] as const) {
     test(`mldsa ${jwkAlgorithm}`, () => {
-      const key = Key.generate(algorithm)
-      const message = utf8('ML-DSA test message')
-      const signature = key.signMessage({ message, sigType })
-      const alteredSignature = signature.slice()
-      alteredSignature[0] ^= 1
-      const seed = Uint8Array.from({ length: 32 }, (_, index) => index)
-      const publicKey = Key.fromPublicBytes({ algorithm, publicKey: key.publicBytes })
-      const seedKey = Key.fromSecretBytes({ algorithm, secretKey: key.secretBytes })
-      const generatedFromSeed = Key.fromSeed({ algorithm, seed })
-      const repeatedSeedKey = Key.fromSeed({ algorithm, seed })
-      const publicJwk = key.jwkPublic
-      const secretJwk = key.jwkSecret
-      const publicJwkKey = Key.fromJwk({ jwk: publicJwk })
-      const secretJwkKey = Key.fromJwk({ jwk: secretJwk })
-      const generatedFromSeedJwkKey = Key.fromJwk({ jwk: generatedFromSeed.jwkSecret })
-      const createdKeys = [
-        key,
-        publicKey,
-        seedKey,
-        generatedFromSeed,
-        repeatedSeedKey,
-        generatedFromSeedJwkKey,
-        publicJwkKey,
-        secretJwkKey,
-      ]
+      const createdKeys: Key[] = []
 
       try {
+        const key = Key.generate(algorithm)
+        createdKeys.push(key)
+        const message = utf8('ML-DSA test message')
+        const signature = key.signMessage({ message, sigType })
+        const alteredSignature = signature.slice()
+        alteredSignature[0] ^= 1
+        const seed = Uint8Array.from({ length: 32 }, (_, index) => index)
+        const publicKey = Key.fromPublicBytes({ algorithm, publicKey: key.publicBytes })
+        createdKeys.push(publicKey)
+        const secretKey = Key.fromSecretBytes({ algorithm, secretKey: key.secretBytes })
+        createdKeys.push(secretKey)
+        const generatedFromSeed = Key.fromSeed({ algorithm, seed })
+        createdKeys.push(generatedFromSeed)
+        const repeatedSeedKey = Key.fromSeed({ algorithm, seed })
+        createdKeys.push(repeatedSeedKey)
+        const publicJwk = key.jwkPublic
+        const secretJwk = key.jwkSecret
+        const publicJwkKey = Key.fromJwk({ jwk: publicJwk })
+        createdKeys.push(publicJwkKey)
+        const secretJwkKey = Key.fromJwk({ jwk: secretJwk })
+        createdKeys.push(secretJwkKey)
+        const generatedFromSeedJwkKey = Key.fromJwk({ jwk: generatedFromSeed.jwkSecret })
+        createdKeys.push(generatedFromSeedJwkKey)
+
         expect(key.algorithm).toBe(algorithm)
         expect(key.secretBytes.length).toBe(32)
         expect(publicKey.verifySignature({ message, signature, sigType })).toBe(true)
         expect(key.verifySignature({ message: utf8('different message'), signature, sigType })).toBe(false)
         expect(key.verifySignature({ message, signature: alteredSignature, sigType })).toBe(false)
-        expect(seedKey.publicBytes).toEqual(key.publicBytes)
+        expect(secretKey.publicBytes).toEqual(key.publicBytes)
         expect(generatedFromSeed.publicBytes).toEqual(repeatedSeedKey.publicBytes)
         expect(generatedFromSeedJwkKey.publicBytes).toEqual(generatedFromSeed.publicBytes)
         expect(publicJwk).toEqual(expect.objectContaining({ alg: jwkAlgorithm, kty: 'AKP' }))
