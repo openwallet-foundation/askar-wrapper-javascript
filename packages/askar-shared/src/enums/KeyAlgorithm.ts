@@ -16,6 +16,9 @@ export enum KeyAlgorithm {
   EcSecp256k1 = 'k256',
   EcSecp256r1 = 'p256',
   EcSecp384r1 = 'p384',
+  MlDsa44 = 'mldsa44',
+  MlDsa65 = 'mldsa65',
+  MlDsa87 = 'mldsa87',
 }
 
 export const keyAlgorithmFromString = (alg: string): KeyAlgorithm => {
